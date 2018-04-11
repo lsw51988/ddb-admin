@@ -1,0 +1,30 @@
+paths:
+    migrations: %%PHINX_CONFIG_DIR%%/database/migrations
+    seeds: %%PHINX_CONFIG_DIR%%/database/seeds
+
+default: &default
+    adapter: mysql
+    host: localhost
+    name: dowedo-lawyer
+    user: dowedo
+    pass: dowedo654321
+    port: 3306
+    charset: utf8
+
+environments:
+    default_migration_table: phinxlog
+    default_database: development
+    development:
+        <<: *default
+
+    qa:
+        <<: *default
+        host: rm-uf67714t9j8fgp03b.mysql.rds.aliyuncs.com
+        user: xmn
+        pass: Xiaomaoniu123456
+
+    production:
+        <<: *default
+        host: rm-uf6c95w0sllvkd49y.mysql.rds.aliyuncs.com
+        user: xmn
+        pass: Xiaomaoniu123456
