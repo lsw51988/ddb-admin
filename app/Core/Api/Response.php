@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Ddb\Core\Api;
 
 use EllipseSynergie\ApiResponse\AbstractResponse;
