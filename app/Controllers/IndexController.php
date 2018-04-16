@@ -13,15 +13,6 @@ class IndexController extends Controller
 
     }
 
-    /**
-     * @Route("/ddb")
-     */
-    public function ddbAction()
-    {
-
-        echo "ddb-test";
-    }
-
     public function route404Action()
     {
 

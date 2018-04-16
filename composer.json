@@ -13,7 +13,8 @@
   "require": {
     "php": "^7.0.0",
     "league/flysystem": "^1.0.44",
-    "guzzlehttp/guzzle":"^6.3.2"
+    "guzzlehttp/guzzle":"^6.3.2",
+    "robmorgan/phinx":"^0.9.2"
   },
   "require-dev": {
     "phalcon/ide-stubs": "*",
