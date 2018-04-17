@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateUsersTable extends AbstractMigration
 {
@@ -32,7 +33,7 @@ class CreateUsersTable extends AbstractMigration
         $this->table("users")
             ->addColumn("name", "string", ["comment" => "姓名", "limit" => 20, "null" => false])
             ->addColumn("password", "string", ["comment" => "密码", "limit" => 40, "null" => false])
-            ->addColumn("role_id", "integer", ["comment" => "角色id", "limit" => 20, "null" => false])
+            ->addColumn("role_id", "integer", ["comment" => "角色id", "limit" => MysqlAdapter::INT_SMALL, "null" => false])
             ->addColumn("mobile", "string", ["comment" => "手机", "limit" => 11, "null" => false])
             ->addColumn("status", "integer", ["comment" => "状态 0不可用 1可用", "limit" => 2, "default" => 1])
             ->addColumn("email", "string", ["comment" => "邮箱", "limit" => 20, "null" => false])

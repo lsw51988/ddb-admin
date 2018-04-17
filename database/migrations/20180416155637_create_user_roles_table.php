@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateUserRolesTable extends AbstractMigration
 {
@@ -28,6 +29,14 @@ class CreateUserRolesTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("user_roles")
+            ->addColumn("role_id", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false])
+            ->addColumn("access_id", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false])
+            ->addColumn("desc", "string", ["limit" => 20, "comment" => "描述"])
+            ->addColumn("status", "integer", ["limit" => 10, "default" => 1, "comment" => "状态 0禁用 1启用"])
+            ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_SMALL, "null" => false, "comment" => "创建者"])
+            ->addColumn("update_by", "integer", ["limit" => MysqlAdapter::INT_SMALL, "null" => false, "comment" => "更新着"])
+            ->addTimestamps()
+            ->save();
     }
 }

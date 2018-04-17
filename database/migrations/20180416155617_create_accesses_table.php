@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateAccessesTable extends AbstractMigration
 {
@@ -28,6 +29,10 @@ class CreateAccessesTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("accesses")
+            ->addColumn("parent_id", "integer", ["limit" => MysqlAdapter::INT_SMALL, "default" => 0])
+            ->addColumn("access_id", "integer", ["limit" => MysqlAdapter::INT_SMALL, "null" => false, "comment" => "权限id"])
+            ->addColumn("model_id", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "模块id"])
+            ->save();
     }
 }
