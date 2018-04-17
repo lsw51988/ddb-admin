@@ -28,6 +28,9 @@ class CreateProvincesTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("provinces")
+            ->addColumn("code", "string", ["limit" => 20])
+            ->addColumn("name", "string", ["limit" => 20])
+            ->save();
     }
 }

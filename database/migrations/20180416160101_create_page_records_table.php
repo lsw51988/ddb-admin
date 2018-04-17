@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreatePageRecordsTable extends AbstractMigration
 {
@@ -28,6 +29,10 @@ class CreatePageRecordsTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("page_records")
+            ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联members"])
+            ->addColumn("page_code", "integer", ["limit" => MysqlAdapter::INT_TINY,"null" => false,  "comment" => "页面代码"])
+            ->addTimestamps()
+            ->save();
     }
 }

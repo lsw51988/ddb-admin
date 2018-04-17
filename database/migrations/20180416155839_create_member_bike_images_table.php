@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateMemberBikeImagesTable extends AbstractMigration
 {
@@ -28,6 +29,11 @@ class CreateMemberBikeImagesTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("member_bike_images")
+            ->addColumn("member_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联member_bikes"])
+            ->addColumn("path", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "存储路径"])
+            ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "上传人id"])
+            ->addTimestamps()
+            ->save();
     }
 }

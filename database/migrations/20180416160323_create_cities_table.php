@@ -28,6 +28,10 @@ class CreateCitiesTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("cities")
+            ->addColumn("code", "string", ["limit" => 20])
+            ->addColumn("name", "string", ["limit" => 20])
+            ->addColumn("province_code", "string", ["limit" => 20])
+            ->save();
     }
 }

@@ -28,6 +28,13 @@ class CreateDistrictsTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("provinces")
+            ->addColumn("district_code", "string", ["limit" => 20])
+            ->addColumn("district_name", "string", ["limit" => 20])
+            ->addColumn("city_code", "string", ["limit" => 20])
+            ->addColumn("city_name", "string", ["limit" => 20])
+            ->addColumn("province_code", "string", ["limit" => 20])
+            ->addColumn("province_name", "string", ["limit" => 20])
+            ->save();
     }
 }

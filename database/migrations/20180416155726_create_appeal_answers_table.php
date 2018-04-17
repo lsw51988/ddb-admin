@@ -30,15 +30,13 @@ class CreateAppealAnswersTable extends AbstractMigration
     public function change()
     {
         $this->table("appeal_answers")
-            ->addColumn("appeal_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR,  "comment" => "对应appeals表","null" => false])
-            ->addColumn("awr_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "comment" => "对应member","null" => false])
-            ->addColumn("type", "integer", ["limit" => MysqlAdapter::INT_TINY,"default"=>1, "comment" => "1来自用户查看附近维修点 2.用户主动请求拖车帮助"])
-            ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY,"default"=>1, "comment" => "1开始帮助 2帮助完成 3取消帮助"])
-            ->addColumn("cancel_reason", "string", ["limit" => MysqlAdapter::INT_TINY,"default"=>1, "comment" => "取消原因","null"=>true])
-            ->addColumn("cancel_time", "timestamp", ["comment" => "取消时间","null"=>true])
-            ->addColumn("create_time", "timestamp", ["comment" => "创建时间","default"=>])
-            ->addColumn("second_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "发布二手车时用到,对应second_bikes"])
-            ->addColumn("appeal_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "求助拖车时用到 对应appeals"])
+            ->addColumn("appeal_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "comment" => "对应appeals表", "null" => false])
+            ->addColumn("awr_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "comment" => "对应member", "null" => false])
+            ->addColumn("type", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "1来自用户查看附近维修点 2.用户主动请求拖车帮助"])
+            ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "1开始帮助 2帮助完成 3取消帮助"])
+            ->addColumn("cancel_reason", "string", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "取消原因", "null" => true])
+            ->addColumn("cancel_time", "timestamp", ["comment" => "取消时间", "null" => true])
+            ->addColumn("finish_time", "timestamp", ["comment" => "完成时间", "null" => true])
             ->addTimestamps()
             ->save();
     }

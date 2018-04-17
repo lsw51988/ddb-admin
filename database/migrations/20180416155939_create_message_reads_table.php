@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateMessageReadsTable extends AbstractMigration
 {
@@ -28,6 +29,10 @@ class CreateMessageReadsTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("message_reads")
+            ->addColumn("message_id", "integer", ["limit" => MysqlAdapter::INT_MEDIUM, "null" => false, "comment" => "关联messages"])
+            ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联member"])
+            ->addTimestamps()
+            ->save();
     }
 }

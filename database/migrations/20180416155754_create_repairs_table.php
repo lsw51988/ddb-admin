@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateRepairsTable extends AbstractMigration
 {
@@ -28,6 +29,19 @@ class CreateRepairsTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("repairs")
+            ->addColumn("name", "string", ["limit" => 20, "null" => false, "comment" => "名称"])
+            ->addColumn("longitude", "string", ["limit" => 10, "null" => false, "comment" => "经度"])
+            ->addColumn("latitude", "string", ["limit" => 10, "null" => false, "comment" => "纬度"])
+            ->addColumn("mobile", "string", ["limit" => 11, "null" => false, "comment" => "手机号码"])
+            ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "创建人id"])
+            ->addColumn("create_by_type", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "创建人类型 1member 2user"])
+            ->addColumn("belonger_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "归属者"])
+            ->addColumn("auditor_id", "integer", ["limit" => MysqlAdapter::INT_SMALL, "null" => true, "comment" => "后台审核者 对应user"])
+            ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "状态 1被创建 2后台审核通过 3后台审核拒绝"])
+            ->addColumn("path", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "修理店图片存储路径"])
+            ->addColumn("refuse_reason", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => true, "comment" => "审核不通过原因"])
+            ->addTimestamps()
+            ->save();
     }
 }

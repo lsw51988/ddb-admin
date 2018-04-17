@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateMemberInsTable extends AbstractMigration
 {
@@ -28,6 +29,9 @@ class CreateMemberInsTable extends AbstractMigration
      */
     public function change()
     {
-
+        $this->table("member_ins")
+            ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联members"])
+            ->addTimestamps()
+            ->save();
     }
 }
