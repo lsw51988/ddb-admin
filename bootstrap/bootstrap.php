@@ -9,7 +9,7 @@ $di->setShared(
     "cache",
     function(){
         $frontCache = new Phalcon\Cache\Frontend\Data(
-            //缓存时间一般为2周
+        //缓存时间一般为2周
             [
                 'lifetime' => '1209600'
             ]
@@ -26,6 +26,7 @@ $di->setShared(
         return $cache;
     }
 );
+
 $di->setShared(
     "config",
     function () {
@@ -251,6 +252,16 @@ $di->setShared(
     }
 );
 
+$di->set('db', function (){
+
+    return new Phalcon\Db\Adapter\Pdo\Mysql(array(
+        "host"     => di("config")->database->host,
+        "username" => di("config")->database->username,
+        "password" => di("config")->database->password,
+        "dbname"   => di("config")->database->dbname
+    ));
+});
+
 function InitDatabase()
 {
     // We only use mysql database here.
@@ -272,7 +283,7 @@ function InitDatabase()
         di()->set(
             $connectionName,
             function () use ($connectionName, $connectionConfig) {
-                $db = new \Phalcon\Db\Adapter\Pdo\Mysql($connectionConfig->toArray());
+                $db = new \Phalcon\Db\Adapter\Pdo\Mysql(di("config")->database);
 
                 // 新创建单独的事件管理器, 注册监听器，用来调试sql
                 // TODO: 这里是用单独的事件管理器还是全局的呢?

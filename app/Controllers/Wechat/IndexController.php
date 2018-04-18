@@ -8,13 +8,13 @@
 
 namespace Ddb\Controllers\Wechat;
 
-
 class IndexController
 {
     /**
      * @Get("/wechat/index")
      */
-    public function indexAction(){
-        echo "wechat-index";
+    public function indexAction()
+    {
+
     }
 }
