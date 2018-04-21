@@ -41,3 +41,41 @@ if (!function_exists("app_log")) {
         return new \Phalcon\Logger\Adapter\File($path . DIRECTORY_SEPARATOR . $loggerName . '.log');
     }
 }
+if (!function_exists("curl_request")) {
+    function curl_request($url, $method = "GET", $param = [])
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //如果把这行注释掉的话，就会直接输出
+        if ($method == "POST") {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $param);
+        }
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
+    }
+}
+if (!function_exists('service')) {
+    /**
+     * 利用DI容器注册和管理用户自定义的服务
+     * @param $serviceName
+     * @param null $parameters
+     * @return callable
+     */
+    function service($serviceName, $parameters = null)
+    {
+        $serviceName = \Phalcon\Text::lower($serviceName);
+        if (strpos($serviceName, "/") === false) {
+            return false;
+        }
+
+        if (!di()->has($serviceName)) {
+            list($module, $service) = explode("/", $serviceName, 2);
+            $class = "Ddb\\Service\\" . ucfirst($module) . "\\" . ucfirst($service);
+            di()->setShared($serviceName, $class);
+        }
+        return di($serviceName, $parameters);
+    }
+}

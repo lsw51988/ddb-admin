@@ -253,12 +253,12 @@ $di->setShared(
 );
 
 $di->set('db', function (){
-
     return new Phalcon\Db\Adapter\Pdo\Mysql(array(
         "host"     => di("config")->database->host,
         "username" => di("config")->database->username,
         "password" => di("config")->database->password,
-        "dbname"   => di("config")->database->dbname
+        "dbname"   => di("config")->database->dbname,
+        "charset"   => di("config")->database->charset
     ));
 });
 

@@ -22,6 +22,7 @@ members
     auth_time 认证时间 null
     token_time token有效时间 null
     scene_code 场景值 null 微信小程序进入的场景值
+    open_id 用户openid 识别用户 not null
     timestamp
 
 2.后台用户表

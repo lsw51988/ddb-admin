@@ -38,12 +38,14 @@ class CreateMembersTable extends AbstractMigration
             ->addColumn("language", "string", ["comment" => "语言", "limit" => 10, "null" => false])
             ->addColumn("gender", "integer", ["comment" => "性别", "limit" => 2, "null" => false])
             ->addColumn("nickName", "string", ["comment" => "微信昵称", "limit" => 20, "null" => false])
-            ->addColumn("mobile", "string", ["comment" => "电话", "limit" => 11, "null" => false])
-            ->addColumn("points", "string", ["comment" => "可用积分", "limit" => 4, "null" => false])
+            ->addColumn("mobile", "string", ["comment" => "电话", "limit" => 11, "null" => true])
+            ->addColumn("points", "string", ["comment" => "可用积分", "limit" => 4, "default" => 0])
             ->addColumn("type", "integer", ["comment" => "类型 1骑行者 2修理者", "limit" => 4, "default" => 1])
             ->addColumn("auth_time", "timestamp", ["comment" => "认证时间", "null" => true])
+            ->addColumn("token", "string", ["comment" => "token", "null" => true, "limit" => 50])
             ->addColumn("token_time", "timestamp", ["comment" => "token有效时间", "null" => true])
             ->addColumn("scene_code", "string", ["comment" => "场景值", "limit" => 6, "null" => true])
+            ->addColumn("open_id", "string", ["comment" => "openid", "limit" => 50, "null" => true])
             ->addTimestamps()
             ->save();
     }

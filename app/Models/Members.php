@@ -2,10 +2,6 @@
 
 namespace Ddb\Models;
 
-/**
- * Class Members
- * @package Ddb\Models
- */
 class Members extends \Phalcon\Mvc\Model
 {
 
@@ -77,7 +73,7 @@ class Members extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
-     * @Column(type="string", length=11, nullable=false)
+     * @Column(type="string", length=11, nullable=true)
      */
     protected $mobile;
 
@@ -105,6 +101,13 @@ class Members extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(type="string", length=50, nullable=true)
+     */
+    protected $token;
+
+    /**
+     *
+     * @var string
      * @Column(type="string", nullable=true)
      */
     protected $token_time;
@@ -115,6 +118,13 @@ class Members extends \Phalcon\Mvc\Model
      * @Column(type="string", length=6, nullable=true)
      */
     protected $scene_code;
+
+    /**
+     *
+     * @var string
+     * @Column(type="string", length=50, nullable=true)
+     */
+    protected $open_id;
 
     /**
      *
@@ -300,6 +310,19 @@ class Members extends \Phalcon\Mvc\Model
     }
 
     /**
+     * Method to set the value of field token
+     *
+     * @param string $token
+     * @return $this
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    /**
      * Method to set the value of field token_time
      *
      * @param string $token_time
@@ -321,6 +344,19 @@ class Members extends \Phalcon\Mvc\Model
     public function setSceneCode($scene_code)
     {
         $this->scene_code = $scene_code;
+
+        return $this;
+    }
+
+    /**
+     * Method to set the value of field open_id
+     *
+     * @param string $open_id
+     * @return $this
+     */
+    public function setOpenId($open_id)
+    {
+        $this->open_id = $open_id;
 
         return $this;
     }
@@ -482,6 +518,16 @@ class Members extends \Phalcon\Mvc\Model
     }
 
     /**
+     * Returns the value of field token
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
      * Returns the value of field token_time
      *
      * @return string
@@ -499,6 +545,16 @@ class Members extends \Phalcon\Mvc\Model
     public function getSceneCode()
     {
         return $this->scene_code;
+    }
+
+    /**
+     * Returns the value of field open_id
+     *
+     * @return string
+     */
+    public function getOpenId()
+    {
+        return $this->open_id;
     }
 
     /**

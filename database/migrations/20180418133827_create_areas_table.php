@@ -3,7 +3,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class CreateDistrictsTable extends AbstractMigration
+class CreateAreasTable extends AbstractMigration
 {
     /**
      * Change Method.
@@ -28,10 +28,13 @@ class CreateDistrictsTable extends AbstractMigration
      */
     public function change()
     {
-        $this->table("districts")
-            ->addColumn("code", "string", ["limit" => 20])
-            ->addColumn("name", "string", ["limit" => 20])
+        $this->table("areas")
+            ->addColumn("district_code", "string", ["limit" => 20])
+            ->addColumn("district_name", "string", ["limit" => 20])
             ->addColumn("city_code", "string", ["limit" => 20])
+            ->addColumn("city_name", "string", ["limit" => 20])
+            ->addColumn("province_code", "string", ["limit" => 20])
+            ->addColumn("province_name", "string", ["limit" => 20])
             ->save();
     }
 }
