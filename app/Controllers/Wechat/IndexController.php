@@ -9,14 +9,20 @@
 namespace Ddb\Controllers\Wechat;
 
 use Ddb\Core\BaseController;
+use Ddb\Helper\Captcha;
 use Ddb\Models\Areas;
 use Ddb\Models\Members;
 
+/**
+ * Class IndexController
+ * @package Ddb\Controllers\Wechat
+ * @RoutePrefix("/wechat")
+ */
 
 class IndexController extends BaseController
 {
     /**
-     * @Post("/wechat/index")
+     * @Post("/index")
      * 用户首次进入逻辑
      * 1.没有该用户，注册
      * 2.返回该用户信息
@@ -73,13 +79,25 @@ class IndexController extends BaseController
     }
 
     /**
-     * @Get("/wechat/qr_code")
+     * @Get("/qr_code")
      * 获取公众号二维码
      */
     public function qr_codeAction(){
         ob_clean();
         header("Content-type:image/jpeg");
         echo file_get_contents(APP_PATH.'/../public/img/qr_code.jpg',true);
+    }
+
+    /**
+     * @Get("/capture")
+     * 获取验证码
+     */
+    public function captureAction(){
+        $token = $this->data->token;
+        $key = $token . 'captcha';
+        $_vc = new Captcha();
+        $_vc->doimg();
+        di("cache")->save($key,$_vc->getCode(),300);
     }
 
 }
