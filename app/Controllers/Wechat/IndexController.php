@@ -89,15 +89,33 @@ class IndexController extends BaseController
     }
 
     /**
-     * @Get("/capture")
+     * @Get("/captcha")
      * 获取验证码
      */
-    public function captureAction(){
-        $token = $this->data->token;
+    public function captchaAction(){
+        $data = $this->data;
+        $token = $data['token'];
         $key = $token . 'captcha';
         $_vc = new Captcha();
         $_vc->doimg();
         di("cache")->save($key,$_vc->getCode(),300);
     }
+
+    /**
+     * 验证图形验证码
+     * @Get("/verifyCaptcha")
+     */
+    public function verifyCaptchaAction()
+    {
+        $data = $this->data;
+        $captcha = $data['captcha'];
+        $token = $this->request->getHeader("token");
+        $key = $token . 'captcha';
+        if ($captcha == di("cache")->get($key)) {
+            return $this->success();
+        }
+        return $this->error();
+    }
+
 
 }
