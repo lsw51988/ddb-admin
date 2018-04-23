@@ -117,5 +117,13 @@ class IndexController extends BaseController
         return $this->error();
     }
 
+    /**
+     * @Get("homePage")
+     * 用户主页
+     */
+    public function homePageAction(){
+
+    }
+
 
 }

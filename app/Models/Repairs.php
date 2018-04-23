@@ -44,6 +44,13 @@ class Repairs extends \Phalcon\Mvc\Model
 
     /**
      *
+     * @var string
+     * @Column(type="string", length=60, nullable=true)
+     */
+    protected $remark;
+
+    /**
+     *
      * @var integer
      * @Column(type="integer", length=11, nullable=false)
      */
@@ -166,6 +173,19 @@ class Repairs extends \Phalcon\Mvc\Model
     public function setMobile($mobile)
     {
         $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * Method to set the value of field remark
+     *
+     * @param string $remark
+     * @return $this
+     */
+    public function setRemark($remark)
+    {
+        $this->remark = $remark;
 
         return $this;
     }
@@ -335,6 +355,16 @@ class Repairs extends \Phalcon\Mvc\Model
     public function getMobile()
     {
         return $this->mobile;
+    }
+
+    /**
+     * Returns the value of field remark
+     *
+     * @return string
+     */
+    public function getRemark()
+    {
+        return $this->remark;
     }
 
     /**
