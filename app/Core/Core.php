@@ -48,6 +48,7 @@ if (!function_exists("curl_request")) {
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //如果把这行注释掉的话，就会直接输出
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);  //终止从服务端验证
         if ($method == "POST") {
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $param);
