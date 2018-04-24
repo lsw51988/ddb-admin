@@ -55,14 +55,14 @@ class IndexController extends BaseController
                 return $this->error("用户数据保存错误");
             }
 
-            di("cache")->save($data['token'], serialize($member), 30 * 24 * 3600);
+            di("cache")->save($data['token'], serialize($member), 24 * 3600);
         } else {
             if (!di("cache")->get($member->getToken())) {
                 $token = md5($data['nickName'] . time() . rand(0, 9999));
                 $member->setToken($token)
                     ->setTokenTime(date("Y-m-d H:i:s", strtotime("+1 month")))
                     ->save();
-                di("cache")->save($token, serialize($member), 30 * 24 * 60);
+                di("cache")->save($token, serialize($member), 24 * 60);
             }
         }
         if($location->status==0){
@@ -116,14 +116,5 @@ class IndexController extends BaseController
         }
         return $this->error();
     }
-
-    /**
-     * @Get("homePage")
-     * 用户主页
-     */
-    public function homePageAction(){
-
-    }
-
 
 }

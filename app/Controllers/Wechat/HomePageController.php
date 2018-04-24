@@ -10,19 +10,46 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Modules\Member;
 
 /**
  * Class HomePageController
  * @package Ddb\Controllers\Wechat
- * @RoutePrefix("/homePage")
+ * @RoutePrefix("/wechat/homePage")
  */
 class HomePageController extends WechatAuthController
 {
+
+    /**
+     * @Get("/index")
+     * 用户主页
+     *
+     * times骑行者代表求助次数 修理者代表应助次数
+     * 暂时无返回交易次数
+     */
+    public function indeAction()
+    {
+        $member = $this->currentMember;
+        $data = [];
+        $point = service("member/query")->getTotalPoints($member);
+        $data['level'] = service("member/query")->getLevel($point);
+        $data['times'] = 0;
+        if ($member->getType() == Member::TYPE_RIDE) {
+            $data['times'] = service("appeal/query")->getAskCount($member);
+        }
+        if ($member->getType() == Member::TYPE_FIX) {
+            $data['times'] = service("appeal/query")->getAnswerCount($member);
+        }
+        return $this->success($data);
+
+    }
+
     /**
      * @Get("/memberData")
      * 用户资料
      */
-    public function memberDataAction(){
+    public function memberDataAction()
+    {
 
     }
 
@@ -30,7 +57,8 @@ class HomePageController extends WechatAuthController
      * @Get("/shop")
      * 商城
      */
-    public function shopAction(){
+    public function shopAction()
+    {
 
     }
 
@@ -38,7 +66,8 @@ class HomePageController extends WechatAuthController
      * @Get("/recommend")
      * 推荐有奖
      */
-    public function recommendAction(){
+    public function recommendAction()
+    {
 
     }
 
@@ -46,7 +75,8 @@ class HomePageController extends WechatAuthController
      * @Get("/shb")
      * 二手车
      */
-    public function shbAction(){
+    public function shbAction()
+    {
 
     }
 
@@ -54,7 +84,8 @@ class HomePageController extends WechatAuthController
      * @Get("/notice")
      * 用户须知
      */
-    public function noticeAction(){
+    public function noticeAction()
+    {
 
     }
 
@@ -62,7 +93,8 @@ class HomePageController extends WechatAuthController
      * @Get("/about")
      * 用户须知
      */
-    public function aboutAction(){
+    public function aboutAction()
+    {
 
     }
 
@@ -70,7 +102,8 @@ class HomePageController extends WechatAuthController
      * @Get("/insurance")
      * 保险
      */
-    public function insuranceAction(){
+    public function insuranceAction()
+    {
 
     }
 
@@ -78,7 +111,8 @@ class HomePageController extends WechatAuthController
      * @Get("/record")
      * 我的记录
      */
-    public function recordAction(){
+    public function recordAction()
+    {
 
     }
 
