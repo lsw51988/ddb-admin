@@ -14,18 +14,30 @@ $di->setShared(
                 'lifetime' => '1209600'
             ]
         );
-        $cache = new \Phalcon\Cache\Backend\Redis(
-            $frontCache,
-            [
-                'host' => "localhost",
-                'port' => 6379,
-                "persistent" => false,
-                'lifetime' => '2000'
-            ]
-        );
+        if(PHP_SAPI=="cli" || APP_ENV=="local"){
+            //本地或cli环境下用本地文件存储
+            $cache = new Phalcon\Cache\Backend\File(
+                $frontCache,
+                [
+                    "cacheDir" => "../app/Cache/",
+                ]
+            );
+        }else{
+            //redis缓存
+            $cache = new \Phalcon\Cache\Backend\Redis(
+                $frontCache,
+                [
+                    'host' => "localhost",
+                    'port' => 6379,
+                    "persistent" => false,
+                    'lifetime' => '2000'
+                ]
+            );
+        }
         return $cache;
     }
 );
+
 
 $di->setShared(
     "config",
@@ -33,17 +45,17 @@ $di->setShared(
         $configDir = APP_PATH . '/Config';
         $configFiles = glob($configDir . '/*.php');
         $config = [];
-        if (is_null(di("cache")->get("config"))) {
+        if (di("cache")->get("config")==null) {
             foreach ($configFiles as $configFile) {
                 $name = substr(basename($configFile), 0, -4);
                 $configData = require $configFile;
-                $config[strtolower($name)] = $configData[APP_ENV];
+                $config[strtolower($name)] = $configData["local"];
             }
-            // 所有环境都是用redis缓存
-            di("cache")->save("config", $config);
+            di("cache")->save("config", serialize($config));
         } else {
-            $config = di("cache")->get("config");
+            $config = unserialize(di("cache")->get("config"));
         }
+        var_dump(di("cache")->get("config"));
         return new \Phalcon\Config($config);
     }
 );

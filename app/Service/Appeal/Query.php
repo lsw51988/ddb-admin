@@ -32,6 +32,7 @@ class Query extends BaseService
     }
 
     /**
+     * @method getAnswerCount
      * @param Members $member
      * @return integer
      * 获取应助记录次数
