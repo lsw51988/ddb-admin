@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\MemberBikes;
 use Ddb\Modules\Member;
+use Ddb\Modules\MemberLog;
 
 /**
  * Class HomePageController
@@ -122,6 +123,19 @@ class HomePageController extends WechatAuthController
      */
     public function recordAction()
     {
+        $memberId = $this->currentMember->getId();
+        $columns = ["content", "created_at"];
+        $page = $this->page;
+        $conditions = "member_id = :member_id: AND type=:type:";
+        $bind = [
+            "member_id" => $memberId,
+            "type" => MemberLog::TYPE_VISIBLE,
+        ];
+        $order = "created_at DESC";
+
+        $data = MemberLog::page($conditions, $columns, $bind, $order, $page);
+
+        return $this->success($data);
 
     }
 

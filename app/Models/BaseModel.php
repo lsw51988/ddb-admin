@@ -12,7 +12,7 @@ use \Phalcon\Mvc\Model;
 
 class BaseModel extends Model
 {
-    //单利模式
+    //单例模式
     private static $instance = null;
 
     public static function getInstance()
@@ -34,9 +34,33 @@ class BaseModel extends Model
                 "id" => $id
             ]
         ]);
-        if($data!=null){
+        if ($data != null) {
             $data = $data->toArray();
         }
         return $data;
+    }
+
+    //单表分页
+    public static function page($conditions = "", $columns, $bind = [], $order = "", $page = 1, $limit = 20)
+    {
+        $rows = self::find([
+            "columns" => $columns,
+            "conditions" => $conditions,
+            "bind" => $bind,
+            "order" => $order,
+            "limit" => $limit,
+            "offset" => ($page - 1) * $limit
+        ]);
+        $total = self::count([
+            "conditions" => $conditions,
+            "bind" => $bind
+        ]);
+        return [
+            'rows' => !empty($rows) ? $rows : [],
+            'total' => $total,
+            'max_page' => (int)ceil($total / 20),
+            'current_page' => $page,
+            'limit' => $limit
+        ];
     }
 }
