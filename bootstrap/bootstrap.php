@@ -55,7 +55,6 @@ $di->setShared(
         } else {
             $config = unserialize(di("cache")->get("config"));
         }
-        var_dump(di("cache")->get("config"));
         return new \Phalcon\Config($config);
     }
 );

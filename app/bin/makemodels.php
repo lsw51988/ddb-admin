@@ -7,10 +7,10 @@ $option = [
     'modelsDir' => '../app/Models',
     'force' => true,
     'namespace' => 'Ddb\Models',
-    'extends' => '\Phalcon\Mvc\Model',
+    'extends' => 'BaseModel',
     'genDocMethods' => true,
     'genSettersGetters' => true,
-    'abstract' => true
+    'abstract' => false
 ];
 
 if ($argc < 2) {

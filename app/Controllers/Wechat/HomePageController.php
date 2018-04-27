@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\MemberBikes;
 use Ddb\Modules\Member;
 
 /**
@@ -41,7 +42,6 @@ class HomePageController extends WechatAuthController
             $data['times'] = service("appeal/query")->getAnswerCount($member);
         }
         return $this->success($data);
-
     }
 
     /**
@@ -50,7 +50,16 @@ class HomePageController extends WechatAuthController
      */
     public function memberDataAction()
     {
-
+        $memberBikeData = [];
+        $memberId = $this->currentMember->getId();
+        $memberKeys = ['id', 'real_name', 'mobile'];
+        $memberData = Member::getColumnValues($memberId, $memberKeys);
+        if ($memberBike = MemberBikes::findFirstByMemberId($memberId)) {
+            $bikeKeys = ['buy_date', 'voltage', 'brand_name', 'price', 'status', 'last_change_time'];
+            $memberBikeData = MemberBikes::getColumnValues($memberBike->getId(), $bikeKeys);
+        }
+        $data = array_merge($memberData, $memberBikeData);
+        return $this->success($data);
     }
 
     /**
