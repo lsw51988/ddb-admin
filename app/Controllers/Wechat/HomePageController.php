@@ -100,7 +100,7 @@ class HomePageController extends WechatAuthController
 
     /**
      * @Get("/about")
-     * 用户须知
+     * 关于
      */
     public function aboutAction()
     {
