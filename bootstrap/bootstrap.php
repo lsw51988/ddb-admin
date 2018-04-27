@@ -229,7 +229,7 @@ $di->setShared(
     'filesystem',
     function () {
         if (APP_ENV == 'local') {
-            return new \League\Flysystem\Adapter\Local(di('config')->filesystem->development->root);
+            return new \League\Flysystem\Adapter\Local(di('config')->filesystem->root);
         }
     }
 );
