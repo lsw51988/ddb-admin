@@ -5,6 +5,8 @@ namespace Ddb\Controllers;
 use Ddb\Core\BaseController;
 use Ddb\Models\MemberLogs;
 use Ddb\Modules\MemberLog;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class IndexController extends BaseController
 {
@@ -13,7 +15,7 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-        echo "欢饮来到我的帝国";
+        print_r(di('config')->get("queue")->toArray());
     }
 
     public function route404Action()
@@ -21,20 +23,4 @@ class IndexController extends BaseController
 
     }
 
-    /**
-     * @Get("/test")
-     */
-    public function testAction()
-    {
-        $columns = ["content", "created_at"];
-        $conditions = "member_id = :member_id:";
-        $bind = [
-            "member_id" => MemberLog::TYPE_VISIBLE
-        ];
-        $order = "created_at DESC";
-
-        $data = MemberLogs::page($conditions, $columns, $bind, $order);
-
-        return $this->success($data);
-    }
 }

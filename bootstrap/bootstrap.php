@@ -19,7 +19,7 @@ $di->setShared(
             $cache = new Phalcon\Cache\Backend\File(
                 $frontCache,
                 [
-                    "cacheDir" => "../app/Cache/",
+                    "cacheDir" => "../storage/cache/",
                 ]
             );
         }else{
@@ -261,6 +261,14 @@ $di->setShared(
         // require phalcon > 2.0.7
         return new \Phalcon\Security\Random();
     }
+);
+$di->setShared(
+    'queue',
+    function (){
+        $config = di("config")->get("queue");
+        return new \Phalcon\Queue\Beanstalk(di('config')->get('queue'));
+    }
+
 );
 
 $di->set('db', function (){
