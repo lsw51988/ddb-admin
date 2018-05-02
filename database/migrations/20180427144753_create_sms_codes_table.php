@@ -31,7 +31,7 @@ class CreateSmsCodesTable extends AbstractMigration
         $this->table("sms_codes")
             ->addColumn("mobile", "string", ["limit" => 11])
             ->addColumn("code", "string", ["limit" => 10])
-            ->addColumn("template", "string", ["limit" => 10, "comment" => "模板"])
+            ->addColumn("template", "string", ["limit" => 30, "comment" => "模板"])
             ->addColumn("status", "integer", ["limit" => 10, "comment" => "状态 1发送中 2发送成功 3发送失败", "default" => 0])
             ->addColumn("memo", "string", ["limit" => 30, "comment" => "回调", "null" => true])
             ->addTimestamps()

@@ -2,12 +2,13 @@
 
 namespace Ddb\Core;
 
+use Ddb\Models\Accesses;;
 
 /**
  * Class Job
  * @package Ddb\Core
  */
-abstract class Job
+abstract class Job extends \Phalcon\Queue\Beanstalk\Job
 {
     /**
      *
@@ -22,6 +23,12 @@ abstract class Job
      */
     public function beforeRun(&$log)
     {
+        $data['id']=1;
+        $data['parent_id']=1;
+        $data['access_id']=1;
+        $data['model_id']=1;
+        $access = new Accesses();
+        $access->save($data);
         $log[] = get_class($this) . "::beforeRun() called";
     }
 

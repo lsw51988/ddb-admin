@@ -3,10 +3,6 @@
 namespace Ddb\Controllers;
 
 use Ddb\Core\BaseController;
-use Ddb\Models\MemberLogs;
-use Ddb\Modules\MemberLog;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 
 class IndexController extends BaseController
 {
@@ -15,7 +11,11 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-        print_r(di('config')->get("queue")->toArray());
+       /* phpinfo();
+        exit();*/
+        //service("sms/manager")->send(1);
+        $a = service("queue/manager")->queue("Testa",['cmd' => 'approve', 'aa' => "aaa","bbb"=>"ccc"]);
+        print_r($a);
     }
 
     public function route404Action()

@@ -265,11 +265,12 @@ $di->setShared(
 $di->setShared(
     'queue',
     function (){
-        $config = di("config")->get("queue");
-        return new \Phalcon\Queue\Beanstalk(di('config')->get('queue'));
+        $config = di("config")->get("queue")->toArray();
+        return new \Phalcon\Queue\Beanstalk($config);
     }
 
 );
+
 
 $di->set('db', function (){
     return new Phalcon\Db\Adapter\Pdo\Mysql(array(
