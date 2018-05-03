@@ -2,27 +2,27 @@
 define("APP_PATH", "../app");
 define("APP_ENV", getenv("APP_ENV"));
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $di = new Phalcon\Di\FactoryDefault();
 $di->setShared(
     "cache",
-    function(){
+    function () {
         $frontCache = new Phalcon\Cache\Frontend\Data(
         //缓存时间一般为2周
             [
                 'lifetime' => '1209600'
             ]
         );
-        if(PHP_SAPI=="cli" || APP_ENV=="local"){
+        if (PHP_SAPI == "cli" || APP_ENV == "local") {
             //本地或cli环境下用本地文件存储
             $cache = new Phalcon\Cache\Backend\File(
                 $frontCache,
                 [
-                    "cacheDir" => "../storage/cache/",
+                    "cacheDir" => __DIR__ . "/../storage/cache/",
                 ]
             );
-        }else{
+        } else {
             //redis缓存
             $cache = new \Phalcon\Cache\Backend\Redis(
                 $frontCache,
@@ -42,18 +42,23 @@ $di->setShared(
 $di->setShared(
     "config",
     function () {
-        $configDir = APP_PATH . '/Config';
-        $configFiles = glob($configDir . '/*.php');
-        $config = [];
-        if (di("cache")->get("config")==null) {
-            foreach ($configFiles as $configFile) {
-                $name = substr(basename($configFile), 0, -4);
-                $configData = require $configFile;
-                $config[strtolower($name)] = $configData["local"];
-            }
-            di("cache")->save("config", serialize($config));
-        } else {
+        if (PHP_SAPI == "cli" || APP_ENV == "local") {
             $config = unserialize(di("cache")->get("config"));
+
+        } else {
+            $configDir = APP_PATH . "/Config";
+            $configFiles = glob($configDir . '/*.php');
+            $config = [];
+            if (di("cache")->get("config") == null) {
+                foreach ($configFiles as $configFile) {
+                    $name = substr(basename($configFile), 0, -4);
+                    $configData = require $configFile;
+                    $config[strtolower($name)] = $configData["local"];
+                }
+                di("cache")->save("config", serialize($config));
+            } else {
+                $config = unserialize(di("cache")->get("config"));
+            }
         }
         return new \Phalcon\Config($config);
     }
@@ -206,10 +211,10 @@ $di->setShared(
         }
 
         //if (APP_ENV == 'production') {
-         $session = new \Phalcon\Session\Adapter\Redis(di('config')->session->options->toArray());
-/*        } else {
-        $session = new \Phalcon\Session\Adapter\Files();
-        }*/
+        $session = new \Phalcon\Session\Adapter\Redis(di('config')->session->options->toArray());
+        /*        } else {
+                $session = new \Phalcon\Session\Adapter\Files();
+                }*/
 
         if (!empty(di('config')->session->session_name)) {
             $session->setName(di('config')->session->session_name);
@@ -264,21 +269,20 @@ $di->setShared(
 );
 $di->setShared(
     'queue',
-    function (){
-        $config = di("config")->get("queue")->toArray();
-        return new \Phalcon\Queue\Beanstalk($config);
+    function () {
+        $config = di("config")->get("queue");
+        return new \Pheanstalk\Pheanstalk($config->host, $config->port);
     }
-
 );
 
 
-$di->set('db', function (){
+$di->set('db', function () {
     return new Phalcon\Db\Adapter\Pdo\Mysql(array(
-        "host"     => di("config")->database->host,
+        "host" => di("config")->database->host,
         "username" => di("config")->database->username,
         "password" => di("config")->database->password,
-        "dbname"   => di("config")->database->dbname,
-        "charset"   => di("config")->database->charset
+        "dbname" => di("config")->database->dbname,
+        "charset" => di("config")->database->charset
     ));
 });
 
@@ -390,5 +394,5 @@ function InitRouters($appPath, $prefix)
 }
 
 // Initialize and bootstrap application
-InitRouters( "../app/Controllers/", "Ddb\\Controllers\\");
+InitRouters("../app/Controllers/", "Ddb\\Controllers\\");
 //InitDatabase();
