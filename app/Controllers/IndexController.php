@@ -3,6 +3,7 @@
 namespace Ddb\Controllers;
 
 use Ddb\Core\BaseController;
+use Ddb\Modules\SmsCode;
 
 class IndexController extends BaseController
 {
@@ -11,7 +12,8 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-
+        /*$smsCode = SmsCode::findFirst();
+        service("sms/manager")->send($smsCode);*/
     }
 
     public function route404Action()

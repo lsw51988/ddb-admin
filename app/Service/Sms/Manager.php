@@ -62,9 +62,13 @@ class Manager extends Service
     }
 
 
-    public function send(SmsCode $smsCode)
+    public function send(SmsCode $smsCode, $token)
     {
-        if($smsCode->getStatus == SmsCode::STATUS_SUCCESS){
+        //需要从缓存中进行判断是否具有发送短信资格,防止暴力调用接口
+        if (!di("cache")->get($token . "_tcgmc")) {
+            return false;
+        }
+        if ($smsCode->getStatus() == SmsCode::STATUS_SUCCESS) {
             return true;
         }
         // 初始化SendSmsRequest实例用于设置发送短信的参数
@@ -95,8 +99,16 @@ class Manager extends Service
 
         // 发起访问请求
         $acsResponse = static::getAcsClient()->getAcsResponse($request);
+        if ($acsResponse->Message == "OK") {
+            $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save();
+        } else {
+            $smsCode->setStatus(SmsCode::STATUS_FAIL)->save();
+        }
+
 
         return $acsResponse;
 
     }
+
+
 }

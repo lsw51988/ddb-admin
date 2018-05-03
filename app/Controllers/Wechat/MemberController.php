@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Modules\SmsCode;
 
 /**
  * Class MemberController
@@ -22,23 +23,43 @@ class MemberController extends WechatAuthController
      * @Post("/auth")
      * 用户完善重要信息
      */
-    public function authAction(){
+    public function authAction()
+    {
 
     }
 
     /**
-     * @Get("/smsCode")
+     * @Post("/smsCode")
      * 获取短信验证码
      */
-    public function smsCodeAction(){
+    public function smsCodeAction()
+    {
+        $token = $this->token;
+        $data = $this->data;
+        $code = rand(1000, 9999);
+        $smsCode = new SmsCode();
+        $smsCodeData['mobile'] = $data['mobile'];
+        $smsCodeData['code'] = $code;
+        $smsCodeData['status'] = SmsCode::STATUS_SENDING;
+        $smsCodeData['template'] = SmsCode::TEMPLATE_INDEX;
 
+        if ($smsCode->save($smsCodeData)) {
+            $key = $data['mobile'] . "_auth";
+            di("cache")->save($key, $code, 5 * 60);
+            $smsCodeData['token'] = $token;
+            di("queue")->useTube("SmsCode")->put(serialize(['smsCode' => $smsCode, 'token' => $token]));
+            return $this->success("发送成功");
+        } else {
+            return $this->error("发送失败");
+        }
     }
 
     /**
      * @Post("/upload")
      * 上传电车照片
      */
-    public function uploadAction(){
+    public function uploadAction()
+    {
 
     }
 
