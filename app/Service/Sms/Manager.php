@@ -14,6 +14,7 @@ use Aliyun\Core\Config;
 use Aliyun\Core\Profile\DefaultProfile;
 use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Api\Sms\Request\V20170525\SendSmsRequest;
+use Phalcon\Exception;
 
 
 Config::load();
@@ -62,14 +63,15 @@ class Manager extends Service
     }
 
 
-    public function send(SmsCode $smsCode, $token)
+    public function send($smsCodeId, $token)
     {
         //需要从缓存中进行判断是否具有发送短信资格,防止暴力调用接口
         if (!di("cache")->get($token . "_tcgmc")) {
-            return false;
+            return;
         }
+        $smsCode = SmsCode::findFirst($smsCodeId);
         if ($smsCode->getStatus() == SmsCode::STATUS_SUCCESS) {
-            return true;
+            return;
         }
         //本地环境不发送
         if (APP_ENV != "local") {
@@ -100,17 +102,29 @@ class Manager extends Service
             //$request->setSmsUpExtendCode("1234567");
 
             // 发起访问请求
-
-            $acsResponse = static::getAcsClient()->getAcsResponse($request);
-            if ($acsResponse->Message == "OK") {
-                $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save();
-            } else {
+            try {
+                $acsResponse = static::getAcsClient()->getAcsResponse($request);
+                if ($acsResponse->Message == "OK") {
+                    $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save();
+                } else {
+                    $smsCode->setStatus(SmsCode::STATUS_FAIL)->save();
+                }
+                app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId());
+                return true;
+            } catch (Exception $e) {
                 $smsCode->setStatus(SmsCode::STATUS_FAIL)->save();
+                app_log("queue")->error("发送失败,smsCodeId=" . $smsCode->getId() . "原因是:" . $e->getMessage());
+                return false;
             }
         } else {
-            $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save();
+            if (!$result = $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save()) {
+                app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId());
+                return true;
+            } else {
+                app_log("queue")->error("发送失败,smsCodeId=" . $smsCode->getId() . "原因是:数据库保存状态失败");
+                return false;
+            }
         }
-
     }
 
     public function getSmsCode()

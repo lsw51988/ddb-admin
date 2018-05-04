@@ -271,11 +271,6 @@ $di->setShared(
         return new \Pheanstalk\Pheanstalk($config->host, $config->port);
     }
 );
-di()->setShared(
-    'logger',
-    app_log('ddb')
-);
-
 
 $di->set('db', function () {
     return new Phalcon\Db\Adapter\Pdo\Mysql(array(
