@@ -9,6 +9,6 @@ while (true) {
     //业务逻辑
     service("sms/manager")->send($smsCode, $token);
     di("cache")->delete($token . "_tcgmc");
-    $job->delete();
+    di("queue")->delete($job);
 }
 

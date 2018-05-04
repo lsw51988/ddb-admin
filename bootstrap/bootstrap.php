@@ -1,6 +1,6 @@
 <?php
-define("APP_PATH", "../app");
-define("APP_ENV", getenv("APP_ENV"));
+define("APP_PATH", __DIR__ . "/../app");
+define("APP_ENV", getenv("APP_ENV") == false ? "local" : getenv("APP_ENV"));
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -15,7 +15,7 @@ $di->setShared(
             ]
         );
         if (PHP_SAPI == "cli" || APP_ENV == "local") {
-            //本地或cli环境下用本地文件存储
+            //本地或cli环境下用本地文件存储 文件缓存时间会存在问题
             $cache = new Phalcon\Cache\Backend\File(
                 $frontCache,
                 [
@@ -42,9 +42,8 @@ $di->setShared(
 $di->setShared(
     "config",
     function () {
-        if (PHP_SAPI == "cli" || APP_ENV == "local") {
+        if (di("cache")->get("config")) {
             $config = unserialize(di("cache")->get("config"));
-
         } else {
             $configDir = APP_PATH . "/Config";
             $configFiles = glob($configDir . '/*.php');
@@ -56,8 +55,6 @@ $di->setShared(
                     $config[strtolower($name)] = $configData["local"];
                 }
                 di("cache")->save("config", serialize($config));
-            } else {
-                $config = unserialize(di("cache")->get("config"));
             }
         }
         return new \Phalcon\Config($config);
@@ -273,6 +270,10 @@ $di->setShared(
         $config = di("config")->get("queue");
         return new \Pheanstalk\Pheanstalk($config->host, $config->port);
     }
+);
+di()->setShared(
+    'logger',
+    app_log('ddb')
 );
 
 

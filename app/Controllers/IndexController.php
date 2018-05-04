@@ -3,7 +3,6 @@
 namespace Ddb\Controllers;
 
 use Ddb\Core\BaseController;
-use Ddb\Modules\SmsCode;
 
 class IndexController extends BaseController
 {

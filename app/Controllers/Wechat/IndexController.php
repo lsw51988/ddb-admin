@@ -107,7 +107,7 @@ class IndexController extends BaseController
 
     /**
      * 验证图形验证码
-     * @Get("/verifyCaptcha")
+     * @Post("/verifyCaptcha")
      */
     public function verifyCaptchaAction()
     {
@@ -116,6 +116,7 @@ class IndexController extends BaseController
         $token = $this->request->getHeader("token");
         $key = $token . 'captcha';
         if ($captcha == di("cache")->get($key)) {
+            di("cache")->delete($key);
             //tcgmc = tokenCanGetMobileCode
             $tcgmcKey = $token . "_tcgmc";
             di("cache")->save($tcgmcKey, 1, 300);

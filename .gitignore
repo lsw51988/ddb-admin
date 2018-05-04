@@ -1,16 +1,5 @@
 /.idea
-/app/cache/*
-/storage/logs/*
-/storage/images/*
-/storage/framework/*
+/storage/*
 .htaccess
 /public/.htaccess
 /vendor
-/public/uploads/*
-/public/files/*
-/public/upload/*
-/public/upload_tmp/*
-/node_modules
-public/upload/
-public/upload_tmp/
-storage/logs/

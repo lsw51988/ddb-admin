@@ -33,8 +33,8 @@ if (!function_exists("app_log")) {
     function app_log($loggerName = 'ddb')
     {
         $date = date('Y-m-d');
-        $app_env = getenv("APP_ENV");
-        $path = di('config')->app->log_path . DIRECTORY_SEPARATOR . $date;
+        $dir = __DIR__."/../../storage/logs";
+        $path = $dir . DIRECTORY_SEPARATOR . $date;
         if (!file_exists($path)) {
             mkdir($path);
         }
