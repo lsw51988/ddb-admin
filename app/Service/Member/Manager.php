@@ -10,6 +10,7 @@ namespace Ddb\Service\Member;
 
 
 use Ddb\Models\MemberLocations;
+use Ddb\Modules\Member;
 use Ddb\Service\BaseService;
 use Ddb\Models\Members;
 
@@ -55,4 +56,9 @@ class Manager extends BaseService
         }
         return true;
     }
+
+    public function freshCache($token,Member $member){
+        di("cache")->save($token, serialize($member), 24 * 3600);
+    }
+
 }

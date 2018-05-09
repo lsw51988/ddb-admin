@@ -67,11 +67,11 @@ class Manager extends Service
     {
         //需要从缓存中进行判断是否具有发送短信资格,防止暴力调用接口
         if (!di("cache")->get($token . "_tcgmc")) {
-            return;
+            return false;
         }
         $smsCode = SmsCode::findFirst($smsCodeId);
         if ($smsCode->getStatus() == SmsCode::STATUS_SUCCESS) {
-            return;
+            return false;
         }
         //本地环境不发送
         if (APP_ENV != "local") {

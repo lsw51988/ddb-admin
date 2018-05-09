@@ -11,6 +11,8 @@ namespace Ddb\Service\Member;
 
 use Ddb\Models\MemberPoints;
 use Ddb\Models\Members;
+use Ddb\Modules\Member;
+use Ddb\Modules\MemberBike;
 use Ddb\Service\BaseService;
 
 class Query extends BaseService
@@ -54,5 +56,25 @@ class Query extends BaseService
             ]
         ]);
         return is_null($totalPoints) ? 0 : $totalPoints;
+    }
+
+    /**
+     * 获取用户的详细信息
+     */
+    public function getAuthInfo($member)
+    {
+        $data = [];
+        $data['real_name'] = $member->getRealName();
+        $data['mobile'] = $member->getRealName();
+        if($memberBike = MemberBike::findFirstByMemberId($member->getId())){
+            $data['brand_name'] = $memberBike->getBrandName();
+            $data['buy_date'] = $memberBike->getBuyDate();
+            $data['number'] = $memberBike->getNumber();
+            $data['voltage'] = $memberBike->getVoltage();
+            $data['price'] = $memberBike->getPrice();
+            $data['status'] = $memberBike->getStatus();
+            $data['last_change_time'] = $memberBike->getLastChangeTime();
+        }
+        return $data;
     }
 }
