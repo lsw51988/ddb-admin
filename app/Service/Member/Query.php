@@ -65,7 +65,7 @@ class Query extends BaseService
     {
         $data = [];
         $data['real_name'] = $member->getRealName();
-        $data['mobile'] = $member->getRealName();
+        $data['mobile'] = $member->getMobile();
         if($memberBike = MemberBike::findFirstByMemberId($member->getId())){
             $data['brand_name'] = $memberBike->getBrandName();
             $data['buy_date'] = $memberBike->getBuyDate();

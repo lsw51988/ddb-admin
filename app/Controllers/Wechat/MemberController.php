@@ -14,6 +14,7 @@ use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SmsCode;
+use League\Flysystem\Config;
 
 /**
  * Class MemberController
@@ -151,7 +152,8 @@ class MemberController extends WechatAuthController
      */
     public function uploadAction()
     {
-
+        $file = $_FILES;
+        di("filesystem")->write($file['file']['name'],$file['file']['tmp_name'],new Config());
     }
 
 }
