@@ -14,7 +14,8 @@ use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SmsCode;
-use League\Flysystem\Config;
+use Ddb\Models\MemberBikeImages;
+use Phalcon\Exception;
 
 /**
  * Class MemberController
@@ -60,7 +61,7 @@ class MemberController extends WechatAuthController
         $this->db->begin();
         $member->setRealName($data['real_name'])
             ->setMobile($data['mobile'])
-            ->setAuthTime(date("Y-m-d H:i:s",time()));
+            ->setAuthTime(date("Y-m-d H:i:s", time()));
 
         if (!$member->save()) {
             $this->db->rollback();
@@ -88,7 +89,7 @@ class MemberController extends WechatAuthController
 
         //需要重写缓存
         $token = $this->token;
-        service("member/manager")->freshCache($token,$member);
+        service("member/manager")->freshCache($token, $member);
         return $this->success();
     }
 
@@ -96,7 +97,8 @@ class MemberController extends WechatAuthController
      * @Get("/auth")
      * 获取用户的重要信息
      */
-    public function authShowAction(){
+    public function authShowAction()
+    {
         $currentMember = $this->currentMember;
         $data = service("member/query")->getAuthInfo($currentMember);
         return $this->success($data);
@@ -148,12 +150,33 @@ class MemberController extends WechatAuthController
 
     /**
      * @Post("/upload")
+     * @Param member_bike_id
      * 上传电车照片
      */
     public function uploadAction()
     {
+        $member = $this->currentMember;
         $file = $_FILES;
-        service("file/manager")->saveFile($file['file']['name'],$file['file']['tmp_name']);
+        $data = $this->data;
+        $memberBikeId = $data['member_bike_id'];
+        $path = "MemberBikeImages/" . $member->getId() . DIRECTORY_SEPARATOR . $file['file']['name'];
+        $memberBikeImage = new MemberBikeImages();
+        $memberBikeImage->setMemberBikeId($memberBikeId)
+            ->setPath($path)
+            ->setCreateBy($member->getId());
+        if ($memberBikeImage->save()) {
+            try {
+                service("file/manager")->saveFile($path, $file['file']['tmp_name']);
+                return $this->success();
+            } catch (Exception $e) {
+                $memberBikeImage->delete();
+                app_log()->error("用户认证,member_id:" . $member->getId() . ";上传图片失败,原因是:" . $e->getMessage());
+                return $this->error("图片保存失败");
+            }
+        } else {
+            app_log()->error("用户认证,member_id:" . $member->getId() . ";保存MemberBikeImage记录失败");
+            return $this->error("记录保存失败");
+        }
     }
 
 }
