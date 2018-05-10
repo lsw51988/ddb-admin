@@ -178,5 +178,4 @@ class MemberController extends WechatAuthController
             return $this->error("记录保存失败");
         }
     }
-
 }
