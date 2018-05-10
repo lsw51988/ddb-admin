@@ -153,7 +153,7 @@ class MemberController extends WechatAuthController
     public function uploadAction()
     {
         $file = $_FILES;
-        di("filesystem")->write($file['file']['name'],$file['file']['tmp_name'],new Config());
+        service("file/manager")->saveFile($file['file']['name'],$file['file']['tmp_name']);
     }
 
 }

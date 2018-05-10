@@ -12,6 +12,7 @@ namespace PHPSTORM_META {
             'appeal/query' instanceof \Ddb\Service\Appeal\Query,
             'sms/manager' instanceof \Ddb\Service\Sms\Manager,
             'queue/manager' instanceof \Ddb\Service\Queue\Manager,
+            'file/manager' instanceof \Ddb\Service\File\Manager,
         ]
     ];
 }

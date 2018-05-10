@@ -6,7 +6,7 @@
  * Time: 下午11:43
  */
 
-namespace Ddb\Service\Member;
+namespace Ddb\Service\File;
 
 
 use Ddb\Service\BaseService;
@@ -31,12 +31,12 @@ class Manager extends BaseService
         foreach ($prams as $k => $v) {
             $config->set($k, $v);
         }
-        return di($this->fileSysTemName)->write($filePath, $fileContent, $config);
+        return di("filesystem")->write($filePath, $fileContent, $config);
     }
 
     public function deleteFile($filePath)
     {
-        return di($this->fileSysTemName)->delete($filePath);
+        return di("filesystem")->delete($filePath);
     }
 
 }
