@@ -25,11 +25,11 @@ class Manager extends BaseService
      * @param $fileContent
      * @return array|bool|false
      */
-    public function saveFile($filePath, $fileContent, $prams = [])
+    public function saveFile($filePath, $fileContent)
     {
         $config = $this->getConfig();
-        foreach ($prams as $k => $v) {
-            $config->set($k, $v);
+        if(APP_ENV=="local"){
+            $fileContent = file_get_contents($fileContent);
         }
         return di("filesystem")->write($filePath, $fileContent, $config);
     }
@@ -38,5 +38,11 @@ class Manager extends BaseService
     {
         return di("filesystem")->delete($filePath);
     }
+
+    public function read($path)
+    {
+        return di("filesystem")->read($path, $this->getConfig());
+    }
+
 
 }

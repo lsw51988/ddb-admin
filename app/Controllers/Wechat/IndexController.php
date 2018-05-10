@@ -124,5 +124,4 @@ class IndexController extends BaseController
         }
         return $this->error();
     }
-
 }

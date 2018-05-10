@@ -15,6 +15,7 @@ use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SmsCode;
 use Ddb\Models\MemberBikeImages;
+use League\Flysystem\Config;
 use Phalcon\Exception;
 
 /**
@@ -90,7 +91,11 @@ class MemberController extends WechatAuthController
         //需要重写缓存
         $token = $this->token;
         service("member/manager")->freshCache($token, $member);
-        return $this->success();
+        return $this->success(
+            [
+                "member_bike_id"=>$memberBike->getId()
+            ]
+        );
     }
 
     /**
@@ -162,6 +167,7 @@ class MemberController extends WechatAuthController
         $path = "MemberBikeImages/" . $member->getId() . DIRECTORY_SEPARATOR . $file['file']['name'];
         $memberBikeImage = new MemberBikeImages();
         $memberBikeImage->setMemberBikeId($memberBikeId)
+            ->setSize($file['file']['size'])
             ->setPath($path)
             ->setCreateBy($member->getId());
         if ($memberBikeImage->save()) {
@@ -175,7 +181,9 @@ class MemberController extends WechatAuthController
             }
         } else {
             app_log()->error("用户认证,member_id:" . $member->getId() . ";保存MemberBikeImage记录失败");
-            return $this->error("记录保存失败");
+            return $this->error($memberBikeId);
         }
     }
+
+
 }
