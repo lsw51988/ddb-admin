@@ -11,8 +11,7 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-        /*$smsCode = SmsCode::findFirst();
-        service("sms/manager")->send($smsCode);*/
+        echo "welcome";
     }
 
     public function route404Action()
