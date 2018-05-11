@@ -15,7 +15,6 @@ use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SmsCode;
 use Ddb\Models\MemberBikeImages;
-use League\Flysystem\Config;
 use Phalcon\Exception;
 
 /**
@@ -198,5 +197,23 @@ class MemberController extends WechatAuthController
         $path = $memberBikeImage->getPath();
         $data = service("file/manager")->read($path);
         return $this->response->setContent($data['contents'])->setContentType('image/jpeg');
+    }
+
+    /**
+     * @Delete("/bikeImg/{id:[0-9]+}")
+     * 删除电动车照片
+     */
+    public function deleteBikeImgAction($id){
+        if($memberBikeImage = MemberBikeImages::findFirst($id)){
+            $path = $memberBikeImage->getPath();
+            if(service("file/manager")->deleteFile($path)){
+                $memberBikeImage->delete();
+                return $this->success();
+            }else{
+                app_log()->error("用户删除电动车图片失败,bikeImageId=".$memberBikeImage->getId());
+                return $this->error("删除图片失败");
+            }
+        }
+        return $this->error("未找到或已经删除该记录");
     }
 }

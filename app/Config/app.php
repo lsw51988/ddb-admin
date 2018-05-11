@@ -15,7 +15,8 @@ return [
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
         //获取openid的
         'APP_ID'=>'wxb029435696312911',
-        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813'
+        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813',
+        'URL'=>'http://local.ddb.com'
 
     ],
     'qa'=>[
@@ -25,7 +26,8 @@ return [
         'debug' => true,
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
         'APP_ID'=>'wxb029435696312911',
-        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813'
+        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813',
+        'URL'=>'http://www.qa-njddb.com'
     ],
     'production'=>[
         "cryptKey"=>"lsw20180414<>_~@#$%&^",
@@ -34,7 +36,8 @@ return [
         'debug' => true,
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
         'APP_ID'=>'wxb029435696312911',
-        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813'
+        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813',
+        'URL'=>'http://www.njddb.com'
     ]
 
 ];

@@ -83,7 +83,11 @@ class Query extends BaseService
                 ]
             ])->toArray();
             if (count($memberBikeImgs) > 0) {
-                $data["img"] = array_column($memberBikeImgs,"id");
+                $imgs = array_column($memberBikeImgs,"id");
+                foreach($imgs as $k=>$v){
+                    $imgs[$k] = di("config")->app->URL."/wechat/member/bikeImg/".$v;
+                }
+                $data['bikeImgs'] = $imgs;
             }
         }
         return $data;
