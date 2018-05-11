@@ -9,6 +9,7 @@
 namespace Ddb\Service\Member;
 
 
+use Ddb\Models\MemberBikeImages;
 use Ddb\Models\MemberPoints;
 use Ddb\Models\Members;
 use Ddb\Modules\Member;
@@ -66,7 +67,7 @@ class Query extends BaseService
         $data = [];
         $data['real_name'] = $member->getRealName();
         $data['mobile'] = $member->getMobile();
-        if($memberBike = MemberBike::findFirstByMemberId($member->getId())){
+        if ($memberBike = MemberBike::findFirstByMemberId($member->getId())) {
             $data['brand_name'] = $memberBike->getBrandName();
             $data['buy_date'] = $memberBike->getBuyDate();
             $data['number'] = $memberBike->getNumber();
@@ -74,6 +75,16 @@ class Query extends BaseService
             $data['price'] = $memberBike->getPrice();
             $data['status'] = $memberBike->getStatus();
             $data['last_change_time'] = $memberBike->getLastChangeTime();
+            $memberBikeImgs = MemberBikeImages::find([
+                "columns" => "id",
+                "conditions" => "member_bike_id = :member_bike_id:",
+                "bind" => [
+                    "member_bike_id" => $memberBike->getId()
+                ]
+            ])->toArray();
+            if (count($memberBikeImgs) > 0) {
+                $data["img"] = array_column($memberBikeImgs,"id");
+            }
         }
         return $data;
     }

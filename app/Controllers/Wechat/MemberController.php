@@ -68,7 +68,9 @@ class MemberController extends WechatAuthController
             $this->db->rollback();
             return $this->error("个人用户信息保存失败");
         }
-        $memberBike = new MemberBike();
+        if(!$memberBike = MemberBike::findFirstByMemberId($memberId)){
+            $memberBike = new MemberBike();
+        }
         $memberBike->setMemberId($member->getId())
             ->setBrandName($data['brand_name'])
             ->setBuyDate($data['buy_date'])
