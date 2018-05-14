@@ -32,6 +32,7 @@ class CreateAppealsTable extends AbstractMigration
         $this->table("appeals")
             ->addColumn("ask_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "求助人id"])
             ->addColumn("awr_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "应答人id"])
+            ->addColumn("method", "integer", ["limit" => 10, "comment" => "求助方式 1查看附近维修点 2请求拖车帮助"])
             ->addColumn("type", "integer", ["limit" => 50, "comment" => "故障类型"])
             ->addColumn("desc", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => true, "comment" => "故障描述"])
             ->addColumn("mobile", "string", ["limit" => 11, "null" => true, "comment" => "手机号"])

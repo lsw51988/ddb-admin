@@ -25,7 +25,9 @@ class AppealsController extends WechatAuthController
      * 2.提供积分请求拖车帮助
      */
     public function createAction(){
-
+        $data = $this->data;
+        $currentMember = $this->currentMember;
+        
     }
 
     /**
@@ -61,6 +63,23 @@ class AppealsController extends WechatAuthController
      */
     public function reviewAction(){
 
+    }
+
+    /**
+     * @Get("/mobile")
+     * 获取用户的mobile信息
+     */
+    public function mobileAction(){
+        $currentMember = $this->currentMember;
+        $mobile = $currentMember->getMobile();
+        if($mobile){
+            return $this->success(
+                [
+                    "mobile"=>$mobile
+                ]
+            );
+        }
+        return $this->error();
     }
 
 

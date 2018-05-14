@@ -73,7 +73,8 @@ class IndexController extends BaseController
                 "token" => $member->getToken(),
                 "avatarUrl" => $member->getAvatarUrl(),
                 "nickName" => $member->getNickName(),
-                "auth_time" => $member->getAuthTime()
+                "auth_time" => $member->getAuthTime(),
+                "mobile"=>$member->getMobile()
             ]);
         } else {
             return $this->success($location);

@@ -23,7 +23,8 @@ class RepairsController extends WechatAuthController
      * 用户添加店铺
      */
     public function createAction(){
-
+        $member = $this->currentMember;
+        $data = $this->data;
     }
 
     /**
