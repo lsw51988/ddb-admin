@@ -6,7 +6,7 @@
  * Time: 上午9:20
  */
 
-namespace Ddb\Controllers\Admin;
+namespace Ddb\Controllers\Admin\Home;
 
 
 use Ddb\Core\ViewBaseController;
@@ -14,7 +14,7 @@ use Ddb\Core\ViewBaseController;
 /**
  * Class IndexController
  * 后台
- * @RoutePrefix("/admin/index")
+ * @RoutePrefix("/admin/home")
  */
 class IndexController extends ViewBaseController
 {
@@ -23,7 +23,7 @@ class IndexController extends ViewBaseController
      */
     public function indexAction(){
         $this->view->setVars([
-            "aaa"=>"asasasdad",
+            "aaa"=>"home-8888",
             "bbb"=>"bbb",
         ]);
     }

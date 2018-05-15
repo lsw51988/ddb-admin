@@ -117,7 +117,6 @@ $di->setShared(
     function () {
         $config = di('config');
         $view = new \Phalcon\Mvc\View();
-        $view->setEventsManager(di('eventsManager'));
         $viewDir = $config->view->path . DIRECTORY_SEPARATOR;
         if (!file_exists($viewDir) || !is_dir($viewDir)) {
             $viewDir = $config->view->path;
@@ -157,7 +156,6 @@ $di->setShared(
     'volt',
     function () {
         $volt = new \Phalcon\Mvc\View\Engine\Volt(di('view'), di());
-        $volt->setEventsManager(di('eventsManager'));
         $options = di('config')->view->volt->toArray();
         if (di('config')->app->debug) {
             $options["compileAlways"] = true;
