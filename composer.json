@@ -16,7 +16,8 @@
     "guzzlehttp/guzzle": "^6.3.2",
     "robmorgan/phinx": "^0.9.2",
     "pda/pheanstalk": "3.1.0",
-    "aliyuncs/oss-sdk-php": "~2.0"
+    "aliyuncs/oss-sdk-php": "~2.0",
+    "intervention/image":"2.4.1"
   },
   "require-dev": {
     "phalcon/ide-stubs": "*",
