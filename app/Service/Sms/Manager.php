@@ -135,4 +135,13 @@ class Manager extends Service
             return rand(1000, 9999);
         }
     }
+
+    public function verify($mobile,$smsCode){
+        if (di("cache")->get($mobile . "_auth") != $smsCode) {
+            return false;
+        }else{
+            di("cache")->delete($mobile . "_auth");
+            return true;
+        }
+    }
 }
