@@ -20,12 +20,19 @@ class IndexController extends ViewBaseController
 {
     /**
      * @Get("/")
+     * 后台首页,数据统计等一些重要信息的显示,这里需要判断用户是否登录
      */
     public function indexAction(){
-        $this->view->setVars([
-            "aaa"=>"asasasdad",
-            "bbb"=>"bbb",
-        ]);
+
     }
+
+    /**
+     * @Route("/login")
+     * 登录,这里注意只有限制IP才可以登录
+     */
+    public function loginAction(){
+
+    }
+
 
 }
