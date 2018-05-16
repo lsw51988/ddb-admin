@@ -12,9 +12,9 @@ namespace Ddb\Service\Member;
 use Ddb\Models\MemberBikeImages;
 use Ddb\Models\MemberPoints;
 use Ddb\Models\Members;
-use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Service\BaseService;
+use Ddb\Models\Areas;
 
 class Query extends BaseService
 {
@@ -89,6 +89,10 @@ class Query extends BaseService
                 }
                 $data['bikeImgs'] = $imgs;
             }
+        }
+        $districtCode = $member->getDistrict();
+        if($addr = Areas::findFirstByDistrictCode($districtCode)){
+            $data['region'] = [$addr->getProvinceName(),$addr->getCityName(),$addr->getDistrictName()];
         }
         return $data;
     }

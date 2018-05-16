@@ -6,7 +6,7 @@
  * Time: 下午11:47
  */
 
-namespace Ddb\Servive\SHB;
+namespace Ddb\Service\Shb;
 
 
 use Ddb\Core\Service;
@@ -16,7 +16,7 @@ class Query extends Service
 {
     public function hasEnoughPoint($member)
     {
-        if ($member->getPoint() < MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]) {
+        if ($member->getPoints() < abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB])) {
             return false;
         }
         return true;

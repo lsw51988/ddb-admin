@@ -38,7 +38,11 @@ class Manager extends BaseService
             return false;
         }
         $currentPoint = (int)$member->getPoints();
-        if (!$member->setPoints($currentPoint + $point)->save()) {
+        $endPoint = $currentPoint - $point;
+        if ($endPoint < 0) {
+            return false;
+        }
+        if (!$member->setPoints($endPoint)->save()) {
             $memberPoint->delete();
             return false;
         }

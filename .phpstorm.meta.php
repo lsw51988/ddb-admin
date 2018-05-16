@@ -1,8 +1,10 @@
 <?php
 
 namespace PHPSTORM_META {
+
     /**
-     * phpstorm自带代码寻址提示
+     * PhpStorm Meta file, to provide autocomplete information for PhpStorm
+     * Generated on 2016-10-21 10:26:57
      */
     $STATIC_METHOD_TYPES = [
         \service('') => [
@@ -13,6 +15,7 @@ namespace PHPSTORM_META {
             'sms/manager' instanceof \Ddb\Service\Sms\Manager,
             'queue/manager' instanceof \Ddb\Service\Queue\Manager,
             'file/manager' instanceof \Ddb\Service\File\Manager,
+            'shb/query' instanceof \Ddb\Service\Shb\Manager,
         ]
     ];
 }

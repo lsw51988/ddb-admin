@@ -31,6 +31,7 @@ class CreateSecondBikeImagesTable extends AbstractMigration
     {
         $this->table("second_bike_images")
             ->addColumn("second_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联second_bikes"])
+            ->addColumn("size", "integer", ["limit" => MysqlAdapter::INT_MEDIUM, "null" => false, "comment" => "图片大小"])
             ->addColumn("path", "string", ["limit" => MysqlAdapter::INT_TINY,"null" => false,  "comment" => "存储时间"])
             ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "对应member"])
             ->addTimestamps()

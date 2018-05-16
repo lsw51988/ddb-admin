@@ -40,7 +40,7 @@ class CreateMembersTable extends AbstractMigration
             ->addColumn("nick_name", "string", ["comment" => "微信昵称", "limit" => 20, "null" => false])
             ->addColumn("real_name", "string", ["comment" => "真实姓名", "limit" => 20, "null" => true])
             ->addColumn("mobile", "string", ["comment" => "电话", "limit" => 11, "null" => true])
-            ->addColumn("points", "string", ["comment" => "可用积分", "limit" => 4, "default" => 0])
+            ->addColumn("points", "integer", ["comment" => "可用积分", "limit" => 1000000, "default" => 0])
             ->addColumn("type", "integer", ["comment" => "类型 1骑行者 2修理者", "limit" => 4, "default" => 1])
             ->addColumn("auth_time", "timestamp", ["comment" => "认证时间", "null" => true])
             ->addColumn("token", "string", ["comment" => "token", "null" => true, "limit" => 50])

@@ -12,7 +12,7 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-        phpinfo();
+
     }
 
     public function route404Action()
