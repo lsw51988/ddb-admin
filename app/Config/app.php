@@ -14,8 +14,8 @@ return [
         //获取地理位置信息的
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
         //获取openid的
-        'APP_ID'=>'wxb029435696312911',
-        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813',
+        'APP_ID'=>'wx3bd752036e968963',
+        'APP_SECRET'=>'2b8e86b02fae128e93099f3549faacb6',
         'URL'=>'http://local.ddb.com'
 
     ],
@@ -25,8 +25,8 @@ return [
         'log_path'  => APP_PATH . '/../storage/logs',
         'debug' => true,
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
-        'APP_ID'=>'wxb029435696312911',
-        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813',
+        'APP_ID'=>'wx3bd752036e968963',
+        'APP_SECRET'=>'2b8e86b02fae128e93099f3549faacb6',
         'URL'=>'http://www.qa-njddb.com'
     ],
     'production'=>[
@@ -35,8 +35,8 @@ return [
         'log_path'  => APP_PATH . '/../storage/logs',
         'debug' => true,
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
-        'APP_ID'=>'wxb029435696312911',
-        'APP_SECRET'=>'b2237b984a982ba9de8f3a7fe5f78813',
+        'APP_ID'=>'wx3bd752036e968963',
+        'APP_SECRET'=>'2b8e86b02fae128e93099f3549faacb6',
         'URL'=>'http://www.njddb.com'
     ]
 

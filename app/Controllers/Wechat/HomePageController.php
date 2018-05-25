@@ -133,7 +133,7 @@ class HomePageController extends WechatAuthController
         ];
         $order = "created_at DESC";
 
-        $data = MemberLog::page($conditions, $columns, $bind, $order, $page);
+        $data = MemberLog::page($columns, $conditions, $bind, $order, $page,"");
 
         return $this->success($data);
 

@@ -41,8 +41,11 @@ class BaseModel extends Model
     }
 
     //单表分页
-    public static function page($conditions = "", $columns, $bind = [], $order = "", $page = 1, $limit = 20)
+    public static function page($columns, $conditions = "", $bind = [], $order, $page = 1, $limit = 20)
     {
+        if($order == ""){
+            $order = "id ASC";
+        }
         $rows = self::find([
             "columns" => $columns,
             "conditions" => $conditions,

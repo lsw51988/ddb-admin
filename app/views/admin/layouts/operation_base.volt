@@ -1,4 +1,4 @@
-{% extends 'layouts/base.volt' %}
+{% extends '../layouts/base.volt' %}
 
 {% block sidebar %}
     <div class="layui-side-scroll">

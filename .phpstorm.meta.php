@@ -7,6 +7,10 @@ namespace PHPSTORM_META {
      * Generated on 2016-10-21 10:26:57
      */
     $STATIC_METHOD_TYPES = [
+        \di('') => [
+            '' == '@',
+            'session' instanceof \Phalcon\Session\Adapter\Files,
+        ],
         \service('') => [
             '' == '@',
             'member/query' instanceof \Ddb\Service\Member\Query,
@@ -16,6 +20,8 @@ namespace PHPSTORM_META {
             'queue/manager' instanceof \Ddb\Service\Queue\Manager,
             'file/manager' instanceof \Ddb\Service\File\Manager,
             'shb/query' instanceof \Ddb\Service\Shb\Manager,
+            'user/manager' instanceof \Ddb\Service\User\Manager,
+            'user/query' instanceof \Ddb\Service\User\Query,
         ]
     ];
 }

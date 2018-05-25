@@ -10,8 +10,10 @@ namespace Ddb\Controllers\Wechat;
 
 use Ddb\Core\BaseController;
 use Ddb\Helper\Captcha;
+use Ddb\Helper\Wechat\WXBizDataCrypt;
 use Ddb\Models\Areas;
 use Ddb\Models\Members;
+use Ddb\Modules\Member;
 
 /**
  * Class IndexController
@@ -29,8 +31,11 @@ class IndexController extends BaseController
     public function indexAction()
     {
         $data = $this->data;
-        $openId = service("member/manager")->getOpenId($data['js_code']);
+        $wechatLogin = service("member/manager")->getWechatLogin($data['js_code']);
+        $openId = $wechatLogin->openid;
+        $sessionKey = $wechatLogin->session_key;
         $location = service("member/manager")->getLocation($data['latitude'], $data['longitude']);
+        $token = md5($data['js_code'] . time() . rand(0, 9999));
         if (!$member = Members::findFirstByOpenId($openId)) {
             $data['open_id'] = $openId;
             //1.根据经纬度获取用户的当前地址
@@ -45,36 +50,35 @@ class IndexController extends BaseController
                 $data['city'] = $area->getCityCode();
                 $data['district'] = $area->getDistrictCode();
             }
-
             $member = new Members();
-            $data['token'] = md5($data['nickName'] . time() . rand(0, 9999));
+            $data['token'] = $token;
             $data['token_time'] = date("Y-m-d H:i:s", strtotime("+1 month"));
-            $data['nick_name'] = $data['nickName'];
-            $data['avatar_url'] = $data['avatarUrl'];
-            unset($data['avatarUrl']);
-            unset($data['nickName']);
             if (!$member->save($data)) {
                 return $this->error("用户数据保存错误");
             }
-
-            di("cache")->save($data['token'], serialize($member), 24 * 3600);
+            di("cache")->save($data['token'], serialize($member), 30 * 24 * 3600);
         } else {
             if (!di("cache")->get($member->getToken())) {
-                $token = md5($data['nickName'] . time() . rand(0, 9999));
                 $member->setToken($token)
                     ->setTokenTime(date("Y-m-d H:i:s", strtotime("+1 month")))
                     ->save();
-                di("cache")->save($token, serialize($member), 24 * 60);
+                di("cache")->save($token, serialize($member), 30 * 24 * 60);
             }
+        }
+        if (!$member->getUnionId()) {
+            di("cache")->save($member->getId() . '_sessionKey', $sessionKey, 30 * 24 * 3600);
         }
         if ($location->status == 0) {
             service("member/manager")->saveLocation($member, $location);
+            $unionFlag = $member->getUnionId() == null ? false : true;
             return $this->success([
                 "token" => $member->getToken(),
                 "avatarUrl" => $member->getAvatarUrl(),
                 "nickName" => $member->getNickName(),
                 "auth_time" => $member->getAuthTime(),
-                "mobile"=>$member->getMobile()
+                "mobile" => $member->getMobile(),
+                "id" => $member->getId(),
+                "union_flag" => $unionFlag
             ]);
         } else {
             return $this->success($location);
@@ -124,5 +128,80 @@ class IndexController extends BaseController
             return $this->success();
         }
         return $this->error();
+    }
+
+    /**
+     * @Get("/avatar")
+     * 获取用户头像
+     */
+    public function avatarAction()
+    {
+        $data = $this->data;
+        $path = $data['path'];
+        $data = service("file/manager")->read($path);
+        return $this->response->setContent($data['contents'])->setContentType('image/jpeg');
+    }
+
+    /**
+     * @Post("/checkToken")
+     * 检查token是否有效
+     */
+    public function checkTokenAction()
+    {
+        $token = $this->request->getHeader("token");
+        $data = $this->data;
+        $memberId = $data['member_id'];
+        if (di('cache')->get($token)) {
+            return $this->success();
+        } else {
+            //说明此时后端的token已经过期,此时应该产生新的token,并将原有的token删除,防止token的值一直不变
+            $member = Member::findFirst($memberId);
+            $rData = [];
+            $rData['auth_time'] = $member->getAuthTime();
+            $rData['avatarUrl'] = $member->getAvatarUrl();
+            $rData['id'] = $data['id'];
+            $rData['mobile'] = $member->getMobile();
+            $rData['nickName'] = $member->getNickName();
+            $rData['token'] = $member->getToken();
+            return $this->error($rData);
+        }
+    }
+
+    /**
+     * @Get("/test")
+     */
+    public function testAction()
+    {
+        $appid = 'wx4f4bc4dec97d474b';
+        $sessionKey = 'tiihtNczf5v6AKRyjwEUhQ==';
+
+        $encryptedData = "CiyLU1Aw2KjvrjMdj8YKliAjtP4gsMZM
+                QmRzooG2xrDcvSnxIMXFufNstNGTyaGS
+                9uT5geRa0W4oTOb1WT7fJlAC+oNPdbB+
+                3hVbJSRgv+4lGOETKUQz6OYStslQ142d
+                NCuabNPGBzlooOmB231qMM85d2/fV6Ch
+                evvXvQP8Hkue1poOFtnEtpyxVLW1zAo6
+                /1Xx1COxFvrc2d7UL/lmHInNlxuacJXw
+                u0fjpXfz/YqYzBIBzD6WUfTIF9GRHpOn
+                /Hz7saL8xz+W//FRAUid1OksQaQx4CMs
+                8LOddcQhULW4ucetDf96JcR3g0gfRK4P
+                C7E/r7Z6xNrXd2UIeorGj5Ef7b1pJAYB
+                6Y5anaHqZ9J6nKEBvB4DnNLIVWSgARns
+                /8wR2SiRS7MNACwTyrGvt9ts8p12PKFd
+                lqYTopNHR1Vf7XjfhQlVsAJdNiKdYmYV
+                oKlaRv85IfVunYzO0IKXsyl7JCUjCpoG
+                20f0a04COwfneQAGGwd5oa+T8yO5hzuy
+                Db/XcxxmK01EpqOyuxINew==";
+
+        $iv = 'r7BXXKkLb8qrSNn05n0qiA==';
+
+        $pc = new WXBizDataCrypt($appid, $sessionKey);
+        $errCode = $pc->decryptData($encryptedData, $iv, $data);
+
+        if ($errCode == 0) {
+            print($data . "\n");
+        } else {
+            print($errCode . "\n");
+        }
     }
 }

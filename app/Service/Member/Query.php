@@ -89,6 +89,15 @@ class Query extends BaseService
                 }
                 $data['bikeImgs'] = $imgs;
             }
+        }else{
+            $data['brand_name'] = "";
+            $data['buy_date'] = "";
+            $data['number'] = "";
+            $data['voltage'] = "";
+            $data['price'] = "";
+            $data['status'] = "";
+            $data['last_change_time'] = "";
+            $data['bikeImgs'] = [];
         }
         $districtCode = $member->getDistrict();
         if($addr = Areas::findFirstByDistrictCode($districtCode)){

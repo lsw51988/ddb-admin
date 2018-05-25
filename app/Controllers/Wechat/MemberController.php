@@ -67,7 +67,7 @@ class MemberController extends WechatAuthController
             $this->db->rollback();
             return $this->error("个人用户信息保存失败");
         }
-        if(!$memberBike = MemberBike::findFirstByMemberId($memberId)){
+        if (!$memberBike = MemberBike::findFirstByMemberId($memberId)) {
             $memberBike = new MemberBike();
         }
         $memberBike->setMemberId($member->getId())
@@ -90,11 +90,11 @@ class MemberController extends WechatAuthController
         $this->db->commit();
 
         //需要重写缓存
-        $token = $this->token;
-        service("member/manager")->freshCache($token, $member);
+        //$token = $this->token;
+        //service("member/manager")->freshCache($token, $member);
         return $this->success(
             [
-                "member_bike_id"=>$memberBike->getId()
+                "member_bike_id" => $memberBike->getId()
             ]
         );
     }
@@ -171,8 +171,9 @@ class MemberController extends WechatAuthController
      * @Get("/bikeImg/{id:[0-9]+}")
      * 查看电动车照片
      */
-    public function bikeImgAction($id){
-        if(!$memberBikeImage = MemberBikeImages::findFirst($id)){
+    public function bikeImgAction($id)
+    {
+        if (!$memberBikeImage = MemberBikeImages::findFirst($id)) {
             return $this->error("找不到图片");
         }
         $path = $memberBikeImage->getPath();
@@ -184,17 +185,93 @@ class MemberController extends WechatAuthController
      * @Delete("/bikeImg/{id:[0-9]+}")
      * 删除电动车照片
      */
-    public function deleteBikeImgAction($id){
-        if($memberBikeImage = MemberBikeImages::findFirst($id)){
+    public function deleteBikeImgAction($id)
+    {
+        if ($memberBikeImage = MemberBikeImages::findFirst($id)) {
             $path = $memberBikeImage->getPath();
-            if(service("file/manager")->deleteFile($path)){
+            if (service("file/manager")->deleteFile($path)) {
                 $memberBikeImage->delete();
                 return $this->success();
-            }else{
-                app_log()->error("用户删除电动车图片失败,bikeImageId=".$memberBikeImage->getId());
+            } else {
+                app_log()->error("用户删除电动车图片失败,bikeImageId=" . $memberBikeImage->getId());
                 return $this->error("删除图片失败");
             }
         }
         return $this->error("未找到或已经删除该记录");
+    }
+
+    /**
+     * @Route("/baseInfo")
+     * 获取用户的头像和昵称信息
+     */
+    public function baseInfoAction()
+    {
+        $member = $this->currentMember;
+        if ($this->request->isGet()) {
+            if ($member->getAvatarUrl() == null) {
+                $data['avatar_url'] = "";
+            } else {
+                $data['avatar_url'] = di("config")->app->URL . "/wechat/avatar?path=" . $member->getAvatarUrl();
+            }
+            $data['nick_name'] = $member->getNickName();
+            return $this->success($data);
+        } else {
+            $file = $_FILES;
+            $data = $this->data;
+            $currentMember = Member::findFirst($member->getId());
+            $path = "AvatarImages/" . $member->getId() . '-' . $file['file']['name'];
+            $this->db->begin();
+            if (!service("member/manager")->updateAvatar($currentMember, $file)) {
+                $this->db->rollback();
+                return $this->error();
+            }
+            $currentMember->setNickName($data['nick_name'])->setAvatarUrl($path);
+            if (!$currentMember->save()) {
+                $this->db->rollback();
+                return $this->error("用户信息保存错误");
+            }
+            $this->db->commit();
+            $rData = [];
+            $rData['nickName'] = $currentMember->getNickName();
+            $rData['auth_time'] = $currentMember->getAuthTime();
+            $rData['avatarUrl'] = $currentMember->getAvatarUrl();
+            $rData['id'] = $currentMember->getId();
+            $rData['token'] = $currentMember->getToken();
+            return $this->success($rData);
+        }
+    }
+
+    /**
+     * @Post("/userInfo")
+     */
+    public function unionIdAction()
+    {
+        $data = $this->data;
+        $iv = $data['iv'];
+        $encryptedData = $data['encryptedData'];
+        $appId = di("config")->app->APP_ID;
+        $memberId = $this->currentMember->getId();
+        if($this->currentMember->getUnionId()){
+            return $this->success();
+        }
+        if ($sessionKey = di("cache")->get($memberId . '_sessionKey')) {
+            if ($sData = service("member/manager")->getDecryptData($memberId, $appId, $sessionKey, $encryptedData, $iv)) {
+                $member = Member::findFirst($memberId);
+                if ($unionId = $sData->unionId) {
+                    $member->setUnionId($sData->unionId)
+                        ->setAvatarUrl($data['avatarUrl'])
+                        ->setNickName($data['nickName'])
+                        ->setGender($data['gender']);
+                    if (!$member->save()) {
+                        return $this->error("保存用户信息错误");
+                    }
+                    return $this->success();
+                }
+            }else{
+                return $this->error("没有sData");
+            }
+        }else{
+            return $this->error("没有sessionKey");
+        }
     }
 }

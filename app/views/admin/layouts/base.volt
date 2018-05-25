@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="/layui/css/layui.css"/>
+    <link rel="stylesheet" href="/css/base.css"/>
     <script src="/layui/layui.js"></script>
     {% block css %}{% endblock %}
 </head>
@@ -36,7 +37,7 @@
         {% block sidebar %}{% endblock %}
     </div>
 
-    <div class="layui-body">
+    <div class="layui-body pd-20">
         {% block content %}{% endblock %}
     </div>
 
@@ -52,10 +53,13 @@
         var $ = layui.$,
             layer = layui.layer;
         var currentUri = "{{ currentUri }}";
+        currentUri = currentUri.substring(0, currentUri.indexOf("?"));
         var model = currentUri.substring(7,currentUri.indexOf('/',7));
         $("."+model).siblings(".layui-nav-item").removeClass("layui-this");
         $("."+model).addClass("layui-this");
-
+        $(".layui-nav-tree .layui-nav-item").removeClass("layui-this");
+        $("a[href='"+currentUri+"']").addClass("layui-this");
+        $("a[href='"+currentUri+"']").closest(".layui-nav-item").addClass("layui-nav-itemed");
     });
 </script>
 {% block scripts %}{% endblock %}

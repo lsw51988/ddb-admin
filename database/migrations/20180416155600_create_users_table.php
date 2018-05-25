@@ -37,6 +37,7 @@ class CreateUsersTable extends AbstractMigration
             ->addColumn("mobile", "string", ["comment" => "手机", "limit" => 11, "null" => false])
             ->addColumn("status", "integer", ["comment" => "状态 0不可用 1可用", "limit" => 2, "default" => 1])
             ->addColumn("email", "string", ["comment" => "邮箱", "limit" => 20, "null" => false])
+            ->addColumn("login_ip", "string", ["comment" => "登录ip", "limit" => 20, "null" => false])
             ->addColumn("create_by", "integer", ["comment" => "创建者", "limit" => 10, "null" => false])
             ->addColumn("update_by", "integer", ["comment" => "更新者", "limit" => 10, "null" => false])
             ->addColumn("department_id", "integer", ["comment" => "部门id", "limit" => 20, "null" => false])

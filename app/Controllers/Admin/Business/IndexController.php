@@ -9,14 +9,13 @@
 namespace Ddb\Controllers\Admin\Business;
 
 
-use Ddb\Core\ViewBaseController;
+use Ddb\Controllers\AdminAuthController;
 
 /**
  * Class IndexController
- * 后台
  * @RoutePrefix("/admin/business")
  */
-class IndexController extends ViewBaseController
+class IndexController extends AdminAuthController
 {
     /**
      * @Get("/index")
@@ -24,17 +23,7 @@ class IndexController extends ViewBaseController
      */
     public function indexAction(){
         $this->view->setVars([
-            "content"=>"这里是后台首页",
+            "content"=>"这里是业务后台首页",
         ]);
     }
-
-    /**
-     * @Route("/login")
-     * 登录,这里注意只有限制IP才可以登录
-     */
-    public function loginAction(){
-
-    }
-
-
 }
