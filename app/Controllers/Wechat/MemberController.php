@@ -54,7 +54,7 @@ class MemberController extends WechatAuthController
         }
         //验证短信验证码
         if (di("cache")->get($data['mobile'] . "_auth") != $data['sms_code']) {
-            return $this->error("短信验证码不正确");
+            return $this->error("短信验证码不正确或过期");
         }
         $memberId = $this->currentMember->getId();
         $member = Member::findFirst($memberId);
@@ -88,6 +88,7 @@ class MemberController extends WechatAuthController
             return $this->error("积分变更失败");
         }
         $this->db->commit();
+        di("cache")->delete($data['mobile'] . "_auth");
 
         //需要重写缓存
         //$token = $this->token;
@@ -146,7 +147,7 @@ class MemberController extends WechatAuthController
         $file = $_FILES;
         $data = $this->data;
         $memberBikeId = $data['member_bike_id'];
-        $path = "MemberBikeImages/" . $member->getId() . DIRECTORY_SEPARATOR . $file['file']['name'];
+        $path = "MemberBikeImages/" . $member->getId() . DIRECTORY_SEPARATOR .uniqid(). $file['file']['name'];
         $memberBikeImage = new MemberBikeImages();
         $memberBikeImage->setMemberBikeId($memberBikeId)
             ->setSize($file['file']['size'])
@@ -265,7 +266,10 @@ class MemberController extends WechatAuthController
                     if (!$member->save()) {
                         return $this->error("保存用户信息错误");
                     }
-                    return $this->success();
+                    return $this->success([
+                        "avatarUrl"=>$member->getAvatarUrl(),
+                        "nickName"=>$member->getNickName()
+                    ]);
                 }
             }else{
                 return $this->error("没有sData");

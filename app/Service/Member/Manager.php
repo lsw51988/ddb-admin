@@ -9,13 +9,13 @@
 namespace Ddb\Service\Member;
 
 
+use Ddb\Models\MemberBikeImages;
 use Ddb\Models\MemberLocations;
 use Ddb\Modules\Member;
 use Ddb\Service\BaseService;
 use Ddb\Models\Members;
 use Phalcon\Exception;
 use Ddb\Helper\Wechat\WXBizDataCrypt;
-use Ddb\Helper\Wechat\ErrorCode;
 
 
 class Manager extends BaseService

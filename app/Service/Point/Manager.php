@@ -38,7 +38,7 @@ class Manager extends BaseService
             return false;
         }
         $currentPoint = (int)$member->getPoints();
-        $endPoint = $currentPoint - $point;
+        $endPoint = $currentPoint + $point;
         if ($endPoint < 0) {
             return false;
         }
