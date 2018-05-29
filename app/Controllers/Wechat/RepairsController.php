@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\RepairAuthImages;
 use Ddb\Models\RepairImages;
+use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Repair;
 use Phalcon\Exception;
@@ -59,7 +60,8 @@ class RepairsController extends WechatAuthController
             app_log()->error("用户增加维修点错误,member_id:" . $member->getId());
             return $this->error("维修点记录保存失败");
         }
-        if (!service("point/manager")->create($member, MemberPoint::TYPE_ADD_REPAIRS)) {
+        $currentMember = Member::findFirst($member->getId());
+        if (!service("point/manager")->create($currentMember, MemberPoint::TYPE_ADD_REPAIRS)) {
             return $this->error("积分变更失败");
         }
         $this->db->commit();

@@ -281,4 +281,21 @@ class MemberController extends WechatAuthController
             return $this->error("没有sessionKey");
         }
     }
+
+    /**
+     * @Get("/mobile")
+     * 获取用户的mobile信息
+     */
+    public function mobileAction(){
+        $currentMember = $this->currentMember;
+        $mobile = $currentMember->getMobile();
+        if($mobile){
+            return $this->success(
+                [
+                    "mobile"=>$mobile
+                ]
+            );
+        }
+        return $this->error();
+    }
 }

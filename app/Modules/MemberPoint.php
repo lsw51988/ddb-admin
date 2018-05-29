@@ -30,6 +30,7 @@ class MemberPoint extends MemberPoints
     const TYPE_PUBLISH_SHB = -1;
     const TYPE_CANCEL_APPEAL = -2;
     const TYPE_APPEAL_SOS = -3;
+    const TYPE_LOST_BIKE = -4;
 
     public static $typeDesc = [
         self::TYPE_REGISTER => "注册",
@@ -50,6 +51,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_PUBLISH_SHB => "发布二手车信息",
         self::TYPE_CANCEL_APPEAL => "取消帮助",
         self::TYPE_APPEAL_SOS => "无法移动,寻求帮助",
+        self::TYPE_LOST_BIKE => "车辆丢失",
     ];
 
     public static $typeScore = [
@@ -71,6 +73,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_PUBLISH_SHB => -100,
         self::TYPE_CANCEL_APPEAL => -10,
         self::TYPE_APPEAL_SOS => -10,
+        self::TYPE_LOST_BIKE => -10,
     ];
 
 }

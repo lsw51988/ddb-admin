@@ -21,7 +21,7 @@ class Manager extends BaseService
      * @param null $appeal_id
      * @return bool
      */
-    public function create(Member $member, $type, $second_bike_id = null, $appeal_id = null)
+    public function create(Member $member, $type, $second_bike_id = null, $appeal_id = null,$lost_bike_id=null)
     {
         $memberPoint = new MemberPoint();
         $point = MemberPoint::$typeScore[$type];
@@ -33,6 +33,9 @@ class Manager extends BaseService
         }
         if ($appeal_id) {
             $memberPoint->setAppealId($appeal_id);
+        }
+        if ($lost_bike_id) {
+            $memberPoint->setLostBikeId($lost_bike_id);
         }
         if (!$memberPoint->save()) {
             return false;

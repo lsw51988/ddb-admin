@@ -87,8 +87,6 @@ class AppealsController extends WechatAuthController
                 ->setStatus(Appeal::STATUS_CREATE);
             if ($appeal->save()) {
                 di("cache")->delete($data['mobile'] . "_auth");
-
-
                     return $this->success([
                         "appeal_id" => $appeal->getId()
                     ]);
