@@ -63,10 +63,10 @@ class Manager extends Service
     }
 
 
-    public function send($smsCodeId, $token)
+    public function send($smsCodeId, $token = null)
     {
         //需要从缓存中进行判断是否具有发送短信资格,防止暴力调用接口
-        if (!di("cache")->get($token . "_tcgmc")) {
+        if ($token != null && !di("cache")->get($token . "_tcgmc")) {
             return false;
         }
         $smsCode = SmsCode::findFirst($smsCodeId);
@@ -136,12 +136,35 @@ class Manager extends Service
         }
     }
 
-    public function verify($mobile,$smsCode){
+    public function verify($mobile, $smsCode)
+    {
         if (di("cache")->get($mobile . "_auth") != $smsCode) {
             return false;
-        }else{
+        } else {
             di("cache")->delete($mobile . "_auth");
             return true;
         }
+    }
+
+    public function create($mobile, $code, $template, $status = 1)
+    {
+        $smsCode = new SmsCode();
+        $smsCode->setMobile($mobile)
+            ->setTemplate($template)
+            ->setCode($code);
+        if ($smsCode->save()) {
+            return $smsCode;
+        } else {
+            return false;
+        }
+    }
+
+    //每日发送短信上限为10条
+    public function canSend($mobile)
+    {
+        if (SmsCode::count("mobile=" . $mobile . " AND created_at>='" . Date("Y-m-d 00:00:00", time()) . "'") > 10) {
+            return false;
+        }
+        return true;
     }
 }

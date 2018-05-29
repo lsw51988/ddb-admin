@@ -119,6 +119,9 @@ class MemberController extends WechatAuthController
     {
         $token = $this->token;
         $data = $this->data;
+        if(!service("sms/manager")->canSend($data['mobile'])){
+            return $this->error("已经超过今日发送短信上限");
+        }
         $code = service("sms/manager")->getSmsCode();
         $smsCode = new SmsCode();
         $smsCodeData['mobile'] = $data['mobile'];

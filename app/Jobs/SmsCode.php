@@ -12,6 +12,8 @@ while (true) {
     } else {
         di("queue")->bury($job, 10240);
     }
-    di("cache")->delete($token . "_tcgmc");
+    if($token!=null){
+        di("cache")->delete($token . "_tcgmc");
+    }
 }
 

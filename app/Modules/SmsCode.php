@@ -23,4 +23,7 @@ class SmsCode extends SmsCodes
     //通用模板 ${code}，5分钟内有效！
     const TEMPLATE_INDEX = "SMS_133270990";
 
+    //修理者接到请求者的取消通知
+    const TEMPLATE_CANCEL = "SMS_135797836";
+
 }

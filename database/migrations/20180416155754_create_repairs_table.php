@@ -31,6 +31,7 @@ class CreateRepairsTable extends AbstractMigration
     {
         $this->table("repairs")
             ->addColumn("name", "string", ["limit" => 20, "null" => false, "comment" => "名称"])
+            ->addColumn("address", "string", ["limit" => 60, "null" => false, "comment" => "地址"])
             ->addColumn("belonger_name", "string", ["limit" => 20, "null" => false, "comment" => "店主姓名或姓氏"])
             ->addColumn("type", "integer", ["limit" => 20, "default" => 0, "comment" => "类型 0电动车维修点 1电动车维修兼销售点 2便民开锁点"])
             ->addColumn("longitude", "string", ["limit" => 10, "null" => false, "comment" => "经度"])

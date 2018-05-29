@@ -12,6 +12,7 @@ namespace Ddb\Controllers;
 use Ddb\Core\BaseController;
 use Ddb\Models\MemberBikeImages;
 use Ddb\Models\RepairImages;
+use Ddb\Modules\SmsCode;
 use Phalcon\Mvc\Controller;
 
 class TestController extends BaseController
@@ -50,5 +51,13 @@ class TestController extends BaseController
             $data[] = di("config")->app->URL."/wechat/repair/repairImg/".$image['id'];
         }
         return $this->success($data);
+    }
+
+    /**
+     * @Get("/smsCount")
+     */
+    public function smsAction(){
+        $count = SmsCode::count("mobile=" . "15077893963" . " AND created_at>='" . Date("Y-m-d 00:00:00", time()) . "'");
+        echo $count;
     }
 }
