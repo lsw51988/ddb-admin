@@ -32,7 +32,7 @@ class CreateSuggestionsTable extends AbstractMigration
         $this->table("suggestions")
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联member"])
             ->addColumn("content", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "建议"])
-            ->addColumn("type", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "类别"])
+            ->addColumn("type", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "类别"])
             ->addColumn("user_id", "integer", ["limit" => MysqlAdapter::INT_SMALL, "null" => true, "comment" => "审核人"])
             ->addColumn("refuse_reason", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => true, "comment" => "拒绝原因"])
             ->addColumn("reply", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => true, "comment" => "采纳情况下的回复"])

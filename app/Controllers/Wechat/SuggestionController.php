@@ -19,10 +19,16 @@ use Ddb\Controllers\WechatAuthController;
 class SuggestionController extends WechatAuthController
 {
     /**
-     * @Post("/")
+     * @Post("/create")
      */
     public function createAction(){
-
+        $data = $this->data;
+        $memberId = $this->currentMember->getId();
+        if(service("suggestion/manager")->create($memberId,$data)){
+            return $this->success();
+        }else{
+            return $this->error("添加失败");;
+        }
     }
 
     /**
