@@ -12,7 +12,7 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-
+        echo "欢迎来到电动帮";
     }
 
     public function route404Action()
