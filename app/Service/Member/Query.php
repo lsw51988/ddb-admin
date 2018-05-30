@@ -83,13 +83,15 @@ class Query extends BaseService
                 ]
             ])->toArray();
             if (count($memberBikeImgs) > 0) {
-                $imgs = array_column($memberBikeImgs,"id");
-                foreach($imgs as $k=>$v){
-                    $imgs[$k] = di("config")->app->URL."/wechat/member/bikeImg/".$v;
+                $imgs = array_column($memberBikeImgs, "id");
+                foreach ($imgs as $k => $v) {
+                    $imgs[$k] = di("config")->app->URL . "/wechat/member/bikeImg/" . $v;
                 }
                 $data['bikeImgs'] = $imgs;
+            } else {
+                $data['bikeImgs'] = [];
             }
-        }else{
+        } else {
             $data['brand_name'] = "";
             $data['buy_date'] = "";
             $data['number'] = "";
@@ -100,8 +102,8 @@ class Query extends BaseService
             $data['bikeImgs'] = [];
         }
         $districtCode = $member->getDistrict();
-        if($addr = Areas::findFirstByDistrictCode($districtCode)){
-            $data['region'] = [$addr->getProvinceName(),$addr->getCityName(),$addr->getDistrictName()];
+        if ($addr = Areas::findFirstByDistrictCode($districtCode)) {
+            $data['region'] = [$addr->getProvinceName(), $addr->getCityName(), $addr->getDistrictName()];
         }
         return $data;
     }
