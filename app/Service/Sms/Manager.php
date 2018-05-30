@@ -74,7 +74,7 @@ class Manager extends Service
             return false;
         }
         //本地环境不发送
-        if (APP_ENV != "local") {
+        //if (APP_ENV != "local") {
             // 初始化SendSmsRequest实例用于设置发送短信的参数
             $request = new SendSmsRequest();
 
@@ -116,15 +116,15 @@ class Manager extends Service
                 app_log("queue")->error("发送失败,smsCodeId=" . $smsCode->getId() . "原因是:" . $e->getMessage());
                 return false;
             }
-        } else {
-            if (!$result = $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save()) {
+        /*} else {
+            if ($result = $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save()) {
                 app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId());
                 return true;
             } else {
                 app_log("queue")->error("发送失败,smsCodeId=" . $smsCode->getId() . "原因是:数据库保存状态失败");
                 return false;
             }
-        }
+        }*/
     }
 
     public function getSmsCode()
