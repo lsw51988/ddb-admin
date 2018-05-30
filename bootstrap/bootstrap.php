@@ -15,7 +15,7 @@ $di->setShared(
                 'lifetime' => '1209600'
             ]
         );
-        if (PHP_SAPI == "cli" || APP_ENV == "local") {
+        if (PHP_SAPI == "cli" || APP_ENV == "local" || APP_ENV == "qa") {
             //本地或cli环境下用本地文件存储 文件缓存时间会存在问题
             $cache = new Phalcon\Cache\Backend\File(
                 $frontCache,
