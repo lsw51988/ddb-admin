@@ -109,7 +109,7 @@ class Manager extends Service
                 } else {
                     $smsCode->setStatus(SmsCode::STATUS_FAIL)->save();
                 }
-                app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId());
+                app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId()."走的qa");
                 return true;
             } catch (Exception $e) {
                 $smsCode->setStatus(SmsCode::STATUS_FAIL)->save();
@@ -118,7 +118,7 @@ class Manager extends Service
             }
         } else {
             if ($result = $smsCode->setStatus(SmsCode::STATUS_SUCCESS)->save()) {
-                app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId());
+                app_log("queue")->info("发送成功,smsCodeId=" . $smsCode->getId()."走的本地");
                 return true;
             } else {
                 app_log("queue")->error("发送失败,smsCodeId=" . $smsCode->getId() . "原因是:数据库保存状态失败");
