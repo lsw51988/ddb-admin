@@ -27,7 +27,7 @@ return [
         'tecent_addr_key'=>'6MSBZ-F25WU-GW7VT-BDDKI-XV2WT-JNF37',
         'APP_ID'=>'wx3bd752036e968963',
         'APP_SECRET'=>'2b8e86b02fae128e93099f3549faacb6',
-        'URL'=>'http://www.qa-njddb.com'
+        'URL'=>'http://www.ebikea.com'
     ],
     'production'=>[
         "cryptKey"=>"lsw20180414<>_~@#$%&^",

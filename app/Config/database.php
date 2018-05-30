@@ -8,7 +8,7 @@ return [
         'charset' => 'utf8'
     ],
     'qa' => [
-        'host' => 'localhost',
+        'host' => '47.97.194.247',
         'dbname' => 'ddb',
         'username' => 'lsw',
         'password' => 'lsw51988',
