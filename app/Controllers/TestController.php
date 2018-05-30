@@ -60,4 +60,11 @@ class TestController extends BaseController
         $count = SmsCode::count("mobile=" . "15077893963" . " AND created_at>='" . Date("Y-m-d 00:00:00", time()) . "'");
         echo $count;
     }
+
+    /**
+     * @Get("/testConfig")
+     */
+    public function testConfigAction(){
+        print_r(di("config"));
+    }
 }
