@@ -2,7 +2,6 @@
 require_once __DIR__ . "/../../bootstrap/bootstrap.php";
 
 while (true) {
-    app_log("queue")->info();
     $job = di("queue")->watch("SmsCode")->reserve();
     $data = unserialize($job->getData());
     $smsCodeId = $data['smsCodeId'];
