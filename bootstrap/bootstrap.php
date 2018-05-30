@@ -53,7 +53,7 @@ $di->setShared(
                 foreach ($configFiles as $configFile) {
                     $name = substr(basename($configFile), 0, -4);
                     $configData = require $configFile;
-                    $config[strtolower($name)] = $configData["local"];
+                    $config[strtolower($name)] = $configData[APP_ENV];
                 }
                 di("cache")->save("config", serialize($config));
             }
