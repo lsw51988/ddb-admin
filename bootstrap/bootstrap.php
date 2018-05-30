@@ -46,7 +46,7 @@ $di->setShared(
         if (di("cache")->get("config")) {
             $config = unserialize(di("cache")->get("config"));
         } else {
-            $configDir = APP_PATH . "/Config";
+            $configDir = getenv("APP_ENV") . "/Config";
             $configFiles = glob($configDir . '/*.php');
             $config = [];
             if (di("cache")->get("config") == null) {
@@ -228,7 +228,7 @@ $di->setShared(
 $di->setShared(
     'filesystem',
     function () {
-        if (APP_ENV == 'local') {
+        if (getenv("APP_ENV") == 'local') {
             return new \League\Flysystem\Adapter\Local(di('config')->filesystem->root);
         }else{
             $ossClient = new \OSS\OssClient(di('config')->filesystem->AccessKeyId, di('config')->filesystem->AccessKeySecret, di('config')->filesystem->Endpoint, false);
