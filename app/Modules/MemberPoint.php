@@ -76,4 +76,18 @@ class MemberPoint extends MemberPoints
         self::TYPE_LOST_BIKE => -10,
     ];
 
+    //根据充值金额,返回具体的充值类型值
+    public static function getRechargeType($amount){
+        if($amount == 10){
+            $type = MemberPoint::TYPE_RECHARGE_10;
+        }
+        if($amount == 50){
+            $type = MemberPoint::TYPE_RECHARGE_50;
+        }
+        if($amount == 100){
+            $type = MemberPoint::TYPE_RECHARGE_100;
+        }
+        return $type;
+    }
+
 }

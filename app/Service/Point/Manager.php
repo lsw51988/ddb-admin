@@ -56,11 +56,11 @@ class Manager extends BaseService
     public function recharge($member,$body,$ip,$totalFee){
         $url = di("config")->pay->PAY_URL;
         $param = [];
-        $param['appid'] = di("config")->pay->APP_ID;
+        $param['appid'] = di("config")->app->APP_ID;
         $param['body'] = $body;
         $param['mch_id'] = di("config")->pay->MCH_ID;
         $param['nonce_str'] = md5(di("security")->hash($member->getId().rand(100000,99999).time()));
-        $param['notify_url'] = di("config")->app->NOTIFY_URL;
+        $param['notify_url'] = di("config")->pay->NOTIFY_URL;
         $param['openid'] = $member->getOpenId();
         $param['out_trade_no'] = $member->getId().'_'.time().rand(10000,99999);//订单号
         $param['spbill_create_ip'] = $ip;
@@ -75,7 +75,7 @@ class Manager extends BaseService
         $param['sign'] = $sign;
 
         $order = new Order();
-        if(!$order->save($param)){
+        if(!$order->setMemberId($member->getId())->save($param)){
             app_log("pay")->error("创建order订单失败");
             return false;
         }
@@ -94,7 +94,7 @@ class Manager extends BaseService
                 $wechatData['package'] = "prepay_id=" . $prepay_id;
                 $wechatData['signType'] = "MD5";
                 $wechatData['timeStamp'] = time();
-                $wechatSign = "appId=".di("config")->pay->APP_ID."&";
+                $wechatSign = "appId=".di("config")->app->APP_ID."&";
                 foreach ($wechatData as $k => $v) {
                     $wechatSign = $wechatSign . $k . "=" . $v . "&";
                 }

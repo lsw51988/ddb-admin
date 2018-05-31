@@ -14,6 +14,7 @@ use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Order;
 use Ddb\Modules\SmsCode;
+use Phalcon\Exception;
 
 /**
  * Class PointController
@@ -70,34 +71,25 @@ class PointController extends WechatAuthController
         $orderId = $data['orderId'];
         if($order = Order::findFirst($orderId)){
             $amount = $order->getTotalFee()/100;
-            $type = "TYPE_RECHARGE_".$amount;
+            $type = MemberPoint::getRechargeType($amount);
             $this->db->begin();
             $sData = [
                 "member_id"=>$memberId,
                 "point"=>$order->getTotalFee()/10
             ];
             $member = Member::findFirst($memberId);
-            if(!$order->setFinishTime(Date("Y-m-d H:i:s",time()))->save()){
+            try{
+                $order->setFinishTime(Date("Y-m-d H:i:s",time()))->save();
+                service("point/manager")->create($member, $type);
+                $member->setPoints($member->getPoints()+$order->getTotalFee()/10)->save();
+                $this->db->commit();
+                return $this->success();
+            }catch (Exception $e){
                 $this->db->rollback();
                 $smsCode = service("sms/manager")->create($member, SmsCode::TEMPLATE_RECHARGE_FAIL,SmsCode::TEMPLATE_RECHARGE_FAIL);
                 di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), null,$sData]));
-                //短信通知管理员
+                return $this->error("管理员已经收到充值未成功短信,将即时处理,给您带来不便,敬请谅解.");
             }
-
-            if(!service("point/manager")->create($member, MemberPoint::$type)){
-                $this->db->rollback();
-                $smsCode = service("sms/manager")->create($member, SmsCode::TEMPLATE_RECHARGE_FAIL,SmsCode::TEMPLATE_RECHARGE_FAIL);
-                di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), null,$sData]));
-                //短信通知管理员
-            }
-            if(!$member->setPoints($member->getPoints()+$order->getTotalFee()/10)->save()){
-                $this->db->rollback();
-                $smsCode = service("sms/manager")->create($member, SmsCode::TEMPLATE_RECHARGE_FAIL,SmsCode::TEMPLATE_RECHARGE_FAIL);
-                di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), null,$sData]));
-                //短信通知管理员
-            }
-            $this->db->commit();
-            return $this->success();
         }else{
             //此处应该记录该member_id
             app_log("pay")->error("member_id:".$this->currentMember->getId()."非法调用充值积分接口!");
