@@ -149,7 +149,7 @@ class AppealsController extends WechatAuthController
             $awrId = $appeal->getAwrId();
             if($awr = Member::findFirst($awrId)){
                 if($smsCode = service("sms/manager")->create($awr->getMobile(),SmsCode::TEMPLATE_CANCEL,SmsCode::TEMPLATE_CANCEL)){
-                    di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), 'token' => null]));
+                    di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId()]));
                 }
             }
         }

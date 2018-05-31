@@ -63,7 +63,7 @@ class Manager extends Service
     }
 
 
-    public function send($smsCodeId, $token = null)
+    public function send($smsCodeId, $token = null, $data = [])
     {
         //需要从缓存中进行判断是否具有发送短信资格,防止暴力调用接口
         if ($token != null && !di("cache")->get($token . "_tcgmc")) {
@@ -91,9 +91,19 @@ class Manager extends Service
             $request->setTemplateCode($smsCode->getTemplate());
 
             // 可选，设置模板参数, 假如模板中存在变量需要替换则为必填项
-            $request->setTemplateParam(json_encode(array(  // 短信模板中字段的值
-                "code" => $smsCode->getCode()
-            ), JSON_UNESCAPED_UNICODE));
+            if ($smsCode->getTemplate() == SmsCode::TEMPLATE_INDEX) {
+                $request->setTemplateParam(json_encode(array(  // 短信模板中字段的值
+                    "code" => $smsCode->getCode()
+                ), JSON_UNESCAPED_UNICODE));
+            }
+
+            if ($smsCode->getTemplate() == SmsCode::TEMPLATE_RECHARGE_FAIL) {
+                $request->setTemplateParam(json_encode(array(  // 短信模板中字段的值
+                    "member_id" => $data['member_id'],
+                    "point" => $data['point']
+                ), JSON_UNESCAPED_UNICODE));
+            }
+
 
             // 可选，设置流水号
             ///$request->setOutId("yourOutId");

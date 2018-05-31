@@ -65,14 +65,14 @@ class TestController extends BaseController
      * @Get("/testConfig")
      */
     public function testConfigAction(){
-        print_r(di("config"));
+        print_r($this->request->getClientAddress());
     }
 
     /**
      * @Get("/pay")
      */
-    public function strAction(){
-        $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+    public function payAction(){
+        $url = di("config")->pay->PAY_URL;
         $param = [];
         $param['appid'] = "wx3bd752036e968963";
         $param['body'] = "电动帮-积分充值";
@@ -80,7 +80,7 @@ class TestController extends BaseController
         $param['nonce_str'] = md5(di("security")->hash('1'.rand(100000,99999).time()));
         $param['notify_url'] = "https://www.ebikea.com/wechat/point/pay_callback";
         $param['openid'] = "oKgHM4myAdesr0AyoIU_JXjvOVz8";
-        $param['out_trade_no'] = "2018053101";
+        $param['out_trade_no'] = "2018053107";
         $param['spbill_create_ip'] = "121.225.203.141";
         $param['total_fee'] = "8";//分钱
         $param['trade_type'] = "JSAPI";
@@ -89,10 +89,48 @@ class TestController extends BaseController
         foreach ($param as $k=>$v){
             $sign = $sign.$k."=".$v."&";
         }
-        $sign = substr($sign,0,(strlen($sign)-1));
+        $sign = $sign."key=fb9e16006856eacc2500856f1c39a05f";
+        $sign = strtoupper(md5($sign));
+        //$sign = $sign."&key="
         $param['sign'] = $sign;
 
-        $result = curl_request($url, "POST", $param);
-        print_r($result);
+        $xml = $this->arrayToXml($param);
+
+        $result = curl_request($url, "POST", $xml);
+        $rData = json_decode(json_encode(simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA)),true);
+        if($rData['return_code']=="SUCCESS" && $rData['result_code']=="SUCCESS"){
+            //准备给小程序的数据
+            $prepay_id = $rData['prepay_id'];
+            //$wechatData['appId'] = "wx3bd752036e968963";
+
+            $wechatData['nonceStr'] = $param['nonce_str'];
+            $wechatData['package'] = "prepay_id=".$prepay_id;
+            $wechatData['signType'] = "MD5";
+            $wechatData['timeStamp'] = time();
+            $wechatSign = "appId=wx3bd752036e968963&";
+            foreach ($wechatData as $k=>$v){
+                $wechatSign = $wechatSign.$k."=".$v."&";
+            }
+            $wechatSign = $wechatSign."key=fb9e16006856eacc2500856f1c39a05f";
+            $wechatSign = strtoupper(md5($wechatSign));
+            $wechatData['paySign'] = $wechatSign;
+            return $this->success($wechatData);
+        }else{
+            //告诉小程序出错的具体信息
+
+        }
+    }
+
+    private function arrayToXml($arr){
+        $xml = "<xml>";
+        foreach ($arr as $key=>$val){
+            if(is_array($val)){
+                $xml.="<".$key.">".$this->arrayToXml($val)."</".$key.">";
+            }else{
+                $xml.="<".$key.">".$val."</".$key.">";
+            }
+        }
+        $xml.="</xml>";
+        return $xml;
     }
 }

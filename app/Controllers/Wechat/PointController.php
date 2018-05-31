@@ -10,6 +10,10 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Modules\Member;
+use Ddb\Modules\MemberPoint;
+use Ddb\Modules\Order;
+use Ddb\Modules\SmsCode;
 
 /**
  * Class PointController
@@ -42,39 +46,63 @@ class PointController extends WechatAuthController
 
     /**
      * @Post("/pay")
+     * 充值积分
      */
     public function payAction(){
+        $data = $this->data;
+        $totalFee = $data['total_fee'];
+        $requestIp = $this->request->getClientAddress();
         $member = $this->currentMember;
-        $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
-        $param = [];
-        $param['appid'] = "wx3bd752036e968963";
-        $param['body'] = "电动帮-积分充值";
-        $param['mch_id'] = "1504528021";
-        $param['nonce_str'] = md5(di("security")->hash($member->getId().rand(100000,99999).time()));
-        $param['notify_url'] = "https://www.ebikea.com/wechat/point/pay_callback";
-        $param['openid'] = "oKgHM4myAdesr0AyoIU_JXjvOVz8";
-        $param['out_trade_no'] = "2018053101";
-        $param['spbill_create_ip'] = "121.225.203.141";
-        $param['total_fee'] = "8";//分钱
-        $param['trade_type'] = "JSAPI";
-
-        $sign = "";
-        foreach ($param as $k=>$v){
-            $sign = $sign.$k."=".$v."&";
+        if($wechatData = service("point/manager")->recharge($member,"电动帮-积分充值",$requestIp,$totalFee)){
+            return $this->success($wechatData);
+        }else{
+            return $this->error();
         }
-        $sign = substr($sign,0,(strlen($sign)-1));
-        $param['sign'] = $sign;
-
-        $result = curl_request($url, "POST", $param);
-        print_r($result);
     }
 
     /**
-     * @Get("/pay_callback")
+     * @Post("/pay_callback")
+     * 小程序回调
      */
     public function payCallbackAction(){
         $data = $this->data;
-        app_log("pay")->info($data);
+        $memberId= $this->currentMember->getId();
+        $orderId = $data['orderId'];
+        if($order = Order::findFirst($orderId)){
+            $amount = $order->getTotalFee()/100;
+            $type = "TYPE_RECHARGE_".$amount;
+            $this->db->begin();
+            $sData = [
+                "member_id"=>$memberId,
+                "point"=>$order->getTotalFee()/10
+            ];
+            $member = Member::findFirst($memberId);
+            if(!$order->setFinishTime(Date("Y-m-d H:i:s",time()))->save()){
+                $this->db->rollback();
+                $smsCode = service("sms/manager")->create($member, SmsCode::TEMPLATE_RECHARGE_FAIL,SmsCode::TEMPLATE_RECHARGE_FAIL);
+                di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), null,$sData]));
+                //短信通知管理员
+            }
+
+            if(!service("point/manager")->create($member, MemberPoint::$type)){
+                $this->db->rollback();
+                $smsCode = service("sms/manager")->create($member, SmsCode::TEMPLATE_RECHARGE_FAIL,SmsCode::TEMPLATE_RECHARGE_FAIL);
+                di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), null,$sData]));
+                //短信通知管理员
+            }
+            if(!$member->setPoints($member->getPoints()+$order->getTotalFee()/10)->save()){
+                $this->db->rollback();
+                $smsCode = service("sms/manager")->create($member, SmsCode::TEMPLATE_RECHARGE_FAIL,SmsCode::TEMPLATE_RECHARGE_FAIL);
+                di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), null,$sData]));
+                //短信通知管理员
+            }
+            $this->db->commit();
+            return $this->success();
+        }else{
+            //此处应该记录该member_id
+            app_log("pay")->error("member_id:".$this->currentMember->getId()."非法调用充值积分接口!");
+            return $this->error("没有该订单");
+        }
     }
 
 }

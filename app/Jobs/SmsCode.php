@@ -6,8 +6,9 @@ while (true) {
     $data = unserialize($job->getData());
     $smsCodeId = $data['smsCodeId'];
     $token = $data['token'];
+    $data = $data['data'];
     //业务逻辑
-    if (service("sms/manager")->send($smsCodeId, $token)) {
+    if (service("sms/manager")->send($smsCodeId, $token,$data)) {
         di("queue")->delete($job);
     } else {
         di("queue")->bury($job, 10240);

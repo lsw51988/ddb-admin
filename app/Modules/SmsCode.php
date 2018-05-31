@@ -26,4 +26,7 @@ class SmsCode extends SmsCodes
     //修理者接到请求者的取消通知
     const TEMPLATE_CANCEL = "SMS_135797836";
 
+    //短信通知管理员充值成功.用户points没有变化
+    const TEMPLATE_RECHARGE_FAIL = "SMS_136390398";
+
 }

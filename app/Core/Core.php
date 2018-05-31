@@ -42,7 +42,7 @@ if (!function_exists("app_log")) {
     }
 }
 if (!function_exists("curl_request")) {
-    function curl_request($url, $method = "GET", $param = [])
+    function curl_request($url, $method = "GET", $param = "")
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);

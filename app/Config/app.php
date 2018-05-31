@@ -17,7 +17,6 @@ return [
         'APP_ID'=>'wx3bd752036e968963',
         'APP_SECRET'=>'2b8e86b02fae128e93099f3549faacb6',
         'URL'=>'http://local.ddb.com'
-
     ],
     'qa'=>[
         "cryptKey"=>"lsw20180414<>_~@#$%&^",
