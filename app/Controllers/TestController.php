@@ -67,4 +67,32 @@ class TestController extends BaseController
     public function testConfigAction(){
         print_r(di("config"));
     }
+
+    /**
+     * @Get("/pay")
+     */
+    public function strAction(){
+        $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+        $param = [];
+        $param['appid'] = "wx3bd752036e968963";
+        $param['body'] = "电动帮-积分充值";
+        $param['mch_id'] = "1504528021";
+        $param['nonce_str'] = md5(di("security")->hash('1'.rand(100000,99999).time()));
+        $param['notify_url'] = "https://www.ebikea.com/wechat/point/pay_callback";
+        $param['openid'] = "oKgHM4myAdesr0AyoIU_JXjvOVz8";
+        $param['out_trade_no'] = "2018053101";
+        $param['spbill_create_ip'] = "121.225.203.141";
+        $param['total_fee'] = "8";//分钱
+        $param['trade_type'] = "JSAPI";
+
+        $sign = "";
+        foreach ($param as $k=>$v){
+            $sign = $sign.$k."=".$v."&";
+        }
+        $sign = substr($sign,0,(strlen($sign)-1));
+        $param['sign'] = $sign;
+
+        $result = curl_request($url, "POST", $param);
+        print_r($result);
+    }
 }
