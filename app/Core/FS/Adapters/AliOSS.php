@@ -112,17 +112,9 @@ class AliOSS extends AbstractAdapter
      */
     public function rename($path, $newpath)
     {
-        $this->client->copyObject([
-            'SourceBucket' => $this->bucket,
-            'SourceKey' => $path,
-            'DestBucket' => $this->bucket,
-            'DestKey' => $newpath
-        ]);
+        $this->client->copyObject($this->bucket,$path,$this->bucket,$newpath);
 
-        $this->client->deleteObject([
-            'Bucket' => $this->bucket,
-            'Key' => $path
-        ]);
+        $this->client->deleteObject($this->bucket,$path);
 
         return true;
     }
@@ -137,12 +129,7 @@ class AliOSS extends AbstractAdapter
      */
     public function copy($path, $newpath)
     {
-        return $this->client->copyObject([
-            'SourceBucket' => $this->bucket,
-            'SourceKey' => $path,
-            'DestBucket' => $this->bucket,
-            'DestKey' => $newpath
-        ]);
+        $this->client->copyObject($this->bucket,$path,$this->bucket,$newpath);
     }
 
     /**
@@ -154,10 +141,7 @@ class AliOSS extends AbstractAdapter
      */
     public function delete($path)
     {
-        $this->client->deleteObject([
-            'Bucket' => $this->bucket,
-            'Key' => $path
-        ]);
+        $this->client->deleteObject($this->bucket,$path);
         return true;
     }
 
@@ -170,10 +154,7 @@ class AliOSS extends AbstractAdapter
      */
     public function deleteDir($dirname)
     {
-        $this->client->deleteObject([
-            'Bucket' => $this->bucket,
-            'Key' => $dirname
-        ]);
+        $this->client->deleteObject($this->bucket,$dirname);
         return true;
     }
 
@@ -194,12 +175,7 @@ class AliOSS extends AbstractAdapter
             $path = $dirname;
         }
 
-        $this->client->putObject([
-            "Bucket" => $this->bucket,
-            "Key" => $path,
-            "Content" => "",
-            "ContentLength" => 0
-        ]);
+        $this->client->putObject($this->bucket,$path,"");
 
         return ['path' => $dirname, 'type' => 'dir'];
     }
@@ -226,10 +202,7 @@ class AliOSS extends AbstractAdapter
      */
     public function has($path)
     {
-        if ($this->client->getObjectMetadata([
-            "Bucket" => $this->bucket,
-            "Key" => $path
-        ])) {
+        if ($this->client->doesObjectExist($this->bucket,$path)) {
             return true;
         }
         return false;
@@ -245,12 +218,9 @@ class AliOSS extends AbstractAdapter
     public function read($path)
     {
         /* @var $object OSSObject */
-        $object = $this->client->getObject([
-            "Bucket" => $this->bucket,
-            "Key" => $path
-        ]);
+        $object = $this->client->getObject($this->bucket,$path);
 
-        return $this->normalizeMetaData($path, $object) + ['contents' => stream_get_contents($object->getObjectContent())];
+        return $object;
     }
 
     /**
@@ -262,16 +232,7 @@ class AliOSS extends AbstractAdapter
      */
     public function readStream($path)
     {
-        $object = $this->client->getObject([
-            "Bucket" => $this->bucket,
-            "Key" => $path
-        ]);
-
-        $stream = fopen('php://temp', 'w+');
-        fwrite($stream, stream_get_contents($object->getObjectContent()));
-        rewind($stream);
-
-        return $this->normalizeMetaData($path, $object) + ['stream' => $stream];
+        //todo
     }
 
     /**
@@ -296,12 +257,7 @@ class AliOSS extends AbstractAdapter
      */
     public function getMetadata($path)
     {
-        $objectMeta = $this->client->getObjectMetadata([
-            "Bucket" => $this->bucket,
-            "Key" => $path
-        ]);
-
-        return $this->normalizeMetaData($path, $objectMeta);
+        //todo
     }
 
     /**
@@ -352,49 +308,4 @@ class AliOSS extends AbstractAdapter
         return ['visibility' => true];
     }
 
-    /**
-     * Builds the normalized output array from a object.
-     *
-     * @param string $path
-     * @param OSSObject $object
-     * @return array
-     * @internal param BlobProperties $properties
-     *
-     */
-    protected function normalizeMetaData($path, OSSObject $object)
-    {
-        return [
-            'path'      => $path,
-            'timestamp' => (int) $object->getLastModified()->format('U'),
-            'dirname'   => Util::dirname($path),
-            'mimetype'  => $object->getContentType(),
-            'size'      => $object->getContentLength(),
-            'type'      => 'file',
-        ];
-    }
-
-    /**
-     * Builds the normalized output array.
-     *
-     * @param string $path
-     * @param int    $timestamp
-     * @param mixed  $content
-     *
-     * @return array
-     */
-    protected function normalize($path, $timestamp, $content = null)
-    {
-        $data = [
-            'path'      => $path,
-            'timestamp' => (int) $timestamp,
-            'dirname'   => Util::dirname($path),
-            'type'      => 'file',
-        ];
-
-        if (is_string($content)) {
-            $data['contents'] = $content;
-        }
-
-        return $data;
-    }
 }

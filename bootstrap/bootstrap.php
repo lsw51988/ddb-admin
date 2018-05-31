@@ -46,7 +46,7 @@ $di->setShared(
         if (di("cache")->get("config")) {
             $config = unserialize(di("cache")->get("config"));
         } else {
-            $configDir = getenv("APP_ENV") . "/Config";
+            $configDir = APP_PATH . "/Config";
             $configFiles = glob($configDir . '/*.php');
             $config = [];
             if (di("cache")->get("config") == null) {

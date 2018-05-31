@@ -28,7 +28,7 @@ class Manager extends BaseService
     public function saveFile($filePath, $fileContent)
     {
         $config = $this->getConfig();
-        if(APP_ENV=="local"){
+        if(getenv("APP_ENV")=="local"){
             $fileContent = file_get_contents($fileContent);
         }
         return di("filesystem")->write($filePath, $fileContent, $config);

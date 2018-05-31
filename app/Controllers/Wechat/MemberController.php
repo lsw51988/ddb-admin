@@ -182,7 +182,7 @@ class MemberController extends WechatAuthController
         }
         $path = $memberBikeImage->getPath();
         $data = service("file/manager")->read($path);
-        return $this->response->setContent($data['contents'])->setContentType('image/jpeg');
+        return $this->response->setContent($data)->setContentType('image/jpeg');
     }
 
     /**
