@@ -12,6 +12,8 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Models\Areas;
+use Ddb\Modules\Member;
+use Ddb\Modules\SecondBike;
 use Phalcon\Exception;
 
 /**
@@ -28,9 +30,9 @@ class SHBController extends WechatAuthController
     public function createAction()
     {
         $member = $this->currentMember;
-        if (!service("shb/query")->hasEnoughPoint($member)) {
+        /*if (!service("shb/query")->hasEnoughPoint($member)) {
             return $this->error("积分不足");
-        }
+        }*/
         //需要首先判断用户积分是否足够
         $data = $this->data;
 
@@ -61,13 +63,12 @@ class SHBController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = $this->data;
-        if (isset($data['region'])) {
+        if (!isset($data['district'])) {
             $district = $member->getDistrict();
-            $districtName = Areas::findByDistrictCode($district)->getDistrictName();
-            $data['district'] = $districtName;
-        } else {
-            $region = explode(",", $data['region']);
-            $data['district'] = $region[2];
+            $area = Areas::findFirstByDistrictCode($district);
+
+            $data['city'] = $area->getCityName();
+            $data['district'] = $area->getDistrictName();
         }
         $rData = service("shb/query")->getList($data);
         return $this->success($rData);
@@ -79,7 +80,8 @@ class SHBController extends WechatAuthController
      */
     public function detailAction($id)
     {
-
+        $data = service("shb/query")->getShbDetail($id);
+        return $this->success($data);
     }
 
     /**
@@ -114,12 +116,14 @@ class SHBController extends WechatAuthController
     }
 
     /**
-     * Post("/contact/{id:[0-9]+}")
+     * @Get("/contact/{id:[0-9]+}")
      * 联系相应发布者
      */
     public function contactAction($id)
     {
-
+        $member = $this->currentMember;
+        service("shb/manager")->contact($member,$id);
+        return $this->success();
     }
 
     /**
@@ -128,7 +132,9 @@ class SHBController extends WechatAuthController
      */
     public function browseAction($id)
     {
-
+        $member = $this->currentMember;
+        service("shb/manager")->browse($member,$id);
+        return $this->success();
     }
 
 }

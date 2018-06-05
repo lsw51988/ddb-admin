@@ -10,10 +10,10 @@ namespace Ddb\Controllers\Wechat;
 
 use Ddb\Core\BaseController;
 use Ddb\Helper\Captcha;
-use Ddb\Helper\Wechat\WXBizDataCrypt;
 use Ddb\Models\Areas;
 use Ddb\Models\Members;
 use Ddb\Modules\Member;
+use Ddb\Models\MemberLocations;
 
 /**
  * Class IndexController
@@ -78,7 +78,8 @@ class IndexController extends BaseController
                 "auth_time" => $member->getAuthTime(),
                 "mobile" => $member->getMobile(),
                 "id" => $member->getId(),
-                "union_flag" => $unionFlag
+                "union_flag" => $unionFlag,
+                "location" => [$location->result->address_component->province, $location->result->address_component->city, $location->result->address_component->district]
             ]);
         } else {
             return $this->success($location);
@@ -156,6 +157,11 @@ class IndexController extends BaseController
         } else {
             //说明此时后端的token已经过期,此时应该产生新的token,并将原有的token删除,防止token的值一直不变
             $member = Member::findFirst($memberId);
+            $memberLocation = MemberLocations::findFirst([
+                "conditions" => "member_id = $memberId",
+                "order" => "created_at DESC"
+            ]);
+            $unionFlag = $member->getUnionId() == null ? false : true;
             $rData = [];
             $rData['auth_time'] = $member->getAuthTime();
             $rData['avatarUrl'] = $member->getAvatarUrl();
@@ -163,6 +169,8 @@ class IndexController extends BaseController
             $rData['mobile'] = $member->getMobile();
             $rData['nickName'] = $member->getNickName();
             $rData['token'] = $member->getToken();
+            $rData['union_flag'] = $unionFlag;
+            $rData['location'] = [$memberLocation->getProvince(), $memberLocation->getCity(), $memberLocation->getDistrict()];
             return $this->error($rData);
         }
     }

@@ -11,6 +11,7 @@ namespace Ddb\Service\Shb;
 
 use Ddb\Core\Service;
 use Ddb\Models\SecondBikes;
+use Ddb\Models\SecondBikeBrowses;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
@@ -55,5 +56,21 @@ class Manager extends Service
         }
     }
 
+    public function browse($member, $id)
+    {
+        $secondBikeBrowse = new SecondBikeBrowses();
+        $secondBikeBrowse->setMemberId($member->getId())
+            ->setSecondBikeId($id)
+            ->save();
+    }
 
+    public function contact($member, $id)
+    {
+        $secondBikeBrowse = SecondBikeBrowses::findFirst([
+            "conditions" => "second_bike_id = $id AND member_id = " . $member->getId(),
+            "order" => "created_at DESC"
+        ]);
+        $secondBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
+            ->save();
+    }
 }
