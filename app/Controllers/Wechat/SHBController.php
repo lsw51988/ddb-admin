@@ -11,8 +11,7 @@ namespace Ddb\Controllers\Wechat;
 
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\SecondBikeImages;
-use Ddb\Models\SecondBikes;
-use Ddb\Modules\MemberPoint;
+use Ddb\Models\Areas;
 use Phalcon\Exception;
 
 /**
@@ -55,10 +54,23 @@ class SHBController extends WechatAuthController
     /**
      * @Get("/list")
      * 列表
+     * 根据当前用户的地址自动筛选出当前区域的车辆
+     * 需要返回用户当前的地址
      */
     public function listAction()
     {
-
+        $member = $this->currentMember;
+        $data = $this->data;
+        if (isset($data['region'])) {
+            $district = $member->getDistrict();
+            $districtName = Areas::findByDistrictCode($district)->getDistrictName();
+            $data['district'] = $districtName;
+        } else {
+            $region = explode(",", $data['region']);
+            $data['district'] = $region[2];
+        }
+        $rData = service("shb/query")->getList($data);
+        return $this->success($rData);
     }
 
     /**

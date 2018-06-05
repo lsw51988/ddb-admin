@@ -44,10 +44,11 @@ class CreateSecondBikesTable extends AbstractMigration
             ->addColumn("district", "string", ['limit' => 8,"null" => false, "comment" => "所在区"])
             ->addColumn("detail_addr", "string", ['limit' => 30,"null" => false, "comment" => "详细地址"])
             ->addColumn("number", "string", ['limit' => 20,"null" => false, "comment" => "车牌号"])
-            ->addColumn("extended", "integer", ["limit" => MysqlAdapter::INT_TINY,"default" => 0, "comment" => "是否延期过一次"])
             ->addColumn("remark", "string", ["limit" => MysqlAdapter::INT_TINY,"null" => true, "comment" => "备注"])
-            ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY,"default" => 1, "comment" => "状态 1提交 2审核通过 3审核拒绝 4成功交易 5过期4天 6过期7天 7状态异常"])
+            ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY,"default" => 1, "comment" => "状态 1提交 2自主取消 3成功交易 4状态异常"])
             ->addColumn("deal_time","timestamp",["comment"=>"成交时间","null" => true])
+            ->addColumn("cancel_time","timestamp",["comment"=>"取消时间","null" => true])
+            ->addColumn("cancel_reason","string",["comment"=>"取消原因","null" => true])
             ->addTimestamps()
             ->save();
     }
