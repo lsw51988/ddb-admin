@@ -38,7 +38,10 @@ class AppealsController extends WechatAuthController
         $currentMember = $this->currentMember;
         if ($this->request->isGet()) {
             //1.检查30分钟之内是否有发送过请求
-            if ($appeal = Appeal::findFirst(["created_at>='" . Date("Y-m-d H:i:s", time() - 30 * 60) . "'"])) {
+            if ($appeal = Appeal::findFirst([
+                "conditions" => "created_at>='" . Date("Y-m-d H:i:s", time() - 30 * 60) . "'",
+                "order" => "created_at DESC"
+            ])) {
                 return $this->success([
                     "mobile" => $currentMember->getMobile(),
                     "appeal" => $appeal
@@ -53,26 +56,26 @@ class AppealsController extends WechatAuthController
                 return $this->error("一天最多只能请求3次帮助");
             }
             $nearMts = service("repair/query")->getNearMtsByRadius($data['longitude'], $data['latitude']);
-            if(sizeof($nearMts)==0){
+            if (sizeof($nearMts) == 0) {
                 return $this->error([
                     "no_repairs" => true
                 ]);
             }
 
-            //验证短信验证码
+            /*//验证短信验证码
             if (di("cache")->get($data['mobile'] . "_auth") != $data['sms_code']) {
                 return $this->error("短信验证码不正确或过期");
-            }
+            }*/
             if (isset($data['appeal_id'])) {
                 $appeal = Appeal::findFirst($data['appeal_id']);
             } else {
                 $appeal = new Appeal();
                 $member = Member::findFirst($currentMember->getId());
-                if($member->getPoints()<10){
+                if ($member->getPoints() < 10) {
                     return $this->error("积分不足");
                 }
-                service("point/manager")->create($member, MemberPoint::TYPE_APPEAL_SOS,  null, $appeal->getId());
-                $member->setPoints($member->getPoints()+MemberPoint::TYPE_APPEAL_SOS)->save();
+                service("point/manager")->create($member, MemberPoint::TYPE_APPEAL_SOS, null, $appeal->getId());
+                $member->setPoints($member->getPoints() + MemberPoint::TYPE_APPEAL_SOS)->save();
             }
             //付费拖车服务 积分奖励暂时取消,前期并不会很拥挤
             if ($data['method'] == Appeal::METHOD_SOS) {
@@ -87,9 +90,9 @@ class AppealsController extends WechatAuthController
                 ->setStatus(Appeal::STATUS_CREATE);
             if ($appeal->save()) {
                 di("cache")->delete($data['mobile'] . "_auth");
-                    return $this->success([
-                        "appeal_id" => $appeal->getId()
-                    ]);
+                return $this->success([
+                    "appeal_id" => $appeal->getId()
+                ]);
 
             } else {
                 return $this->error("保存不成功");
@@ -147,8 +150,8 @@ class AppealsController extends WechatAuthController
 
         if ($appeal->getMethod() == Appeal::METHOD_SOS && $appeal->getStatus() == Appeal::STATUS_ANSWER) {
             $awrId = $appeal->getAwrId();
-            if($awr = Member::findFirst($awrId)){
-                if($smsCode = service("sms/manager")->create($awr->getMobile(),SmsCode::TEMPLATE_CANCEL,SmsCode::TEMPLATE_CANCEL)){
+            if ($awr = Member::findFirst($awrId)) {
+                if ($smsCode = service("sms/manager")->create($awr->getMobile(), SmsCode::TEMPLATE_CANCEL, SmsCode::TEMPLATE_CANCEL)) {
                     di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId()]));
                 }
             }

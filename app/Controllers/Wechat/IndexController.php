@@ -70,6 +70,7 @@ class IndexController extends BaseController
         }
         if ($location->status == 0) {
             service("member/manager")->saveLocation($member, $location);
+            $repairFlag = service("member/query")->isRepair($member);
             $unionFlag = $member->getUnionId() == null ? false : true;
             return $this->success([
                 "token" => $member->getToken(),
@@ -79,6 +80,7 @@ class IndexController extends BaseController
                 "mobile" => $member->getMobile(),
                 "id" => $member->getId(),
                 "union_flag" => $unionFlag,
+                "repair_flag" => $repairFlag,
                 "location" => [$location->result->address_component->province, $location->result->address_component->city, $location->result->address_component->district]
             ]);
         } else {

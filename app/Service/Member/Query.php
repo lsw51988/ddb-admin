@@ -13,6 +13,7 @@ use Ddb\Models\MemberBikeImages;
 use Ddb\Models\MemberPoints;
 use Ddb\Models\Members;
 use Ddb\Modules\MemberBike;
+use Ddb\Modules\Repair;
 use Ddb\Service\BaseService;
 use Ddb\Models\Areas;
 
@@ -106,5 +107,15 @@ class Query extends BaseService
             $data['region'] = [$addr->getProvinceName(), $addr->getCityName(), $addr->getDistrictName()];
         }
         return $data;
+    }
+
+    /**
+     * 判断用户是否是修理者
+     */
+    public function isRepair($member){
+        if(Repair::findFirstByBelongerId($member->getId())){
+            return true;
+        }
+        return false;
     }
 }

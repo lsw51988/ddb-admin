@@ -14,6 +14,8 @@ namespace PHPSTORM_META {
         \service('') => [
             '' == '@',
             'appeal/query' instanceof \Ddb\Service\Appeal\Query,
+            'appealanswer/query' instanceof \Ddb\Service\AppealAnswer\Query,
+            'appealanswer/manager' instanceof \Ddb\Service\AppealAnswer\Manager,
             'file/manager' instanceof \Ddb\Service\File\Manager,
             'member/query' instanceof \Ddb\Service\Member\Query,
             'member/manager' instanceof \Ddb\Service\Member\Manager,
