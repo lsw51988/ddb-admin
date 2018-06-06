@@ -12,8 +12,6 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Models\Areas;
-use Ddb\Modules\Member;
-use Ddb\Modules\SecondBike;
 use Phalcon\Exception;
 
 /**
@@ -69,6 +67,9 @@ class SHBController extends WechatAuthController
 
             $data['city'] = $area->getCityName();
             $data['district'] = $area->getDistrictName();
+        }
+        if(!empty($data['self_flag'])){
+            $data['member_id'] = $member->getId();
         }
         $rData = service("shb/query")->getList($data);
         return $this->success($rData);
@@ -135,6 +136,15 @@ class SHBController extends WechatAuthController
         $member = $this->currentMember;
         service("shb/manager")->browse($member,$id);
         return $this->success();
+    }
+
+    /**
+     * @Get("/manage_detail/{id:[0-9]+}")
+     * 管理详情
+     */
+    public function manageDetailAction($id){
+        $data = service("shb/query")->getManageDetail($id);
+        return $this->success($data);
     }
 
 }

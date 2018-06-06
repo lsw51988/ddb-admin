@@ -42,6 +42,9 @@ class Manager extends Service
         if (isset($data['remark'])) {
             $shb->setRemark($data['remark']);
         }
+        if (isset($data['last_change_time']) && $data['last_change_time']!="未更换") {
+            $shb->setLastChangeTime($data['last_change_time']);
+        }
         if (!$shb->save()) {
             $this->db->rollback();
             return false;

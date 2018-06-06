@@ -58,26 +58,31 @@ class Query extends Service
                     break;
             }
         }
+        if (!empty($search['self_flag'])) {
+            $conditions = $conditions . " AND member_id = " . $search['member_id'];
+        }
+
         $data = SecondBike::page($columns, $conditions, [], $order);
         return $data;
     }
 
-    public function getShbDetail($id){
+    public function getShbDetail($id)
+    {
         $shb = SecondBike::findFirst($id);
         $seller = Member::findFirst($shb->getMemberId());
 
         $shbImages = SecondBikeImages::find([
-            "conditions"=>"second_bike_id = $id",
-            "columns"=>"id"
+            "conditions" => "second_bike_id = $id",
+            "columns" => "id"
         ]);
 
         $imgUrls = [];
-        foreach($shbImages as $shbImage){
+        foreach ($shbImages as $shbImage) {
             $imgUrls[] = di("config")->app->URL . "/wechat/member/bikeImg/" . $shbImage->id;
         }
 
         $data = [];
-        $data['buy_date'] = substr($shb->getBuyDate(),0,-3);
+        $data['buy_date'] = substr($shb->getBuyDate(), 0, -3);
         $data['voltage'] = $shb->getVoltage();
         $data['brand_name'] = $shb->getBrandName();
         $data['out_price'] = $shb->getOutPrice();
@@ -90,6 +95,39 @@ class Query extends Service
         $data['member_name'] = $seller->getRealName();
         $data['mobile'] = $seller->getMobile();
         $data['imgUrls'] = $imgUrls;
+
+        return $data;
+    }
+
+    public function getManageDetail($id){
+        $shb = SecondBike::findFirst($id);
+        $seller = Member::findFirst($shb->getMemberId());
+
+        $shbImages = SecondBikeImages::find([
+            "conditions" => "second_bike_id = $id",
+            "columns" => "id"
+        ]);
+        $imgUrls = [];
+        foreach ($shbImages as $shbImage) {
+            $imgUrls[] = di("config")->app->URL . "/wechat/member/bikeImg/" . $shbImage->id;
+        }
+
+        $data = [];
+        $data['member_name'] = $seller->getRealName();
+        $data['mobile'] = $seller->getMobile();
+        $data['imgUrls'] = $imgUrls;
+        $data['buy_date'] = substr($shb->getBuyDate(), 0, -3);
+        $data['voltage'] = $shb->getVoltage();
+        $data['brand_name'] = $shb->getBrandName();
+        $data['out_price'] = $shb->getOutPrice();
+        $data['in_status'] = $shb->getInStatus();
+        $data['last_change_time'] = $shb->getLastChangeTime();
+        $data['province'] = $shb->getProvince();
+        $data['city'] = $shb->getCity();
+        $data['district'] = $shb->getDistrict();
+        $data['detail_addr'] = $shb->getDetailAddr();
+        $data['number'] = $shb->getNumber();
+        $data['remark'] = $shb->getRemark();
 
         return $data;
     }
