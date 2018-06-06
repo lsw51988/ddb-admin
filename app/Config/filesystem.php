@@ -2,7 +2,10 @@
 
 return [
     'local' => [
-        'root' => APP_PATH . '/../storage/images'
+        'Bucket' => 'ddb-qa',
+        'Endpoint' => 'http://oss-cn-shanghai.aliyuncs.com',
+        'AccessKeyId' => 'LTAIalkl1uFofBe4',
+        'AccessKeySecret' => 'h51e6LTIfRvvDVRIhQITBjAnaThYwG'
     ],
 
     'qa' => [

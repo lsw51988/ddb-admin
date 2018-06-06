@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Models\Areas;
+use Ddb\Modules\SecondBike;
 use Phalcon\Exception;
 
 /**
@@ -28,9 +29,9 @@ class SHBController extends WechatAuthController
     public function createAction()
     {
         $member = $this->currentMember;
-        /*if (!service("shb/query")->hasEnoughPoint($member)) {
+        if (!service("shb/query")->hasEnoughPoint($member, "create")) {
             return $this->error("积分不足");
-        }*/
+        }
         //需要首先判断用户积分是否足够
         $data = $this->data;
 
@@ -43,13 +44,78 @@ class SHBController extends WechatAuthController
     }
 
     /**
-     * @Put("/update")
+     * @Post("/update")
      * 修改二手车信息
      */
     public function updateAction()
     {
+        $member = $this->currentMember;
+        if (!service("shb/query")->hasEnoughPoint($member, "update")) {
+            return $this->error("积分不足");
+        }
+        $data = $this->data;
 
+        if ($shbId = service("shb/manager")->update($member, $data)) {
+            return $this->success();
+        }
+        return $this->error();
     }
+
+    /**
+     * @Post("/repub")
+     * 重新发布二手车信息
+     */
+    public function repubAction()
+    {
+        $member = $this->currentMember;
+        if (!service("shb/query")->hasEnoughPoint($member, "repub")) {
+            return $this->error("积分不足");
+        }
+        $data = $this->data;
+
+        if ($shbId = service("shb/manager")->repub($member, $data)) {
+            return $this->success();
+        }
+        return $this->error();
+    }
+
+    /**
+     * @Get("/revoke/{id:[0-9]+}")
+     * 撤销二手车
+     */
+    public function revokeAction($id)
+    {
+        $data = $this->data;
+        $member = $this->currentMember;
+        if ($shb = SecondBike::findFirst($id)) {
+            if ($shb->getMemberId() != $member->getId()) {
+                return $this->error("非本人操作");
+            }
+            $shb->setStatus(SecondBike::STATUS_CANCEL)->setCancelTime(date("Y-m-d H:i:s", time()))->setCancelReason($data['reason'])->save();
+            return $this->success();
+        } else {
+            return $this->error("未找到该条记录");
+        }
+    }
+
+    /**
+     * @Get("/deal/{id:[0-9]+}")
+     * 成交二手车
+     */
+    public function dealAction($id)
+    {
+        $member = $this->currentMember;
+        if ($shb = SecondBike::findFirst($id)) {
+            if ($shb->getMemberId() != $member->getId()) {
+                return $this->error("非本人操作");
+            }
+            $shb->setStatus(SecondBike::STATUS_DEAL)->setDealTime(date("Y-m-d H:i:s", time()))->save();
+            return $this->success();
+        } else {
+            return $this->error("未找到该条记录");
+        }
+    }
+
 
     /**
      * @Get("/list")
@@ -68,7 +134,7 @@ class SHBController extends WechatAuthController
             $data['city'] = $area->getCityName();
             $data['district'] = $area->getDistrictName();
         }
-        if(!empty($data['self_flag'])){
+        if (!empty($data['self_flag'])) {
             $data['member_id'] = $member->getId();
         }
         $rData = service("shb/query")->getList($data);
@@ -123,7 +189,7 @@ class SHBController extends WechatAuthController
     public function contactAction($id)
     {
         $member = $this->currentMember;
-        service("shb/manager")->contact($member,$id);
+        service("shb/manager")->contact($member, $id);
         return $this->success();
     }
 
@@ -134,7 +200,7 @@ class SHBController extends WechatAuthController
     public function browseAction($id)
     {
         $member = $this->currentMember;
-        service("shb/manager")->browse($member,$id);
+        service("shb/manager")->browse($member, $id);
         return $this->success();
     }
 
@@ -142,9 +208,42 @@ class SHBController extends WechatAuthController
      * @Get("/manage_detail/{id:[0-9]+}")
      * 管理详情
      */
-    public function manageDetailAction($id){
+    public function manageDetailAction($id)
+    {
         $data = service("shb/query")->getManageDetail($id);
         return $this->success($data);
     }
 
+    /**
+     * @Get("/bikeImg/{id:[0-9]+}")
+     * 查看电动车照片
+     */
+    public function bikeImgAction($id)
+    {
+        if (!$secondBikeImage = SecondBikeImages::findFirst($id)) {
+            return $this->error("找不到图片");
+        }
+        $path = $secondBikeImage->getPath();
+        $data = service("file/manager")->read($path);
+        return $this->response->setContent($data)->setContentType('image/jpeg');
+    }
+
+    /**
+     * @Delete("/bikeImg/{id:[0-9]+}")
+     * 删除电动车照片
+     */
+    public function deleteBikeImgAction($id)
+    {
+        if ($secondBikeImage = SecondBikeImages::findFirst($id)) {
+            $path = $secondBikeImage->getPath();
+            if (service("file/manager")->deleteFile($path)) {
+                $secondBikeImage->delete();
+                return $this->success();
+            } else {
+                app_log()->error("用户删除电动车图片失败,bikeImageId=" . $secondBikeImage->getId());
+                return $this->error("删除图片失败");
+            }
+        }
+        return $this->error("未找到或已经删除该记录");
+    }
 }

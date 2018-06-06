@@ -1,7 +1,7 @@
 <?php
 return [
     'local' => [
-        'host' => 'localhost',
+        'host' => '47.97.194.247',
         'dbname' => 'ddb',
         'username' => 'lsw',
         'password' => 'lsw51988',

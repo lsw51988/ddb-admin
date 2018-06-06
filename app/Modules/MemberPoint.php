@@ -31,6 +31,8 @@ class MemberPoint extends MemberPoints
     const TYPE_CANCEL_APPEAL = -2;
     const TYPE_APPEAL_SOS = -3;
     const TYPE_LOST_BIKE = -4;
+    const TYPE_UPDATE_SHB = -5;
+    const TYPE_REPUB_SHB = -6;
 
     public static $typeDesc = [
         self::TYPE_REGISTER => "注册",
@@ -52,6 +54,8 @@ class MemberPoint extends MemberPoints
         self::TYPE_CANCEL_APPEAL => "取消帮助",
         self::TYPE_APPEAL_SOS => "无法移动,寻求帮助",
         self::TYPE_LOST_BIKE => "车辆丢失",
+        self::TYPE_UPDATE_SHB => "更新二手车信息",
+        self::TYPE_REPUB_SHB => "重新发布二手车",
     ];
 
     public static $typeScore = [
@@ -74,6 +78,8 @@ class MemberPoint extends MemberPoints
         self::TYPE_CANCEL_APPEAL => -10,
         self::TYPE_APPEAL_SOS => -10,
         self::TYPE_LOST_BIKE => -10,
+        self::TYPE_UPDATE_SHB => -10,
+        self::TYPE_REPUB_SHB => -100,
     ];
 
     //根据充值金额,返回具体的充值类型值

@@ -13,14 +13,23 @@ use Ddb\Core\Service;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
-use Ddb\Models\Areas;
 use Ddb\Modules\SecondBike;
 
 class Query extends Service
 {
-    public function hasEnoughPoint($member)
+    public function hasEnoughPoint($member,$type)
     {
-        if ($member->getPoints() < abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB])) {
+        if($type=="create"){
+            $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
+        }
+        if($type=="update"){
+            $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
+        }
+        if($type=="repub"){
+            $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_REPUB_SHB]);
+        }
+
+        if ($member->getPoints() < $point) {
             return false;
         }
         return true;
@@ -29,7 +38,7 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,brand_name,out_price,city,district,created_at";
-        $conditions = "status=1";
+        $conditions = "1=1";
         if (!empty($search['time'])) {
             switch ($search['time']) {
                 case 1:
@@ -62,7 +71,7 @@ class Query extends Service
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
         }
 
-        $data = SecondBike::page($columns, $conditions, [], $order);
+        $data = SecondBike::page($columns, $conditions, [], $order,$search['current_page']);
         return $data;
     }
 
@@ -78,7 +87,7 @@ class Query extends Service
 
         $imgUrls = [];
         foreach ($shbImages as $shbImage) {
-            $imgUrls[] = di("config")->app->URL . "/wechat/member/bikeImg/" . $shbImage->id;
+            $imgUrls[] = di("config")->app->URL . "/wechat/shb/bikeImg/" . $shbImage->id;
         }
 
         $data = [];
@@ -109,7 +118,7 @@ class Query extends Service
         ]);
         $imgUrls = [];
         foreach ($shbImages as $shbImage) {
-            $imgUrls[] = di("config")->app->URL . "/wechat/member/bikeImg/" . $shbImage->id;
+            $imgUrls[] = di("config")->app->URL . "/wechat/shb/bikeImg/" . $shbImage->id;
         }
 
         $data = [];
@@ -120,6 +129,7 @@ class Query extends Service
         $data['voltage'] = $shb->getVoltage();
         $data['brand_name'] = $shb->getBrandName();
         $data['out_price'] = $shb->getOutPrice();
+        $data['in_price'] = $shb->getInPrice();
         $data['in_status'] = $shb->getInStatus();
         $data['last_change_time'] = $shb->getLastChangeTime();
         $data['province'] = $shb->getProvince();
@@ -128,6 +138,7 @@ class Query extends Service
         $data['detail_addr'] = $shb->getDetailAddr();
         $data['number'] = $shb->getNumber();
         $data['remark'] = $shb->getRemark();
+        $data['status'] = $shb->getStatus();
 
         return $data;
     }

@@ -228,13 +228,13 @@ $di->setShared(
 $di->setShared(
     'filesystem',
     function () {
-        if (getenv("APP_ENV") == 'local') {
+        /*if (getenv("APP_ENV") == 'local') {
             return new \League\Flysystem\Adapter\Local(di('config')->filesystem->root);
-        }else{
+        }else{*/
             $ossClient = new \OSS\OssClient(di('config')->filesystem->AccessKeyId, di('config')->filesystem->AccessKeySecret, di('config')->filesystem->Endpoint, false);
             $aliOss = new \Ddb\Core\FS\Adapters\AliOSS(di('config')->filesystem->Bucket,$ossClient);
             return $aliOss;
-        }
+        //}
     }
 );
 
