@@ -133,4 +133,78 @@ class TestController extends BaseController
         $xml.="</xml>";
         return $xml;
     }
+
+    /**
+     * @Get("/ext")
+     */
+    public function extAction(){
+        $url = "www.badiu.com/1.php?a=1";
+        /*//$url = basename($url);
+        $pos1 = strrpos($url,'.');
+        $pos2 = strpos($url,'?');
+
+        if(strstr($url,'?')){
+            echo substr($url,$pos1+1,$pos2-$pos1-1);
+        }else{
+            echo substr($url,$pos1);
+        }*/
+        $name = parse_url($url);
+        $extArr=explode('.',$name);
+        return $extArr[1];
+    }
+
+    /**
+     * @Get("/dir")
+     */
+    public function dirAction(){
+        echo date("d/m/Y",time());
+        /*
+        $dir = "/home/lsw/wx";
+        $files = $this->my_scandir($dir);
+        print_r($files);*/
+    }
+
+    /**
+     * @Get("/preg")
+     */
+    public function pregAction(){
+        $date = "2014-12-12 10:00:00";
+        preg_match("/^[0-9]{4}(\-|\/)[0-1]{1}[0-9]{1}(\\1)[0-1]{1}[0-9]{1}\s[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}$/",$date,$match);
+        print_r($match);
+
+        $day = date("j",time());
+        print_r(date("Y-m-d",strtotime("-{$day} days",time())));
+    }
+
+    /**
+     * @param $dir
+     * @return array
+     */
+    private function my_scandir($dir){
+        $files=array();
+        //检测是否存在文件
+        if(is_dir($dir)){
+            //打开目录
+            if($handle=opendir($dir)) {
+                //返回当前文件的条目
+                while(($file=readdir($handle))!==false){
+                    //去除特殊目录
+                    if($file!="." && $file!=".."){
+                        //判断子目录是否还存在子目录
+                        if(is_dir($dir."/".$file)){
+                            //递归调用本函数，再次获取目录
+                            $files[$file]=$this->my_scandir($dir."/".$file);
+                        }else {
+                            //获取目录数组
+                            $files[]=$dir."/".$file;
+                        }
+                    }
+                }
+                //关闭文件夹
+                closedir($handle);
+                //返回文件夹数组
+                return $files;
+            }
+        }
+    }
 }

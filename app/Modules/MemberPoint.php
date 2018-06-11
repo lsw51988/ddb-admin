@@ -66,7 +66,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_NEW_PAGE => 1,
         self::TYPE_SUGGESTION => 2,
         self::TYPE_SUGGESTION_APPROVED => 2,
-        self::TYPE_RECOMMEND => 2,
+        self::TYPE_RECOMMEND => 10,
         self::TYPE_SCORE => 2,
         self::TYPE_APPEAL => 2,
         self::TYPE_APPEAL_CALLBACK => 2,

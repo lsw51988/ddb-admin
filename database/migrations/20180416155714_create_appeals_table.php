@@ -34,7 +34,7 @@ class CreateAppealsTable extends AbstractMigration
             ->addColumn("awr_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "应答人id"])
             ->addColumn("method", "integer", ["limit" => 10, "comment" => "求助方式 1查看附近维修点 2请求拖车帮助"])
             ->addColumn("type", "integer", ["limit" => 50, "comment" => "故障类型"])
-            ->addColumn("desc", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => true, "comment" => "故障描述"])
+            ->addColumn("description", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => true, "comment" => "故障描述"])
             ->addColumn("mobile", "string", ["limit" => 11, "null" => true, "comment" => "手机号"])
             ->addColumn("longitude", "string", ["limit" => 10, "null" => true, "comment" => "经度"])
             ->addColumn("latitude", "string", ["limit" => 10, "null" => true, "comment" => "纬度"])

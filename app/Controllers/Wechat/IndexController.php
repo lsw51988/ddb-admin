@@ -12,8 +12,10 @@ use Ddb\Core\BaseController;
 use Ddb\Helper\Captcha;
 use Ddb\Models\Areas;
 use Ddb\Models\Members;
+use Ddb\Models\Recommends;
 use Ddb\Modules\Member;
 use Ddb\Models\MemberLocations;
+use Ddb\Modules\MemberPoint;
 
 /**
  * Class IndexController
@@ -57,6 +59,11 @@ class IndexController extends BaseController
                 return $this->error("用户数据保存错误");
             }
             di("cache")->save($data['token'], serialize($member), 30 * 24 * 3600);
+            if ($data['share_member_id'] != "") {
+                service("recommend/manager")->create($data['share_member_id'],$member->getId());
+                $tMember = Member::findFirst($data['share_member_id']);
+                service("point/manager")->create($tMember, MemberPoint::TYPE_RECOMMEND);
+            }
         } else {
             if (!di("cache")->get($member->getToken())) {
                 $member->setToken($token)

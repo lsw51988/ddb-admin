@@ -22,6 +22,7 @@ namespace PHPSTORM_META {
             'point/manager' instanceof \Ddb\Service\Point\Manager,
             'queue/manager' instanceof \Ddb\Service\Queue\Manager,
             'repair/query' instanceof \Ddb\Service\Repair\Query,
+            'recommend/manager' instanceof \Ddb\Service\Recommend\Manager,
             'shb/query' instanceof \Ddb\Service\Shb\Query,
             'shb/manager' instanceof \Ddb\Service\Shb\Manager,
             'sms/manager' instanceof \Ddb\Service\Sms\Manager,

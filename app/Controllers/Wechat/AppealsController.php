@@ -85,7 +85,7 @@ class AppealsController extends WechatAuthController
                 ->setType($data['type'])
                 ->setLongitude($data['longitude'])
                 ->setLatitude($data['latitude'])
-                ->setDesc($data['desc'])
+                ->setDescription($data['desc'])
                 ->setAskId($currentMember->getId())
                 ->setStatus(Appeal::STATUS_CREATE);
             if ($appeal->save()) {
