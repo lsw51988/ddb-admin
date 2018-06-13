@@ -33,6 +33,7 @@ class CreateLostBikeContactsTable extends AbstractMigration
         $this->table("lost_bike_contacts")
             ->addColumn("lost_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "lost_bike关联"])
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "联系人,member_bike关联"])
+            ->addColumn("call_time", "timestamp", [ "null" => true, "comment" => "打电话时间"])
             ->addTimestamps()
             ->save();
     }

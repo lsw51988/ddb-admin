@@ -115,4 +115,56 @@ class LostController extends WechatAuthController
             return $this->success();
         }
     }
+
+    /**
+     * @Get("/list")
+     */
+    public function listAction(){
+        $member = $this->currentMember;
+        $data = $this->data;
+        if (!isset($data['district'])) {
+            $district = $member->getDistrict();
+            $area = Areas::findFirstByDistrictCode($district);
+
+            $data['city'] = $area->getCityName();
+            $data['district'] = $area->getDistrictName();
+        }
+
+        $rData = service("lost/query")->getList($data);
+        return $this->success($rData);
+    }
+
+    /**
+     * @Get("/contact/{id:[0-9]+}")
+     * 联系相应发布者
+     */
+    public function contactAction($id)
+    {
+        $member = $this->currentMember;
+        service("lost/manager")->contact($member, $id);
+        return $this->success();
+    }
+
+    /**
+     * @Get("/detail/{id:[0-9]}")
+     * id值得是lostBikeId
+     * 详情
+     */
+    public function detailAction($id)
+    {
+        $data = service("lost/query")->getDetail($id);
+        return $this->success($data);
+    }
+
+    /**
+     * @Get("/browse/{id:[0-9]+}")
+     * 浏览详情
+     */
+    public function browseAction($id)
+    {
+        $member = $this->currentMember;
+        service("lost/manager")->browse($member, $id);
+        return $this->success();
+    }
+
 }
