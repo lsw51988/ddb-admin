@@ -60,7 +60,7 @@ class Query extends Service
         if (!empty($search['price'])) {
             switch ($search['price']) {
                 case 1:
-                    $order = "out_price ACS";
+                    $order = "out_price ASC";
                     break;
                 case 2:
                     $order = "out_price DESC";

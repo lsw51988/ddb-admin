@@ -41,7 +41,7 @@ class Query extends Service
         if (!empty($search['rewards'])) {
             switch ($search['rewards']) {
                 case 1:
-                    $order = "rewards ACS";
+                    $order = "rewards ASC";
                     break;
                 case 2:
                     $order = "rewards DESC";
