@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\MemberSigns;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
@@ -119,7 +120,7 @@ class MemberController extends WechatAuthController
     {
         $token = $this->token;
         $data = $this->data;
-        if(!service("sms/manager")->canSend($data['mobile'])){
+        if (!service("sms/manager")->canSend($data['mobile'])) {
             return $this->error("已经超过今日发送短信上限");
         }
         $code = service("sms/manager")->getSmsCode();
@@ -150,7 +151,7 @@ class MemberController extends WechatAuthController
         $file = $_FILES;
         $data = $this->data;
         $memberBikeId = $data['member_bike_id'];
-        $path = "MemberBikeImages/" . $member->getId() . DIRECTORY_SEPARATOR .uniqid(). $file['file']['name'];
+        $path = "MemberBikeImages/" . $member->getId() . DIRECTORY_SEPARATOR . uniqid() . $file['file']['name'];
         $memberBikeImage = new MemberBikeImages();
         $memberBikeImage->setMemberBikeId($memberBikeId)
             ->setSize($file['file']['size'])
@@ -255,7 +256,7 @@ class MemberController extends WechatAuthController
         $encryptedData = $data['encryptedData'];
         $appId = di("config")->app->APP_ID;
         $memberId = $this->currentMember->getId();
-        if($this->currentMember->getUnionId()){
+        if ($this->currentMember->getUnionId()) {
             return $this->success();
         }
         if ($sessionKey = di("cache")->get($memberId . '_sessionKey')) {
@@ -270,14 +271,14 @@ class MemberController extends WechatAuthController
                         return $this->error("保存用户信息错误");
                     }
                     return $this->success([
-                        "avatarUrl"=>$member->getAvatarUrl(),
-                        "nickName"=>$member->getNickName()
+                        "avatarUrl" => $member->getAvatarUrl(),
+                        "nickName" => $member->getNickName()
                     ]);
                 }
-            }else{
+            } else {
                 return $this->error("没有sData");
             }
-        }else{
+        } else {
             return $this->error("没有sessionKey");
         }
     }
@@ -286,16 +287,34 @@ class MemberController extends WechatAuthController
      * @Get("/mobile")
      * 获取用户的mobile信息
      */
-    public function mobileAction(){
+    public function mobileAction()
+    {
         $currentMember = $this->currentMember;
         $mobile = $currentMember->getMobile();
-        if($mobile){
+        if ($mobile) {
             return $this->success(
                 [
-                    "mobile"=>$mobile
+                    "mobile" => $mobile
                 ]
             );
         }
         return $this->error();
+    }
+
+    /**
+     * @Post("sign")
+     * 连续七天签到的话则多增加10个积分
+     */
+    public function signAction()
+    {
+        $member = $this->currentMember;
+        if ($memberSign = MemberSigns::findFirst("member_id = '" . $member->getId() . " AND created_at>='" . date("Y-m-d H:i:s", time()) . "'")) {
+            return $this->error("今日已经签过");
+        } else {
+            $memberSign = new MemberSigns();
+            $memberSign->setMemberId($member->getId())->save();
+            service("point/manager")->create($member, MemberPoint::TYPE_SIGN);
+            return $this->success();
+        }
     }
 }

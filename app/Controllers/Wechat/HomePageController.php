@@ -34,14 +34,17 @@ class HomePageController extends WechatAuthController
         $member = $this->currentMember;
         $data = [];
         $point = service("member/query")->getTotalPoints($member);
+        $data['point'] = $point;
         $data['level'] = service("member/query")->getLevel($point);
-        $data['times'] = 0;
+        $data['appeal_times'] = 0;
+        $data['deal_times'] = 0;
         if ($member->getType() == Member::TYPE_RIDE) {
-            $data['times'] = service("appeal/query")->getAskCount($member);
+            $data['appeal_times'] = service("appeal/query")->getAskCount($member);
         }
         if ($member->getType() == Member::TYPE_FIX) {
-            $data['times'] = service("appeal/query")->getAnswerCount($member);
+            $data['appeal_times'] = service("appeal/query")->getAnswerCount($member);
         }
+        $data['deal_times'] = service("shb/query")->getDealCount($member->getId());
         return $this->success($data);
     }
 

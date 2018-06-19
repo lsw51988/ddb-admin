@@ -13,7 +13,7 @@ use Ddb\Models\MemberPoints;
 class MemberPoint extends MemberPoints
 {
     const TYPE_REGISTER = 1;
-    const TYPE_FIRST_OPEN = 2;
+    const TYPE_SIGN = 2;
     const TYPE_AUTH = 3;
     const TYPE_ADD_REPAIRS = 4;
     const TYPE_NEW_PAGE = 5;
@@ -34,9 +34,15 @@ class MemberPoint extends MemberPoints
     const TYPE_UPDATE_SHB = -5;
     const TYPE_REPUB_SHB = -6;
 
+    const LEVEL_BRONZE = 500;
+    const LEVEL_SILVER = 1000;
+    const LEVEL_GOLD = 2000;
+    const LEVEL_DIAMOND = 5000;
+    const LEVEL_KING = 10000;
+
     public static $typeDesc = [
         self::TYPE_REGISTER => "注册",
-        self::TYPE_FIRST_OPEN => "每日打开第一次",
+        self::TYPE_SIGN => "每日签到",
         self::TYPE_AUTH => "用户完善信息",
         self::TYPE_ADD_REPAIRS => "增加维修点",
         self::TYPE_NEW_PAGE => "第一次探索新的页面",
@@ -60,10 +66,10 @@ class MemberPoint extends MemberPoints
 
     public static $typeScore = [
         self::TYPE_REGISTER => 5,
-        self::TYPE_FIRST_OPEN => 1,
+        self::TYPE_SIGN => 2,
         self::TYPE_AUTH => 5,
         self::TYPE_ADD_REPAIRS => 10,
-        self::TYPE_NEW_PAGE => 1,
+        self::TYPE_NEW_PAGE => 2,
         self::TYPE_SUGGESTION => 2,
         self::TYPE_SUGGESTION_APPROVED => 2,
         self::TYPE_RECOMMEND => 10,

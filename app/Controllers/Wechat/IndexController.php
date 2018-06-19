@@ -12,7 +12,6 @@ use Ddb\Core\BaseController;
 use Ddb\Helper\Captcha;
 use Ddb\Models\Areas;
 use Ddb\Models\Members;
-use Ddb\Models\Recommends;
 use Ddb\Modules\Member;
 use Ddb\Models\MemberLocations;
 use Ddb\Modules\MemberPoint;
