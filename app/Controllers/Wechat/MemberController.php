@@ -302,17 +302,18 @@ class MemberController extends WechatAuthController
     }
 
     /**
-     * @Post("sign")
+     * @Post("/sign")
      * 连续七天签到的话则多增加10个积分
      */
     public function signAction()
     {
         $member = $this->currentMember;
-        if ($memberSign = MemberSigns::findFirst("member_id = '" . $member->getId() . " AND created_at>='" . date("Y-m-d H:i:s", time()) . "'")) {
+        if (MemberSigns::findFirst("member_id = " . $member->getId() . " AND created_at>='" . date("Y-m-d 00:00:00", time()) . "'")) {
             return $this->error("今日已经签过");
         } else {
             $memberSign = new MemberSigns();
             $memberSign->setMemberId($member->getId())->save();
+            $member = Member::findFirst($this->currentMember->getId());
             service("point/manager")->create($member, MemberPoint::TYPE_SIGN);
             return $this->success();
         }
