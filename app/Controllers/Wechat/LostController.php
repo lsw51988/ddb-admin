@@ -50,13 +50,10 @@ class LostController extends WechatAuthController
                 $bikeImages[$i] = di("config")->app->URL . "/wechat/member/bikeImg/" . $bikeImages[$i];
             }
             if ($lostBike = LostBikes::findFirstByMemberBikeId($memberBikeId)) {
-                if ($area = Areas::findFirstByDistrictCode($lostBike->getDistrict())) {
-                    $location = [];
-                    $location[] = $area->getProvinceName();
-                    $location[] = $area->getCityName();
-                    $location[] = $area->getDistrictName();
-                }
-
+                $location = [];
+                $location[] = $lostBike->getProvince();
+                $location[] = $lostBike->getCity();
+                $location[] = $lostBike->getDistrict();
                 return $this->success([
                     "lostBike" => $lostBike,
                     "location" => $location,
@@ -81,90 +78,96 @@ class LostController extends WechatAuthController
                 if ($lostBike->getUpdatedAt() != null && strtotime($lostBike->getUpdatedAt()) >= strtotime(Date("Y-m-d 00:00:00"))) {
                     return $this->error("今日已经刷新过了,明天再来吧");
                 }
-                $lostBike->setUpdatedAt(Date("Y-m-d H:i:s", time()));
-            } else {
-                $lostBike = new LostBikes();
-                if ($currentMember->getPoints() < 10) {
-                    return $this->error("积分不足");
-                }
-            }
-            $addr = explode(",", $data['addr']);
-            $districtName = $addr['2'];
-            $area = Areas::findFirstByDistrictName($districtName);
-            $lostBike->setMemberId($member->getId())
-                ->setMemberBikeId($memberBikeId)
-                ->setLostDate($data['lost_date'])
-                ->setProvince($area->getProvinceCode())
-                ->setCity($area->getCityCode())
-                ->setDistrict($area->getDistrictCode())
-                ->setAddress($data['address'])
-                ->setMemo($data['memo'])
-                ->setRewards($data['rewards']);
-            $this->db->begin();
-            if (!$lostBike->save()) {
-                $this->db->rollback();
-                return $this->error("保存丢失车辆信息失败");
-            }
-            if (!$data["lostBikeId"]) {
-                if (!service("point/manager")->create($currentMember, MemberPoint::TYPE_LOST_BIKE, null, null, $lostBike->getId())) {
-                    $this->db->rollback();
-                    return $this->error("积分保存失败");
-                }
-            }
-            $this->db->commit();
-            return $this->success();
-        }
+
+$lostBike->setUpdatedAt(Date("Y-m-d H:i:s", time()));
+} else {
+    $lostBike = new LostBikes();
+    if ($currentMember->getPoints() < 10) {
+        return $this->error("积分不足");
+    }
+}
+$addr = explode(",", $data['addr']);
+$districtName = $addr['2'];
+$area = Areas::findFirstByDistrictName($districtName);
+$lostBike->setMemberId($member->getId())
+    ->setMemberBikeId($memberBikeId)
+    ->setLostDate($data['lost_date'])
+    ->setProvince($area->getProvinceCode())
+    ->setCity($area->getCityCode())
+    ->setDistrict($area->getDistrictCode())
+    ->setAddress($data['address'])
+    ->setMemo($data['memo'])
+    ->setRewards($data['rewards']);
+$this->db->begin();
+if (!$lostBike->save()) {
+    $this->db->rollback();
+    return $this->error("保存丢失车辆信息失败");
+}
+if (!$data["lostBikeId"]) {
+    if (!service("point/manager")->create($currentMember, MemberPoint::TYPE_LOST_BIKE, null, null, $lostBike->getId())) {
+        $this->db->rollback();
+        return $this->error("积分保存失败");
+    }
+}
+$this->db->commit();
+return $this->success();
+}
+}
+
+/**
+ * @Get("/list")
+ */
+public
+function listAction()
+{
+    $member = $this->currentMember;
+    $data = $this->data;
+    if (!isset($data['district'])) {
+        $district = $member->getDistrict();
+        $area = Areas::findFirstByDistrictCode($district);
+
+        $data['city'] = $area->getCityName();
+        $data['district'] = $area->getDistrictName();
     }
 
-    /**
-     * @Get("/list")
-     */
-    public function listAction(){
-        $member = $this->currentMember;
-        $data = $this->data;
-        if (!isset($data['district'])) {
-            $district = $member->getDistrict();
-            $area = Areas::findFirstByDistrictCode($district);
+    $rData = service("lost/query")->getList($data);
+    return $this->success($rData);
+}
 
-            $data['city'] = $area->getCityName();
-            $data['district'] = $area->getDistrictName();
-        }
+/**
+ * @Get("/contact/{id:[0-9]+}")
+ * 联系相应发布者
+ */
+public
+function contactAction($id)
+{
+    $member = $this->currentMember;
+    service("lost/manager")->contact($member, $id);
+    return $this->success();
+}
 
-        $rData = service("lost/query")->getList($data);
-        return $this->success($rData);
-    }
+/**
+ * @Get("/detail/{id:[0-9]}")
+ * id值得是lostBikeId
+ * 详情
+ */
+public
+function detailAction($id)
+{
+    $data = service("lost/query")->getDetail($id);
+    return $this->success($data);
+}
 
-    /**
-     * @Get("/contact/{id:[0-9]+}")
-     * 联系相应发布者
-     */
-    public function contactAction($id)
-    {
-        $member = $this->currentMember;
-        service("lost/manager")->contact($member, $id);
-        return $this->success();
-    }
-
-    /**
-     * @Get("/detail/{id:[0-9]}")
-     * id值得是lostBikeId
-     * 详情
-     */
-    public function detailAction($id)
-    {
-        $data = service("lost/query")->getDetail($id);
-        return $this->success($data);
-    }
-
-    /**
-     * @Get("/browse/{id:[0-9]+}")
-     * 浏览详情
-     */
-    public function browseAction($id)
-    {
-        $member = $this->currentMember;
-        service("lost/manager")->browse($member, $id);
-        return $this->success();
-    }
+/**
+ * @Get("/browse/{id:[0-9]+}")
+ * 浏览详情
+ */
+public
+function browseAction($id)
+{
+    $member = $this->currentMember;
+    service("lost/manager")->browse($member, $id);
+    return $this->success();
+}
 
 }

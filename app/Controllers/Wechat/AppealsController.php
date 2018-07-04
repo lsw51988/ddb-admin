@@ -62,10 +62,10 @@ class AppealsController extends WechatAuthController
                 ]);
             }
 
-            /*//验证短信验证码
+            //验证短信验证码
             if (di("cache")->get($data['mobile'] . "_auth") != $data['sms_code']) {
                 return $this->error("短信验证码不正确或过期");
-            }*/
+            }
             if (isset($data['appeal_id'])) {
                 $appeal = Appeal::findFirst($data['appeal_id']);
             } else {

@@ -133,7 +133,7 @@ class MemberController extends WechatAuthController
         if ($smsCode->save($smsCodeData)) {
             $key = $data['mobile'] . "_auth";
             di("cache")->save($key, $code, 5 * 60);
-            di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), 'token' => $token]));
+            di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), 'token' => $token, 'data' => []]));
             return $this->success("发送成功");
         } else {
             return $this->error("发送失败");
