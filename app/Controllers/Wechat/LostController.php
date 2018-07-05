@@ -49,7 +49,7 @@ class LostController extends WechatAuthController
             for ($i = 0; $i < sizeof($bikeImages); $i++) {
                 $bikeImages[$i] = di("config")->app->URL . "/wechat/member/bikeImg/" . $bikeImages[$i];
             }
-            if ($lostBike = LostBikes::findFirst("member_id=" . $memberBikeId . " AND created_at<='" . date("Y-m-d H:i:s", strtotime("-3 day"))) . "'") {
+            if ($lostBike = LostBikes::findFirst("member_id=" . $memberBikeId . " AND created_at<='" . date("Y-m-d H:i:s", strtotime("-3 day")) . "'")) {
                 $location = [];
                 $location[] = $lostBike->getProvince();
                 $location[] = $lostBike->getCity();
