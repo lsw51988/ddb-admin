@@ -4,7 +4,7 @@
     <div class="layui-side-scroll">
         <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
         <ul class="layui-nav layui-nav-tree">
-            <li class="layui-nav-item layui-this"><a href="/admin/index">首页</a></li>
+            <li class="layui-nav-item layui-this"><a href="/admin">首页</a></li>
             <li class="layui-nav-item">
                 <a href="javascript:;">骑行者</a>
                 <dl class="layui-nav-child">

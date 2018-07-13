@@ -276,101 +276,49 @@ $di->setShared(
 );
 
 $di->set('db', function () {
-    return new Phalcon\Db\Adapter\Pdo\Mysql(array(
+    $em = new \Phalcon\Events\Manager();
+    $em->attach('db',
+        function($event, $connection)
+        {
+            if ($event->getType() == 'beforeQuery') {
+                app_log("db")->info($connection->getSQLStatement());
+            }
+        }
+    );
+
+    $db =  new Phalcon\Db\Adapter\Pdo\Mysql(array(
         "host" => di("config")->database->host,
         "username" => di("config")->database->username,
         "password" => di("config")->database->password,
         "dbname" => di("config")->database->dbname,
         "charset" => di("config")->database->charset
     ));
+    $db->setEventsManager($em);
+    return $db;
 });
 
-function InitDatabase()
+/*function InitDatabase()
 {
-    // We only use mysql database here.
-    $connections = di('config')->database;
-    foreach ($connections as $connectionName => $connectionConfig) {
-        // 对于主链接，writeConnection，使用非shared的方式
-        $shared = false;
-        if ($connectionName != 'db') {
-            $shared = true;
+
+    $connection = new Phalcon\Db\Adapter\Pdo\Mysql(array(
+        "host" => di("config")->database->host,
+        "username" => di("config")->database->username,
+        "password" => di("config")->database->password,
+        "dbname" => di("config")->database->dbname,
+        "charset" => di("config")->database->charset
+    ));
+
+    $eventsManager = new \Phalcon\Events\Manager();
+
+    $eventsManager->attach(
+        "db:beforeQuery",
+        function (\Phalcon\Events\Event $event, $connection) {
+            $sql = $connection->getSQLStatement();
+            app_log("mysql")->info($sql);
         }
-
-        // 创建日志服务
-        di()->setShared(
-            $connectionName . "Logger",
-            app_log($connectionName)
-        );
-
-        // 创建数据库服务
-        di()->set(
-            $connectionName,
-            function () use ($connectionName, $connectionConfig) {
-                $db = new \Phalcon\Db\Adapter\Pdo\Mysql(di("config")->database);
-
-                // 新创建单独的事件管理器, 注册监听器，用来调试sql
-                // TODO: 这里是用单独的事件管理器还是全局的呢?
-                //$eventsManager = new \Phalcon\Events\Manager();
-                $db->setEventsManager(di('eventsManager'));
-
-                if (di('config')->app->debug && APP_ENV != 'production') {
-                    di('eventsManager')->attach(
-                        'db',
-                        function ($event, $source) use ($db, $connectionName) {
-                            // 数据库的监控和日志单独处理，不与应用本身的放一起
-                            $logger = di($connectionName . "Logger");
-                            if ($source == $db) { // 只记录当前链接的事件
-                                $profile = di('profile');
-                                if ($event->getType() == 'beforeQuery') {
-                                    $profile->startProfile(
-                                        $source->getSQLStatement()
-                                    );
-
-                                    $sqlVariables = $source->getSQLVariables();
-                                    if (count($sqlVariables)) {
-                                        $keyArr = [];
-                                        $valArr = [];
-                                        foreach ($sqlVariables as $k => $v) {
-                                            if (':' == $k[0]) {
-                                                $keyArr[] = $k;
-                                            } else {
-                                                $keyArr[] = ':' . $k;
-                                            }
-                                            if ('string' == gettype($v)) {
-                                                $valArr[] = '\'' . $v . '\'';
-                                            } else {
-                                                $valArr[] = $v;
-                                            }
-                                        }
-
-                                        $query = $source->getSQLStatement();
-                                        for ($i = count($keyArr) - 1; $i >= 0; $i--) {
-                                            $query = str_replace($keyArr[$i], $valArr[$i], $query);
-                                        }
-                                        $logger->log($query, \Phalcon\Logger::DEBUG);
-                                    } else {
-                                        $logger->log($source->getSQLStatement(), \Phalcon\Logger::DEBUG);
-                                    }
-                                } else if ($event->getType() == 'afterQuery') {
-                                    $profile->stopProfile();
-                                    $profile = $profile->getLastProfile();
-                                    $totalSeconds = $profile->getTotalElapsedSeconds();
-                                    $slow_query_time = 1;
-                                    if ($totalSeconds > $slow_query_time) {
-                                        $logger->log('Run time is ' . $totalSeconds, \Phalcon\Logger::ERROR);
-                                    }
-                                }
-                            }
-                        }
-                    );
-                }
-
-                return $db;
-            },
-            $shared
-        );
-    }
-}
+    );
+    $connection->setEventsManager($eventsManager);
+}*/
 
 
 function InitRouters($appPath, $prefix)

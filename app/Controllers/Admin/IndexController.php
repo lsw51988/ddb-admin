@@ -25,15 +25,30 @@ class IndexController extends ViewBaseController
         if ($this->request->isPost()) {
             $data = $this->data;
             if ($user = service("user/manager")->verify($data)) {
-                if(service("user/manager")->login($user)){
+                if (service("user/manager")->login($user)) {
                     return $this->response->redirect('/admin/business/index');
-                }else{
-                    return $this->error("登录失败");
+                } else {
+                    return $this->response->redirect('/admin/login');
                 }
-
-            }else{
+            } else {
                 return $this->error("用户不存在或密码错误");
             }
+        } else {
+            if (di('session')->has("user_auth_identity")) {
+                return $this->response->redirect('/admin/business/index');
+            }
+        }
+    }
+
+    /**
+     * @Route("/")
+     */
+    public function indexAction()
+    {
+        if (di('session')->has("user_auth_identity")) {
+            return $this->response->redirect('/admin/business/index');
+        } else {
+            return $this->response->redirect('/admin/login');
         }
     }
 }

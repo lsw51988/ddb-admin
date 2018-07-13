@@ -3,7 +3,7 @@ layui.use(['form', 'layer', 'jquery'], function () {
     var layer = layui.layer;
     var $ = layui.$;
     form.on('submit', function (data) {
-        data.field.login = jQuery.sha1(data.field.login);
+        //data.field.login = jQuery.sha1(data.field.login);
         layer.load();
         $.ajax({
             url: "/admin/login",
