@@ -10,7 +10,9 @@ namespace Ddb\Controllers\Admin\Business;
 
 
 use Ddb\Controllers\AdminAuthController;
+use Ddb\Models\LostBikes;
 use Ddb\Modules\Member;
+use Ddb\Modules\SecondBike;
 
 /**
  * Class IndexController
@@ -24,26 +26,45 @@ class IndexController extends AdminAuthController
      */
     public function indexAction()
     {
-
-        //riders_count
-        //repairer_count
-        //shb_count
-        //lost_count
-        /*$this->view->setVars([
-            "content"=>"这里是业务后台首页",
-        ]);*/
-        $this->view->setVars([
-            "content" => "这里是业务后台首页",
-        ]);
         $timeRange = [
             'start_time' => date("Y-m-d 00:00:00", strtotime("-1 day")),
             'end_time' => date("Y-m-d 23:59:59", strtotime("-1 day")),
         ];
-        $riders_count = Member::count("created_at >= '".$timeRange['start_time']."' AND created_at <='".$timeRange['end_time']."' group by type");
-        //$shb_count =
+        $conditions = "created_at>=:start_time: AND created_at<=:end_time:";
+        $bind=[
+            "start_time"=>$timeRange['start_time'],
+            "end_time"=>$timeRange['end_time'],
+        ];
+        $memberCount = Member::count([
+            "conditions"=>$conditions,
+            "bind"=>$bind,
+            "group"=>"type"
+        ])->toArray();
+        $countTypes = array_reduce($memberCount,function($countTypes,$v){
+            $countTypes[$v['type']] = $v['rowcount'];
+            return $countTypes;
+        });
+        if($countTypes==null){
+            $riderCount = 0;
+            $fixerCount = 0;
+        }else{
+            $riderCount = $countTypes[Member::TYPE_RIDE];
+            $fixerCount = $countTypes[Member::TYPE_FIX];
+        }
+        $shbCount = SecondBike::count([
+            "conditions"=>$conditions,
+            "bind"=>$bind,
+        ]);
+        $lostCount = LostBikes::count([
+            "conditions"=>$conditions,
+            "bind"=>$bind,
+        ]);
+
         $this->view->setVars([
-            "riders_count" => $riders_count,
-            //"repairer_count" => $repairer_count,
+            "riders_count" => $riderCount,
+            "fixers_count" => $fixerCount,
+            "shb_count" => $shbCount,
+            "lost_count" => $lostCount
         ]);
 
     }

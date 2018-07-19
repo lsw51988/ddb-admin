@@ -41,4 +41,24 @@ class BaseController extends Controller
             'msg' => $msg
         ]);
     }
+
+    protected function laySuccess($data)
+    {
+        return $this->apiResponse->withArray([
+            'code' => '00',
+            'data' => $data['rows']->toArray(),
+            'count' => $data['count'],
+            'msg' => "OK"
+        ]);
+    }
+
+    protected function layError($msg)
+    {
+        return $this->apiResponse->withArray([
+            'code' => '01',
+            'data' => [],
+            'count' => 0,
+            'msg' => $msg
+        ]);
+    }
 }

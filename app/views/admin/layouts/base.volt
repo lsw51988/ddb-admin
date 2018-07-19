@@ -42,24 +42,29 @@
     </div>
 
     <div class="layui-footer">
-        <!-- 底部固定区域 -->
         @ddb.com 电动帮
     </div>
 </div>
 <script>
     //JavaScript代码区域
-    layui.use(['element','jquery','layer'], function(){
+    layui.use(['element', 'jquery', 'layer', 'form'], function () {
         var element = layui.element;
         var $ = layui.$,
             layer = layui.layer;
         var currentUri = "{{ currentUri }}";
-        currentUri = currentUri.substring(0, currentUri.indexOf("?"));
-        var model = currentUri.substring(7,currentUri.indexOf('/',7));
-        $("."+model).siblings(".layui-nav-item").removeClass("layui-this");
-        $("."+model).addClass("layui-this");
+        var model = "";
+        if (currentUri.indexOf("?") != -1) {
+            currentUri = currentUri.substring(0, currentUri.indexOf("?"));
+            model = currentUri.substring(7, currentUri.indexOf('/', 7));
+        } else {
+            model = currentUri;
+        }
+
+        $("a[href='" + currentUri + "']").siblings(".layui-nav-item").removeClass("layui-this");
+        $("a[href='" + currentUri + "']").addClass("layui-this");
         $(".layui-nav-tree .layui-nav-item").removeClass("layui-this");
-        $("a[href='"+currentUri+"']").addClass("layui-this");
-        $("a[href='"+currentUri+"']").closest(".layui-nav-item").addClass("layui-nav-itemed");
+        $("a[href='" + currentUri + "']").addClass("layui-this");
+        $("a[href='" + currentUri + "']").closest(".layui-nav-item").addClass("layui-nav-itemed");
     });
 </script>
 {% block scripts %}{% endblock %}

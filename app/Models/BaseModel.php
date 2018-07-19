@@ -60,7 +60,7 @@ class BaseModel extends Model
         ]);
         return [
             'rows' => !empty($rows) ? $rows : [],
-            'total' => $total,
+            'count' => $total,
             'max_page' => (int)ceil($total / 20),
             'current_page' => $page,
             'limit' => $limit

@@ -1,7 +1,6 @@
 {% extends '../layouts/business_base.volt' %}
 {% block title %}业务管理首页{% endblock %}
 {% block content %}
-    {{ content }} {{ currentUri }}
     <div class="layui-form">
         <table class="layui-table">
             <colgroup>
@@ -21,7 +20,7 @@
             </tr>
             <tr>
                 <td>昨天新增修理者</td>
-                <td>{{ repairer_count }}人</td>
+                <td>{{ fixers_count }}人</td>
             </tr>
             <tr>
                 <td>昨天新增二手车</td>

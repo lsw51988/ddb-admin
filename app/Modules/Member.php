@@ -16,6 +16,11 @@ class Member extends Members
     const TYPE_RIDE = 1;//骑行者
     const TYPE_FIX = 2;//修理者
 
+    const STATUS_REGISTER = 1;
+    const STATUS_TO_AUTH = 2;
+    const STATUS_AUTHED = 3;
+    const STATUS_AUTH_DENIED = 4;
+
     public function afterUpdate()
     {
         $token = $this->getToken();
