@@ -13,8 +13,20 @@ use Ddb\Models\SecondBikes;
 
 class SecondBike extends SecondBikes
 {
+    //1提交 2审核通过 3审核拒绝 4自主取消 5成交 6状态异常
     const STATUS_CREATE = 1;
-    const STATUS_CANCEL = 2;
-    const STATUS_DEAL = 3;
-    const STATUS_ABNORMAL = 4;
+    const STATUS_AUTH = 2;
+    const STATUS_DENIED = 3;
+    const STATUS_CANCEL = 4;
+    const STATUS_DEAL = 5;
+    const STATUS_ABNORMAL = 6;
+
+    public static $statusDesc = [
+        self::STATUS_CREATE => "提交",
+        self::STATUS_AUTH => "审核通过",
+        self::STATUS_DENIED => "审核拒绝",
+        self::STATUS_CANCEL => "自主取消",
+        self::STATUS_DEAL => "成交",
+        self::STATUS_ABNORMAL => "异常"
+    ];
 }

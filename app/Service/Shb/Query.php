@@ -79,23 +79,26 @@ class Query extends Service
 
     public function getAdminList($search = [])
     {
-        $columns = "S.id,S.brand_name,S.out_price,A.province_name,A.city_name,A.district_name,S.created_at,M.real_name,M.mobile";
+        $columns = "S.id,S.brand_name,S.out_price,S.province,S.city,S.district,S.created_at,S.status,M.real_name,M.mobile";
         $builder = $this->modelsManager->createBuilder()
             ->columns($columns)
             ->from(["S" => SecondBike::class])
             ->leftJoin(Member::class, "S.member_id = M.id", 'M')
-            ->leftJoin(Areas::class, "A.district_code = S.district", "A");
+            ->leftJoin(Areas::class, "A.district_code = S.district_code", "A");
+        if (!empty($search['status'])) {
+            $builder->andWhere('S.status=' . $search['status']);
+        }
         if (!empty($search['real_name'])) {
             $builder->andWhere('M.real_name LIKE %' . $search['real_name'] . '%');
         }
         if (!empty($search['province'])) {
-            $builder->andWhere('S.province = ' . $search['province']);
+            $builder->andWhere('S.province_code = ' . $search['province']);
         }
         if (!empty($search['city'])) {
-            $builder->andWhere('S.city = ' . $search['city']);
+            $builder->andWhere('S.city_code = ' . $search['city']);
         }
         if (!empty($search['district'])) {
-            $builder->andWhere('S.district = ' . $search['district']);
+            $builder->andWhere('S.district_code = ' . $search['district']);
         }
         $paginator = new QueryBuilder([
             'builder' => $builder,

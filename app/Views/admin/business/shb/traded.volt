@@ -6,7 +6,7 @@
     <span class="layui-breadcrumb">
       <a href="">后台</a>
       <a href="">二手车</a>
-      <a><cite>总览</cite></a>
+      <a><cite>交易完成</cite></a>
     </span>
     <fieldset class="layui-elem-field">
         <legend>
@@ -17,15 +17,13 @@
                 <div class="layui-col-md4">
                     <label class="layui-form-label">姓名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
-                               value="{{ search['real_name'] }}">
+                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{{ search['real_name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
                     <label class="layui-form-label">手机号</label>
                     <div class="layui-input-block">
-                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
-                               value="{{ search['mobile'] }}">
+                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ search['mobile'] }}">
                     </div>
                 </div>
             </div>
@@ -66,7 +64,6 @@
             <col width="120">
             <col width="120">
             <col width="120">
-            <col width="120">
             <col>
         </colgroup>
         <thead>
@@ -79,7 +76,6 @@
             <th>省</th>
             <th>市</th>
             <th>区</th>
-            <th>状态</th>
             <th>提交时间</th>
             <th>操作</th>
         </tr>
@@ -89,13 +85,12 @@
             <tr>
                 <td>{{ member['id'] }}</td>
                 <td>{{ member['brand_name'] }}</td>
-                <td>{{ member['out_price'] }}</td>
+                <td>{{ member['out_price']}}</td>
                 <td>{{ member['real_name'] }}</td>
-                <td>{{ member['mobile'] }}</td>
+                <td>{{ member['mobile']}}</td>
                 <td>{{ member['province'] }}</td>
                 <td>{{ member['city'] }}</td>
                 <td>{{ member['district'] }}</td>
-                <td>{{ statusDesc[member['status']] }}</td>
                 <td>{{ member['created_at'] }}</td>
                 <td>
                     <button class="layui-btn check" data-id="{{ member['id'] }}">查看</button>
@@ -210,8 +205,8 @@
                 var id = data.value
                 getDistricts(id);
             })
-            $("#reset").click(function () {
-                window.location.href = "/admin/business/member/list";
+            $("#reset").click(function(){
+                window.location.href="/admin/business/member/list";
             });
             $(".check").click(function () {
                 console.log($(this).data('id'));
