@@ -31,13 +31,13 @@ class Manager extends Service
         $shb = new SecondBikes();
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
         if ($area = Areas::findFirst("province_name='" . $data['province'] . "' AND city_name='" . $data['city'] . "' AND district_name='" . $data['district'] . "'")) {
-            $province = $area->getProvinceCode();
-            $city = $area->getCityCode();
-            $district = $area->getDistrictCode();
+            $provinceCode = $area->getProvinceCode();
+            $cityCode = $area->getCityCode();
+            $districtCode = $area->getDistrictCode();
         } else {
-            $province = $data['province'];
-            $city = $data['city'];
-            $district = $data['district'];
+            $provinceCode = $data['province'];
+            $cityCode = $data['city'];
+            $districtCode = $data['district'];
             app_log()->info("获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
         }
         $shb->setMemberId($member->getId())
@@ -46,9 +46,12 @@ class Manager extends Service
             ->setBrandName($data['brand_name'])
             ->setInPrice($data['in_price'])
             ->setOutPrice($data['out_price'])
-            ->setProvince($province)
-            ->setCity($city)
-            ->setDistrict($district)
+            ->setProvince($data['province'])
+            ->setCity($data['city'])
+            ->setDistrict($data['district'])
+            ->setProvinceCode($provinceCode)
+            ->setCityCode($cityCode)
+            ->setDistrictCode($districtCode)
             ->setDetailAddr($data['detail_addr'])
             ->setNumber($data['number']);
         if (isset($data['remark'])) {

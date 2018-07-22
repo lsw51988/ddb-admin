@@ -19,15 +19,15 @@ use Phalcon\Paginator\Adapter\QueryBuilder;
 
 class Query extends Service
 {
-    public function hasEnoughPoint($member,$type)
+    public function hasEnoughPoint($member, $type)
     {
-        if($type=="create"){
+        if ($type == "create") {
             $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
         }
-        if($type=="update"){
+        if ($type == "update") {
             $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
         }
-        if($type=="repub"){
+        if ($type == "repub") {
             $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_REPUB_SHB]);
         }
 
@@ -77,24 +77,25 @@ class Query extends Service
         return $data;
     }
 
-    public function getAdminList($search = []){
+    public function getAdminList($search = [])
+    {
         $columns = "S.id,S.brand_name,S.out_price,A.province_name,A.city_name,A.district_name,S.created_at,M.real_name,M.mobile";
         $builder = $this->modelsManager->createBuilder()
             ->columns($columns)
-            ->from(["S"=>SecondBike::class])
-            ->leftJoin(Member::class,"S.member_id = M.id",'M')
+            ->from(["S" => SecondBike::class])
+            ->leftJoin(Member::class, "S.member_id = M.id", 'M')
             ->leftJoin(Areas::class, "A.district_code = S.district", "A");
         if (!empty($search['real_name'])) {
-            $builder->andWhere('M.real_name LIKE %'.$search['real_name'].'%');
+            $builder->andWhere('M.real_name LIKE %' . $search['real_name'] . '%');
         }
         if (!empty($search['province'])) {
-            $builder->andWhere('S.province = '.$search['province']);
+            $builder->andWhere('S.province = ' . $search['province']);
         }
         if (!empty($search['city'])) {
-            $builder->andWhere('S.city = '.$search['city']);
+            $builder->andWhere('S.city = ' . $search['city']);
         }
         if (!empty($search['district'])) {
-            $builder->andWhere('S.district = '.$search['district']);
+            $builder->andWhere('S.district = ' . $search['district']);
         }
         $paginator = new QueryBuilder([
             'builder' => $builder,
@@ -138,7 +139,8 @@ class Query extends Service
         return $data;
     }
 
-    public function getManageDetail($id){
+    public function getManageDetail($id)
+    {
         $shb = SecondBike::findFirst($id);
         $seller = Member::findFirst($shb->getMemberId());
 
@@ -173,7 +175,8 @@ class Query extends Service
         return $data;
     }
 
-    public function getDealCount($memberId){
+    public function getDealCount($memberId)
+    {
         $count = 0;
         $count = SecondBike::count(["member_id = $memberId"]);
         return $count;

@@ -35,7 +35,6 @@ class SHBController extends WechatAuthController
         }
         //需要首先判断用户积分是否足够
         $data = $this->data;
-
         if ($shbId = service("shb/manager")->create($member, $data)) {
             return $this->success([
                 "shb_id" => $shbId
