@@ -25,13 +25,15 @@ class AppealController extends AdminAuthController
     public function listAction()
     {
         $request = $this->request->get();
+        $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
+        $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = service("appeal/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,
             'data' => $data->items->toArray(),
             'total' => $data->total_items,
-            'type_desc'=>Appeal::$typeDesc,
-            'status_desc'=>Appeal::$statusDesc,
+            'type_desc' => Appeal::$typeDesc,
+            'status_desc' => Appeal::$statusDesc,
             'search' => $request
         ]);
     }

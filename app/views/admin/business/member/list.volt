@@ -17,13 +17,15 @@
                 <div class="layui-col-md4">
                     <label class="layui-form-label">姓名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{{ search['real_name'] }}">
+                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
+                               value="{{ search['real_name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
                     <label class="layui-form-label">手机号</label>
                     <div class="layui-input-block">
-                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ search['mobile'] }}">
+                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
+                               value="{{ search['mobile'] }}">
                     </div>
                 </div>
             </div>
@@ -48,8 +50,10 @@
                 <div class="layui-col-md12">
                     <label class="layui-form-label">类型</label>
                     <div class="layui-input-block">
-                        <input type="radio" name="type" value="1" title="骑行者" {% if search['type']==1 %}checked{% endif %}>
-                        <input type="radio" name="type" value="2" title="修理者" {% if search['type']==2 %}checked{% endif %}>
+                        <input type="radio" name="type" value="1" title="骑行者"
+                               {% if search['type']==1 %}checked{% endif %}>
+                        <input type="radio" name="type" value="2" title="修理者"
+                               {% if search['type']==2 %}checked{% endif %}>
                     </div>
                 </div>
             </div>
@@ -215,8 +219,8 @@
                 var id = data.value
                 getDistricts(id);
             })
-            $("#reset").click(function(){
-                window.location.href="/admin/business/member/list";
+            $("#reset").click(function () {
+                window.location.href = "/admin/business/member/list";
             });
             $(".check").click(function () {
                 console.log($(this).data('id'));
