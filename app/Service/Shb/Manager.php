@@ -30,7 +30,7 @@ class Manager extends Service
         $this->db->begin();
         $shb = new SecondBikes();
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
-        if ($area = Areas::findFirst("province_name=" . $data['province'] . ' AND city_name=' . $data['city'] . " AND district_name=" . $data['district'])) {
+        if ($area = Areas::findFirst("province_name='" . $data['province'] . "' AND city_name='" . $data['city'] . "' AND district_name='" . $data['district'] . "'")) {
             $province = $area->getProvinceCode();
             $city = $area->getCityCode();
             $district = $area->getDistrictCode();
