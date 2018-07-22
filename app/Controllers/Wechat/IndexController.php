@@ -33,7 +33,6 @@ class IndexController extends BaseController
     {
         $data = $this->data;
         $wechatLogin = service("member/manager")->getWechatLogin($data['js_code']);
-        return $this->success($wechatLogin);
         $openId = $wechatLogin->openid;
         $sessionKey = $wechatLogin->session_key;
         $location = service("member/manager")->getLocation($data['latitude'], $data['longitude']);
