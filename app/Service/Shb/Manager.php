@@ -10,6 +10,7 @@ namespace Ddb\Service\Shb;
 
 
 use Ddb\Core\Service;
+use Ddb\Models\Areas;
 use Ddb\Models\SecondBikes;
 use Ddb\Models\SecondBikeBrowses;
 use Ddb\Modules\Member;
@@ -29,21 +30,31 @@ class Manager extends Service
         $this->db->begin();
         $shb = new SecondBikes();
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
+        if ($area = Areas::findFirst("province_name=" . $data['province'] . ' AND city_name=' . $data['city'] . " AND district_name=" . $data['district'])) {
+            $province = $area->getProvinceCode();
+            $city = $area->getCityCode();
+            $district = $area->getDistrictCode();
+        } else {
+            $province = $data['province'];
+            $city = $data['city'];
+            $district = $data['district'];
+            app_log()->info("获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
+        }
         $shb->setMemberId($member->getId())
             ->setBuyDate($data['buy_date'])
             ->setVoltage($data['voltage'])
             ->setBrandName($data['brand_name'])
             ->setInPrice($data['in_price'])
             ->setOutPrice($data['out_price'])
-            ->setProvince($data['province'])
-            ->setCity($data['city'])
-            ->setDistrict($data['district'])
+            ->setProvince($province)
+            ->setCity($city)
+            ->setDistrict($district)
             ->setDetailAddr($data['detail_addr'])
             ->setNumber($data['number']);
         if (isset($data['remark'])) {
             $shb->setRemark($data['remark']);
         }
-        if (isset($data['last_change_time']) && $data['last_change_time']!="未更换") {
+        if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
         if (!$shb->save()) {
@@ -68,7 +79,7 @@ class Manager extends Service
         $data['district'] = $addr[2];
         $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']];
         $this->db->begin();
-        if(!$shb = SecondBikes::findFirst($data['id'])){
+        if (!$shb = SecondBikes::findFirst($data['id'])) {
             return false;
         }
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
@@ -86,7 +97,7 @@ class Manager extends Service
         if (isset($data['remark'])) {
             $shb->setRemark($data['remark']);
         }
-        if (isset($data['last_change_time']) && $data['last_change_time']!="未更换") {
+        if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
         if (!$shb->save()) {
@@ -111,7 +122,7 @@ class Manager extends Service
         $data['district'] = $addr[2];
         $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']];
         $this->db->begin();
-        if(!$shb = SecondBikes::findFirst($data['id'])){
+        if (!$shb = SecondBikes::findFirst($data['id'])) {
             return false;
         }
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
@@ -130,7 +141,7 @@ class Manager extends Service
         if (isset($data['remark'])) {
             $shb->setRemark($data['remark']);
         }
-        if (isset($data['last_change_time']) && $data['last_change_time']!="未更换") {
+        if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
         if (!$shb->save()) {

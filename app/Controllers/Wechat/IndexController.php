@@ -25,7 +25,7 @@ class IndexController extends BaseController
 {
     /**
      * @Post("/index")
-     * 用户首次进入逻辑-->改版后不进行注册，否则陌生用户太多，只根据js_code记录session_key
+     * 用户首次进入逻辑
      * 1.没有该用户，注册
      * 2.返回该用户信息
      */
