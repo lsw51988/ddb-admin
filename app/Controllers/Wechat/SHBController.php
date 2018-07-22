@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Models\Areas;
+use Ddb\Modules\Member;
 use Ddb\Modules\SecondBike;
 use Phalcon\Exception;
 
@@ -28,7 +29,7 @@ class SHBController extends WechatAuthController
      */
     public function createAction()
     {
-        $member = $this->currentMember;
+        $member = Member::findFirst($this->currentMember->getId());
         if (!service("shb/query")->hasEnoughPoint($member, "create")) {
             return $this->error("积分不足");
         }
