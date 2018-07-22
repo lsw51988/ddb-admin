@@ -34,6 +34,8 @@ class MemberController extends AdminAuthController
     {
         $request = $this->request->get();
         $request['type'] = Member::TYPE_RIDE;
+        $request['limit'] = $this->limit;
+        $request['page'] = $this->page;
         $data = service("member/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,
@@ -56,6 +58,8 @@ class MemberController extends AdminAuthController
         }
         $request['type'] = $type;
         $request['status'] = Member::STATUS_TO_AUTH;
+        $request['limit'] = $this->limit;
+        $request['page'] = $this->page;
         $data = service("member/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,
@@ -78,6 +82,8 @@ class MemberController extends AdminAuthController
         }
         $request['type'] = $type;
         $request['status'] = Member::STATUS_AUTHED;
+        $request['limit'] = $this->limit;
+        $request['page'] = $this->page;
         $data = service("member/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,
@@ -100,6 +106,8 @@ class MemberController extends AdminAuthController
         }
         $request['type'] = $type;
         $request['status'] = Member::STATUS_AUTH_DENIED;
+        $request['limit'] = $this->limit;
+        $request['page'] = $this->page;
         $data = service("member/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,

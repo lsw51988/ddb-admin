@@ -10,10 +10,12 @@ namespace Ddb\Service\Shb;
 
 
 use Ddb\Core\Service;
+use Ddb\Models\Areas;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SecondBike;
+use Phalcon\Paginator\Adapter\QueryBuilder;
 
 class Query extends Service
 {
@@ -71,7 +73,35 @@ class Query extends Service
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
         }
 
-        $data = SecondBike::page($columns, $conditions, [], $order,$search['current_page']);
+        $data = SecondBike::page($columns, $conditions, [], $order);
+        return $data;
+    }
+
+    public function getAdminList($search = []){
+        $columns = "S.id,S.brand_name,S.out_price,A.province_name,A.city_name,A.district_name,S.created_at,M.real_name,M.mobile";
+        $builder = $this->modelsManager->createBuilder()
+            ->columns($columns)
+            ->from(["S"=>SecondBike::class])
+            ->leftJoin(Member::class,"S.member_id = M.id",'M')
+            ->leftJoin(Areas::class, "A.district_code = S.district", "A");
+        if (!empty($search['real_name'])) {
+            $builder->andWhere('M.real_name LIKE %'.$search['real_name'].'%');
+        }
+        if (!empty($search['province'])) {
+            $builder->andWhere('S.province = '.$search['province']);
+        }
+        if (!empty($search['city'])) {
+            $builder->andWhere('S.city = '.$search['city']);
+        }
+        if (!empty($search['district'])) {
+            $builder->andWhere('S.district = '.$search['district']);
+        }
+        $paginator = new QueryBuilder([
+            'builder' => $builder,
+            'limit' => $search['limit'],
+            'page' => $search['page']
+        ]);
+        $data = $paginator->getPaginate();
         return $data;
     }
 

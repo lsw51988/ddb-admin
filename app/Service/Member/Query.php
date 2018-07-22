@@ -158,8 +158,8 @@ class Query extends BaseService
         }
         $paginator = new QueryBuilder([
             'builder' => $builder,
-            'limit' => $this->limit,
-            'page' => $this->page
+            'limit' => $request['limit'],
+            'page' => $request['page']
         ]);
         $data = $paginator->getPaginate();
         return $data;
