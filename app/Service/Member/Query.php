@@ -127,7 +127,6 @@ class Query extends BaseService
      */
     public function getList($request)
     {
-
         $columns = ["M.id", "M.avatar_url", "M.gender", "M.real_name", "M.nick_name", "M.mobile", "M.type", "A.province_name", "M.city_name", "M.district_name", "M.points", "M.updated_at", "A.district_name", "A.city_name", "A.province_name"];
         $builder = $this->modelsManager->createBuilder()
             ->from(["M" => Member::class])

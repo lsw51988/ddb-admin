@@ -9,7 +9,9 @@
 namespace Ddb\Controllers\Admin\Business;
 
 use Ddb\Controllers\AdminAuthController;
+use Ddb\Models\MemberBikeImages;
 use Ddb\Modules\Member;
+use Ddb\Modules\MemberBike;
 
 
 /**
@@ -33,7 +35,11 @@ class MemberController extends AdminAuthController
     public function listAction()
     {
         $request = $this->request->get();
-        $request['type'] = Member::TYPE_RIDE;
+        $type = Member::TYPE_RIDE;
+        if (!empty($request['type'])) {
+            $type = $request['type'];
+        }
+        $request['type'] = $type;
         $request['limit'] = $this->limit;
         $request['page'] = $this->page;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
@@ -140,6 +146,19 @@ class MemberController extends AdminAuthController
     public function editAction()
     {
 
+    }
+
+    /**
+     * @Get("/{id:[0-9]+}/imgs")
+     */
+    public function imgsAction($memberId){
+        $memberBikeId = MemberBike::findFirstByMemberId($memberId)->getId();
+        $memberBikeImgs = MemberBikeImages::findByMemberBikeId($memberBikeId);
+        $ids = array_column($memberBikeImgs->toArray(),'id');
+        foreach ($ids as $id){
+            $data[] = "/wechat/member/bikeImg/".$id;
+        }
+        return $this->success($data);
     }
 
 }

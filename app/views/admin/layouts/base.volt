@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="/layui/css/layui.css"/>
+    <link rel="stylesheet" href="/viewer/viewer.css"/>
+    <link rel="stylesheet" href="/viewer/viewer.min.css"/>
     <link rel="stylesheet" href="/css/base.css"/>
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
     <script src="/layui/layui.js"></script>
+    <script src="/viewer/viewer.js"></script>
+    <script src="/viewer/viewer.min.js"></script>
     {% block css %}{% endblock %}
 </head>
 <body class="layui-layout-body">
@@ -68,5 +73,6 @@
     });
 </script>
 {% block scripts %}{% endblock %}
+{% block css %}{% endblock %}
 </body>
 </html>

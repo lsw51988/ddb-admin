@@ -1,8 +1,8 @@
 {% extends '../layouts/business_base.volt' %}
 
 {% block title %}业务管理首页{% endblock %}
-{% block content %}
 
+{% block content %}
     <span class="layui-breadcrumb">
       <a href="">后台</a>
       <a href="">骑行者</a>
@@ -76,6 +76,7 @@
             <col width="120">
             <col width="120">
             <col width="120">
+            <col width="150">
             <col width="120">
             <col>
         </colgroup>
@@ -89,6 +90,7 @@
             <th>省</th>
             <th>市</th>
             <th>区</th>
+            <th>照片</th>
             <th>提交时间</th>
             <th>操作</th>
         </tr>
@@ -106,35 +108,93 @@
                 <td>{{ member['district_name'] }}</td>
                 <td>{{ member['updated_at'] }}</td>
                 <td>
-                    <button class="layui-btn check" data-id="{{ member['id'] }}">查看</button>
-                    <button class="layui-btn layui-btn-warm edit" data-id="{{ member['id'] }}">编辑</button>
+                    <button class="layui-btn photo" data-id="{{ member['id'] }}">查看照片</button>
+                </td>
+                <td>
+                    <a href="https://www.baidu.com/">
+                        <button class="layui-btn detail" data-id="{{ member['id'] }}">详情</button>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <div id="page"></div>
+
+    <ul id="viewer" style="display:none;padding:20px;height:80px;">
+    </ul>
+
 {% endblock %}
 
 {% block css %}
+    <style type="text/css">
+        .img {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            float: left;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
 {% endblock %}
 {% block scripts %}
     <script>
-        layui.use(['laypage', 'jquery', 'form'], function () {
+        $(document).ready(function () {
+
+        });
+        layui.use(['laypage', 'jquery', 'form', 'layer'], function () {
             var laypage = layui.laypage;
             var form = layui.form;
+            var layer = layui.layer;
             var $ = layui.$;
-            //执行一个laypage实例
+
             laypage.render({
                 elem: 'page'
                 , count: {{ total }}
                 , limit: 20
                 , curr:{{ page }}
                 , jump: function (obj, first) {
-                    //console.log(obj.curr);
                     if (!first) {
                         window.location.href = "/admin/business/member/list?page=" + obj.curr
                     }
+                }
+            });
+            var requestFlag = false;
+            $(".photo").click(function () {
+                var member_id = $(this).data('id');
+                if(!requestFlag){
+                    $.ajax({
+                        url: "/admin/business/member/" + member_id + "/imgs",
+                        method: "GET",
+                        success: function (res) {
+                            requestFlag = true;
+                            var data = res.data;
+                            for (var i = 0; i < data.length; i++) {
+                                $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
+                            }
+                            layer.open({
+                                type: 1,
+                                area: '500px',
+                                content: $("#viewer")
+                            });
+                            $("#viewer").show();
+                            $('#viewer').viewer();
+                            $(".layui-layer-shade").removeClass('layui-layer-shade');
+                        },
+                        error: function () {
+                            layer.msg("请求错误")
+                        }
+                    })
+                }else{
+                    layer.open({
+                        type: 1,
+                        area: '500px',
+                        content: $("#viewer")
+                    });
+                    $("#viewer").show();
+                    $('#viewer').viewer();
+                    $(".layui-layer-shade").removeClass('layui-layer-shade');
                 }
             });
 
@@ -221,12 +281,6 @@
             })
             $("#reset").click(function () {
                 window.location.href = "/admin/business/member/list";
-            });
-            $(".check").click(function () {
-                console.log($(this).data('id'));
-            });
-            $(".edit").click(function () {
-                console.log($(this).data('id'));
             });
         });
     </script>
