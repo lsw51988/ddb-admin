@@ -140,9 +140,6 @@
 {% endblock %}
 {% block scripts %}
     <script>
-        $(document).ready(function () {
-
-        });
         layui.use(['laypage', 'jquery', 'form', 'layer'], function () {
             var laypage = layui.laypage;
             var form = layui.form;
@@ -160,15 +157,15 @@
                     }
                 }
             });
-            var requestFlag = false;
+
             $(".photo").click(function () {
+                $("#viewer").empty();
                 var member_id = $(this).data('id');
-                if(!requestFlag){
-                    $.ajax({
-                        url: "/admin/business/member/" + member_id + "/imgs",
-                        method: "GET",
-                        success: function (res) {
-                            requestFlag = true;
+                $.ajax({
+                    url: "/admin/business/member/" + member_id + "/imgs",
+                    method: "GET",
+                    success: function (res) {
+                        if(res.status){
                             var data = res.data;
                             for (var i = 0; i < data.length; i++) {
                                 $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
@@ -181,21 +178,14 @@
                             $("#viewer").show();
                             $('#viewer').viewer();
                             $(".layui-layer-shade").removeClass('layui-layer-shade');
-                        },
-                        error: function () {
-                            layer.msg("请求错误")
+                        }else{
+                            layer.msg(res.msg);
                         }
-                    })
-                }else{
-                    layer.open({
-                        type: 1,
-                        area: '500px',
-                        content: $("#viewer")
-                    });
-                    $("#viewer").show();
-                    $('#viewer').viewer();
-                    $(".layui-layer-shade").removeClass('layui-layer-shade');
-                }
+                    },
+                    error: function () {
+                        layer.msg("请求错误")
+                    }
+                })
             });
 
             function getProvinces() {
