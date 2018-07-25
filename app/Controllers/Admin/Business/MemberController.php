@@ -151,14 +151,18 @@ class MemberController extends AdminAuthController
     /**
      * @Get("/{id:[0-9]+}/imgs")
      */
-    public function imgsAction($memberId){
-        $memberBikeId = MemberBike::findFirstByMemberId($memberId)->getId();
-        $memberBikeImgs = MemberBikeImages::findByMemberBikeId($memberBikeId);
-        $ids = array_column($memberBikeImgs->toArray(),'id');
-        foreach ($ids as $id){
-            $data[] = "/wechat/member/bikeImg/".$id;
+    public function imgsAction($memberId)
+    {
+        if ($memberBike = MemberBike::findFirstByMemberId($memberId)) {
+            $memberBikeId = $memberBike->getId();
+            $memberBikeImgs = MemberBikeImages::findByMemberBikeId($memberBikeId);
+            $ids = array_column($memberBikeImgs->toArray(), 'id');
+            foreach ($ids as $id) {
+                $data[] = "/wechat/member/bikeImg/" . $id;
+            }
+            return $this->success($data);
         }
-        return $this->success($data);
+        return $this->error('暂无照片');
     }
 
 }

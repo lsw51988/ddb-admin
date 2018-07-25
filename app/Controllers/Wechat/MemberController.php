@@ -178,12 +178,16 @@ class MemberController extends WechatAuthController
      */
     public function bikeImgAction($id)
     {
+        ob_clean();
+        header("Content-type:image/jpeg");
         if (!$memberBikeImage = MemberBikeImages::findFirst($id)) {
             return $this->error("找不到图片");
         }
         $path = $memberBikeImage->getPath();
         $data = service("file/manager")->read($path);
-        return $this->response->setContent($data)->setContentType('image/jpeg');
+        $this->response->setContentType('image/jpeg');
+        $this->response->setContent($data);
+        return $this->response;
     }
 
     /**
