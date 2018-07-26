@@ -12,6 +12,7 @@ use Ddb\Controllers\AdminAuthController;
 use Ddb\Models\MemberBikeImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
+use Ddb\Modules\MemberPoint;
 
 
 /**
@@ -132,12 +133,20 @@ class MemberController extends AdminAuthController
     }
 
     /**
-     * @Post("/auth/{id:[0-9]+}")
+     * @Get("/auth/{id:[0-9]+}")
      * 审核用户资料
      */
     public function authAction($id)
     {
-
+        if($member = Member::findFirst($id)){
+            if($member->setStatus(Member::STATUS_AUTHED)->save()){
+                if (!service("point/manager")->create($member, MemberPoint::TYPE_AUTH)) {
+                    return $this->error("积分变更失败");
+                }
+                return $this->success();
+            }
+        }
+        return $this->error("未找到该记录");
     }
 
     /**

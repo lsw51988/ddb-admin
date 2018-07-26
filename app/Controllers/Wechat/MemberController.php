@@ -85,9 +85,6 @@ class MemberController extends WechatAuthController
             $this->db->rollback();
             return $this->error("个人用户车辆信息保存失败");
         }
-        if (!service("point/manager")->create($member, MemberPoint::TYPE_AUTH)) {
-            return $this->error("积分变更失败");
-        }
         $this->db->commit();
         di("cache")->delete($data['mobile'] . "_auth");
 
