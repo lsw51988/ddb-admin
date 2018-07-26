@@ -22,14 +22,6 @@ use Ddb\Modules\MemberPoint;
 class MemberController extends AdminAuthController
 {
     /**
-     * @Get("/{id:[0-9]+}")
-     */
-    public function showAction($id)
-    {
-
-    }
-
-    /**
      * 列表
      * @Get("/list")
      */
@@ -43,8 +35,9 @@ class MemberController extends AdminAuthController
         $request['type'] = $type;
         $request['limit'] = $this->limit;
         $request['page'] = $this->page;
-        $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
-        $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
+        $request['real_name'] = isset($request['real_name']) ? $request['real_name'] : "";
+        $request['mobile'] = isset($request['mobile']) ? $request['mobile'] : "";
+        $request['status'] = isset($request['status']) ? $request['status'] : 99;
         $data = service("member/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,
@@ -81,65 +74,19 @@ class MemberController extends AdminAuthController
     }
 
     /**
-     * 列表
-     * @Get("/authed")
-     */
-    public function authedAction()
-    {
-        $request = $this->request->get();
-        $type = Member::TYPE_RIDE;
-        if (!empty($request['type'])) {
-            $type = $request['type'];
-        }
-        $request['type'] = $type;
-        $request['status'] = Member::STATUS_AUTHED;
-        $request['limit'] = $this->limit;
-        $request['page'] = $this->page;
-        $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
-        $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
-        $data = service("member/query")->getList($request);
-        $this->view->setVars([
-            'page' => $this->page,
-            'data' => $data->items->toArray(),
-            'total' => $data->total_items,
-            'search' => $request
-        ]);
-    }
-
-    /**
-     * 列表
-     * @Get("/auth_denied")
-     */
-    public function authDeniedAction()
-    {
-        $request = $this->request->get();
-        $type = Member::TYPE_RIDE;
-        if (!empty($request['type'])) {
-            $type = $request['type'];
-        }
-        $request['type'] = $type;
-        $request['status'] = Member::STATUS_AUTH_DENIED;
-        $request['limit'] = $this->limit;
-        $request['page'] = $this->page;
-        $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
-        $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
-        $data = service("member/query")->getList($request);
-        $this->view->setVars([
-            'page' => $this->page,
-            'data' => $data->items->toArray(),
-            'total' => $data->total_items,
-            'search' => $request
-        ]);
-    }
-
-    /**
      * @Get("/auth/{id:[0-9]+}")
      * 审核用户资料
      */
     public function authAction($id)
     {
-        if($member = Member::findFirst($id)){
-            if($member->setStatus(Member::STATUS_AUTHED)->save()){
+        $request = $this->data;
+        if ($member = Member::findFirst($id)) {
+            if ($request['type'] == 'pass') {
+                $status = Member::STATUS_AUTHED;
+            } else {
+                $status = Member::STATUS_AUTH_DENIED;
+            }
+            if ($member->setStatus($status)->save()) {
                 if (!service("point/manager")->create($member, MemberPoint::TYPE_AUTH)) {
                     return $this->error("积分变更失败");
                 }
@@ -147,14 +94,6 @@ class MemberController extends AdminAuthController
             }
         }
         return $this->error("未找到该记录");
-    }
-
-    /**
-     * @Put("/{id:[0-9]+}")
-     */
-    public function editAction()
-    {
-
     }
 
     /**

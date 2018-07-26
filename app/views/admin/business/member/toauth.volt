@@ -5,7 +5,7 @@
 
     <span class="layui-breadcrumb">
       <a href="">后台</a>
-      <a href="">骑行者</a>
+      <a href="">用户</a>
       <a><cite>待审核</cite></a>
     </span>
     <fieldset class="layui-elem-field">
@@ -102,17 +102,30 @@
                 <td>{{ member['district_name'] }}</td>
                 <td>{{ member['updated_at'] }}</td>
                 <td>
-                    <button class="layui-btn check" data-id="{{ member['id'] }}">查看</button>
-                    <button class="layui-btn layui-btn-warm edit" data-id="{{ member['id'] }}">编辑</button>
+                    <button class="layui-btn photo" data-id="{{ member['id'] }}">查看照片</button>
+                    <button class="layui-btn layui-btn-warm pass" data-id="{{ member['id'] }}">通过</button>
+                    <button class="layui-btn layui-btn-danger refuse" data-id="{{ member['id'] }}">拒绝</button>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <div id="page"></div>
+    <ul id="viewer" style="display:none;padding:20px;height:80px;">
+    </ul>
 {% endblock %}
 
 {% block css %}
+    <style type="text/css">
+        .img {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            float: left;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
 {% endblock %}
 {% block scripts %}
     <script>
@@ -127,7 +140,6 @@
                 , limit: 20
                 , curr:{{ page }}
                 , jump: function (obj, first) {
-                    //console.log(obj.curr);
                     if (!first) {
                         window.location.href = "/admin/business/member/list?page=" + obj.curr
                     }
@@ -218,12 +230,87 @@
             $("#reset").click(function(){
                 window.location.href="/admin/business/member/toauth";
             });
-            $(".check").click(function () {
-                console.log($(this).data('id'));
+            $(".photo").click(function () {
+                $("#viewer").empty();
+                var member_id = $(this).data('id');
+                $.ajax({
+                    url: "/admin/business/member/" + member_id + "/imgs",
+                    method: "GET",
+                    success: function (res) {
+                        if(res.status){
+                            var data = res.data;
+                            for (var i = 0; i < data.length; i++) {
+                                $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
+                            }
+                            layer.open({
+                                type: 1,
+                                area: '500px',
+                                content: $("#viewer")
+                            });
+                            $("#viewer").show();
+                            $('#viewer').viewer();
+                            $(".layui-layer-shade").removeClass('layui-layer-shade');
+                        }else{
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.msg("请求错误")
+                    }
+                })
             });
-            $(".edit").click(function () {
-                console.log($(this).data('id'));
+
+            $(".pass").click(function(){
+                var member_id = $(this).data('id');
+                var layer_load = layer.load();
+                $.ajax({
+                    url: "/admin/business/member/auth/" + member_id,
+                    data:{
+                        'type':'pass'
+                    },
+                    method: "GET",
+                    success: function (res) {
+                        if(res.status){
+                            layer.msg('修改成功',function () {
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.close(layer_load);
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.close(layer_load);
+                        layer.msg("请求错误,请联系大帅比李少文")
+                    }
+                })
             });
+
+            $(".refuse").click(function(){
+                var member_id = $(this).data('id');
+                var layer_load = layer.load();
+                $.ajax({
+                    url: "/admin/business/member/auth/" + member_id,
+                    data:{
+                        'type':'refuse'
+                    },
+                    method: "GET",
+                    success: function (res) {
+                        if(res.status){
+                            layer.msg('修改成功',function () {
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.close(layer_load);
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.close(layer_load);
+                        layer.msg("请求错误,请联系大帅比李少文")
+                    }
+                })
+            })
         });
     </script>
 {% endblock %}

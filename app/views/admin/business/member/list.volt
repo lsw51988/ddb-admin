@@ -5,7 +5,7 @@
 {% block content %}
     <span class="layui-breadcrumb">
       <a href="">后台</a>
-      <a href="">骑行者</a>
+      <a href="">用户</a>
       <a><cite>总览</cite></a>
     </span>
     <fieldset class="layui-elem-field">
@@ -57,6 +57,19 @@
                     </div>
                 </div>
             </div>
+            <div class="layui-row layui-form-item ">
+                <div class="layui-col-md12">
+                    <label class="layui-form-label">审核状态</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="status" value="99" title="全部"
+                               {% if search['status']==99 %}checked{% endif %}>
+                        <input type="radio" name="status" value="3" title="通过"
+                               {% if search['status']==3 %}checked{% endif %}>
+                        <input type="radio" name="status" value="4" title="拒绝"
+                               {% if search['status']==4 %}checked{% endif %}>
+                    </div>
+                </div>
+            </div>
             <div class="layui-form-item">
                 <div class="layui-input-block">
                     <button class="layui-btn" lay-submit lay-filter="formDemo">搜索</button>
@@ -76,7 +89,6 @@
             <col width="120">
             <col width="120">
             <col width="120">
-            <col width="150">
             <col width="120">
             <col>
         </colgroup>
@@ -90,7 +102,6 @@
             <th>省</th>
             <th>市</th>
             <th>区</th>
-            <th>照片</th>
             <th>提交时间</th>
             <th>操作</th>
         </tr>
@@ -109,11 +120,6 @@
                 <td>{{ member['updated_at'] }}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ member['id'] }}">查看照片</button>
-                </td>
-                <td>
-                    <a href="https://www.baidu.com/">
-                        <button class="layui-btn detail" data-id="{{ member['id'] }}">详情</button>
-                    </a>
                 </td>
             </tr>
         {% endfor %}
