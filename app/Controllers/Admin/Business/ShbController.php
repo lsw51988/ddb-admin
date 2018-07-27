@@ -9,6 +9,8 @@
 namespace Ddb\Controllers\Admin\Business;
 
 use Ddb\Controllers\AdminAuthController;
+use Ddb\Modules\Member;
+use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SecondBike;
 
 /**
@@ -18,12 +20,27 @@ use Ddb\Modules\SecondBike;
 class ShbController extends AdminAuthController
 {
     /**
-     * @Post("/audit/{id:[0-9]+}")
+     * @Get("/audit/{id:[0-9]+}")
      * 审核
      */
-    public function auditAction()
+    public function auditAction($id)
     {
-
+        $request = $this->data;
+        if ($secondBike = SecondBike::findFirst($id)) {
+            if ($request['type'] == 'pass') {
+                $status = SecondBike::STATUS_AUTH;
+            } else {
+                $status = SecondBike::STATUS_DENIED;
+            }
+            if ($secondBike->setStatus($status)->save()) {
+                //扣除积分
+                $member = Member::findFirst($secondBike->getMemberId());
+                if (!service("point/manager")->create($member, MemberPoint::TYPE_PUBLISH_SHB, $id)) {
+                    return $this->error("积分扣除失败");
+                }
+            }
+        }
+        return $this->error("未找到该记录");
     }
 
     /**

@@ -10,8 +10,8 @@
                 <dl class="layui-nav-child">
                     <dd><a href="/admin/business/member/list" class="/admin/business/member/list">总览</a></dd>
                     <dd><a href="/admin/business/member/to_auth" class="/admin/business/member/to_auth">待审核</a></dd>
-                    <dd><a href="/admin/business/member/authed" class="/admin/business/member/authed">审核通过</a></dd>
-                    <dd><a href="/admin/business/member/auth_denied" class="/admin/business/member/auth_denied">审核拒绝</a></dd>
+                    {#<dd><a href="/admin/business/member/authed" class="/admin/business/member/authed">审核通过</a></dd>#}
+                    {#<dd><a href="/admin/business/member/auth_denied" class="/admin/business/member/auth_denied">审核拒绝</a></dd>#}
                 </dl>
             </li>
             <li class="layui-nav-item">

@@ -120,6 +120,7 @@
                 <td>{{ member['updated_at'] }}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ member['id'] }}">查看照片</button>
+                    <button class="layui-btn layui-btn-normal edit" data-id="{{ member['id'] }}">修改</button>
                 </td>
             </tr>
         {% endfor %}
@@ -278,6 +279,10 @@
             $("#reset").click(function () {
                 window.location.href = "/admin/business/member/list";
             });
+            $('.edit').click(function () {
+
+            })
+
         });
     </script>
 {% endblock %}

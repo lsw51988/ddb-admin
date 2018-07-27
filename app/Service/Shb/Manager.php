@@ -64,14 +64,8 @@ class Manager extends Service
             $this->db->rollback();
             return false;
         }
-        //扣除积分
-        $currentMember = Member::findFirst($member->getId());
-        if (service("point/manager")->create($currentMember, MemberPoint::TYPE_PUBLISH_SHB, $shb->getId())) {
-            $this->db->commit();
-            return $shb->getId();
-        } else {
-            return false;
-        }
+        $this->db->commit();
+        return $shb->getId();
     }
 
     public function update($member, $data)

@@ -81,29 +81,40 @@
         </tr>
         </thead>
         <tbody>
-        {% for member in data %}
+        {% for bike in data %}
             <tr>
-                <td>{{ member['id'] }}</td>
-                <td>{{ member['brand_name'] }}</td>
-                <td>{{ member['out_price']}}</td>
-                <td>{{ member['real_name'] }}</td>
-                <td>{{ member['mobile']}}</td>
-                <td>{{ member['province'] }}</td>
-                <td>{{ member['city'] }}</td>
-                <td>{{ member['district'] }}</td>
-                <td>{{ member['created_at'] }}</td>
+                <td>{{ bike['id'] }}</td>
+                <td>{{ bike['brand_name'] }}</td>
+                <td>{{ bike['out_price']}}</td>
+                <td>{{ bike['real_name'] }}</td>
+                <td>{{ bike['mobile']}}</td>
+                <td>{{ bike['province'] }}</td>
+                <td>{{ bike['city'] }}</td>
+                <td>{{ bike['district'] }}</td>
+                <td>{{ bike['created_at'] }}</td>
                 <td>
-                    <button class="layui-btn check" data-id="{{ member['id'] }}">查看</button>
-                    <button class="layui-btn layui-btn-warm edit" data-id="{{ member['id'] }}">编辑</button>
+                    <button class="layui-btn photo" data-id="{{ bike['id'] }}">查看照片</button>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <div id="page"></div>
+    <ul id="viewer" style="display:none;padding:20px;height:80px;">
+    </ul>
 {% endblock %}
 
 {% block css %}
+    <style type="text/css">
+        .img {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            float: left;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
 {% endblock %}
 {% block scripts %}
     <script>
@@ -122,6 +133,36 @@
                         window.location.href = "/admin/business/shb/list?page=" + obj.curr
                     }
                 }
+            });
+
+            $(".photo").click(function () {
+                $("#viewer").empty();
+                var member_id = $(this).data('id');
+                $.ajax({
+                    url: "/admin/business/member/" + member_id + "/imgs",
+                    method: "GET",
+                    success: function (res) {
+                        if(res.status){
+                            var data = res.data;
+                            for (var i = 0; i < data.length; i++) {
+                                $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
+                            }
+                            layer.open({
+                                type: 1,
+                                area: '500px',
+                                content: $("#viewer")
+                            });
+                            $("#viewer").show();
+                            $('#viewer').viewer();
+                            $(".layui-layer-shade").removeClass('layui-layer-shade');
+                        }else{
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.msg("请求错误")
+                    }
+                })
             });
 
             function getProvinces() {
