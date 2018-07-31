@@ -131,6 +131,28 @@
     <ul id="viewer" style="display:none;padding:20px;height:80px;">
     </ul>
 
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="top:300px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="member_id">
+                    <label for="name">姓名</label>
+                    <input type="text" class="form-control" id="name">
+                    <label for="mobile">手机号</label>
+                    <input type="text" class="form-control" id="mobile">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block css %}
@@ -172,7 +194,7 @@
                     url: "/admin/business/member/" + member_id + "/imgs",
                     method: "GET",
                     success: function (res) {
-                        if(res.status){
+                        if (res.status) {
                             var data = res.data;
                             for (var i = 0; i < data.length; i++) {
                                 $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
@@ -185,7 +207,7 @@
                             $("#viewer").show();
                             $('#viewer').viewer();
                             $(".layui-layer-shade").removeClass('layui-layer-shade');
-                        }else{
+                        } else {
                             layer.msg(res.msg);
                         }
                     },
@@ -280,9 +302,40 @@
                 window.location.href = "/admin/business/member/list";
             });
             $('.edit').click(function () {
-
+                var member_id = $(this).data('id');
+                $('#myModal').modal();
+                $('.modal-backdrop').removeClass('modal-backdrop');
+                $("#member_id").val(member_id);
             })
-
+            $("#submit").click(function(){
+                var mobile = $("#mobile").val();
+                var name = $("#name").val();
+                var member_id = $("#member_id").val();
+                var layer_load = layer.load();
+                $.ajax({
+                    url: "/admin/business/member",
+                    method: "POST",
+                    data:{
+                        'mobile':mobile,
+                        'name':name,
+                        'member_id':member_id
+                    },
+                    success: function (res) {
+                        $('#myModal').modal('hide');
+                        if (res.status) {
+                            layer.close(layer_load);
+                            layer.msg("修改成功");
+                        } else {
+                            layer.close(layer_load);
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.close(layer_load);
+                        layer.msg("请求错误")
+                    }
+                })
+            })
         });
     </script>
 {% endblock %}

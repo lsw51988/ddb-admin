@@ -113,4 +113,26 @@ class MemberController extends AdminAuthController
         return $this->error('暂无照片');
     }
 
+    /**
+     * @Post("")
+     */
+    public function updateAction(){
+        $data = $this->request->get();
+        $memberId = $data['member_id'];
+        if($member = Member::findFirst($memberId)){
+            if(isset($data['name'])){
+                $member->setRealName($data['name']);
+            }
+            if(isset($data['mobile'])){
+                $member->setMobile($data['mobile']);
+            }
+            if($member->save()){
+                return $this->success();
+            }else{
+                return $this->error();
+            }
+        }
+        return $this->error("未找到相关记录");
+    }
+
 }
