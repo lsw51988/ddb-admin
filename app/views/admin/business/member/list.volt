@@ -323,8 +323,9 @@
                     success: function (res) {
                         $('#myModal').modal('hide');
                         if (res.status) {
-                            layer.close(layer_load);
-                            layer.msg("修改成功");
+                            layer.msg("修改成功",function () {
+                                window.location.reload();
+                            });
                         } else {
                             layer.close(layer_load);
                             layer.msg(res.msg);

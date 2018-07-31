@@ -108,6 +108,25 @@
     <div id="page"></div>
     <ul id="viewer" style="display:none;padding:20px;height:80px;">
     </ul>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="top:300px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="bike_id">
+                    <label for="out_price">价格</label>
+                    <input type="text" class="form-control" id="out_price">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block css %}
@@ -255,12 +274,41 @@
             $("#reset").click(function () {
                 window.location.href = "/admin/business/member/list";
             });
-            $(".check").click(function () {
-                console.log($(this).data('id'));
-            });
-            $(".edit").click(function () {
-                console.log($(this).data('id'));
-            });
+            $('.edit').click(function () {
+                var bike_id = $(this).data('id');
+                $('#myModal').modal();
+                $('.modal-backdrop').removeClass('modal-backdrop');
+                $("#bike_id").val(bike_id);
+            })
+            $("#submit").click(function(){
+                var out_price = $("#out_price").val();
+                var bike_id = $("#bike_id").val();
+                var layer_load = layer.load();
+                $.ajax({
+                    url: "/admin/business/shb/update",
+                    method: "POST",
+                    data:{
+                        'bike_id':bike_id,
+                        'out_price':out_price
+                    },
+                    success: function (res) {
+                        $('#myModal').modal('hide');
+                        if (res.status) {
+                            //layer.close(layer_load);
+                            layer.msg("修改成功",function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            layer.close(layer_load);
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.close(layer_load);
+                        layer.msg("请求错误")
+                    }
+                })
+            })
         });
     </script>
 {% endblock %}

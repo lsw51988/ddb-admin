@@ -52,11 +52,17 @@ class ShbController extends AdminAuthController
     }
 
     /**
-     * @Put("/{id:[0-9]+}")
+     * @Post("/update")
      */
     public function editAction()
     {
-
+        $request = $this->data;
+        if ($secondBike = SecondBike::findFirst($request['bike_id'])) {
+            if ($secondBike->setOutPrice($request['out_price'])->save()) {
+                return $this->success();
+            }
+        }
+        return $this->error("未找到该记录");
     }
 
     /**
