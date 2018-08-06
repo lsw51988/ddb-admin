@@ -148,7 +148,7 @@ class IndexController extends BaseController
         $data = $this->data;
         $path = $data['path'];
         $data = service("file/manager")->read($path);
-        return $this->response->setContent($data['contents'])->setContentType('image/jpeg');
+        return $this->response->setContent($data)->setContentType('image/jpeg');
     }
 
     /**
