@@ -27,6 +27,8 @@ class AppealController extends AdminAuthController
         $request = $this->request->get();
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
+        $request['page'] = $this->page;
+        $request['limit'] = $this->limit;
         $data = service("appeal/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,

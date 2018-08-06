@@ -10,6 +10,7 @@ namespace Ddb\Service\Appeal;
 
 
 use Ddb\Models\Appeals;
+use Ddb\Models\Areas;
 use Ddb\Models\Members;
 use Ddb\Modules\Member;
 use Ddb\Service\BaseService;
@@ -55,9 +56,10 @@ class Query extends BaseService
      */
     public function getList($request)
     {
-        $columns = ["A.id", "A.method", "A.type", "A.description", "A.mobile", "A.longitude", "A.longitude", "A.status", "A.awr_time", "A.awr_cancel_time", "A.awr_fin_time", "A.created_at", "M.real_name"];
+        $columns = ["A.id", "A.method", "A.type", "A.description","Ar.province_name", "Ar.city_name", "Ar.district_name",  "A.mobile", "A.longitude", "A.longitude", "A.status", "A.awr_time", "A.awr_cancel_time", "A.awr_fin_time", "A.created_at", "M.real_name"];
         $builder = $this->modelsManager->createBuilder()
             ->from(["A" => Appeals::class])
+            ->leftJoin(Areas::class, "A.district = Ar.district_code", "Ar")
             ->leftJoin(Member::class, "A.ask_id = M.id", "M")
             ->columns($columns);
         if (!empty($request['status'])) {
@@ -74,8 +76,8 @@ class Query extends BaseService
         }
         $paginator = new QueryBuilder([
             'builder' => $builder,
-            'limit' => $this->limit,
-            'page' => $this->page
+            'limit' => $request['limit'],
+            'page' => $request['page']
         ]);
         $data = $paginator->getPaginate();
         return $data;

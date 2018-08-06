@@ -255,8 +255,9 @@
                 var shb_id = $(this).data('id');
                 var layer_load = layer.load();
                 $.ajax({
-                    url: "/admin/business/shb/auth/" + shb_id,
+                    url: "/admin/business/shb/audit",
                     data:{
+                        'shb_id':shb_id,
                         'type':'pass'
                     },
                     method: "GET",

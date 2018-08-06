@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\Areas;
 use Ddb\Modules\Appeal;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
@@ -39,7 +40,7 @@ class AppealsController extends WechatAuthController
         if ($this->request->isGet()) {
             //1.检查30分钟之内是否有发送过请求
             if ($appeal = Appeal::findFirst([
-                "conditions" => "created_at>='" . Date("Y-m-d H:i:s", time() - 30 * 60) . "'",
+                "conditions" => "created_at>='" . date("Y-m-d H:i:s", time() - 30 * 60) . "'",
                 "order" => "created_at DESC"
             ])) {
                 return $this->success([
@@ -52,7 +53,7 @@ class AppealsController extends WechatAuthController
                 ]);
             }
         } else {
-            if (Appeal::count("created_at>='" . Date("Y-m-d 00:00:00") . "'") > 3) {
+            if (Appeal::count("created_at>='" . date("Y-m-d 00:00:00") . "'") > 3) {
                 return $this->error("一天最多只能请求3次帮助");
             }
             $nearMts = service("repair/query")->getNearMtsByRadius($data['longitude'], $data['latitude']);
@@ -81,6 +82,7 @@ class AppealsController extends WechatAuthController
             if ($data['method'] == Appeal::METHOD_SOS) {
                 $appeal->setPoints(10);
             }
+            $location = service("member/manager")->getLocation($data['latitude'], $data['longitude']);
             $appeal->setMethod($data['method'])
                 ->setType($data['type'])
                 ->setLongitude($data['longitude'])
@@ -88,12 +90,22 @@ class AppealsController extends WechatAuthController
                 ->setDescription($data['desc'])
                 ->setAskId($currentMember->getId())
                 ->setStatus(Appeal::STATUS_CREATE);
+            //1.根据经纬度获取用户的当前地址
+            if ($location->status != 0) {
+                $appeal->setProvince($data['province'])
+                    ->setCity($data['city'])
+                    ->setDistrict($data['district']);
+            } else {
+                $area = Areas::findFirstByDistrictName($location->result->address_component->district);
+                $appeal->setProvince($area->getProvinceCode())
+                    ->setCity($area->getCityCode())
+                    ->setDistrict($area->getDistrictCode());
+            }
             if ($appeal->save()) {
                 di("cache")->delete($data['mobile'] . "_auth");
                 return $this->success([
                     "appeal_id" => $appeal->getId()
                 ]);
-
             } else {
                 return $this->error("保存不成功");
             }

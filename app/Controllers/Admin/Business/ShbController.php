@@ -20,13 +20,13 @@ use Ddb\Modules\SecondBike;
 class ShbController extends AdminAuthController
 {
     /**
-     * @Get("/audit/{id:[0-9]+}")
+     * @Get("/audit")
      * 审核
      */
-    public function auditAction($id)
+    public function auditAction()
     {
         $request = $this->data;
-        if ($secondBike = SecondBike::findFirst($id)) {
+        if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
             if ($request['type'] == 'pass') {
                 $status = SecondBike::STATUS_AUTH;
             } else {
@@ -38,6 +38,7 @@ class ShbController extends AdminAuthController
                 if (!service("point/manager")->create($member, MemberPoint::TYPE_PUBLISH_SHB, $id)) {
                     return $this->error("积分扣除失败");
                 }
+                return $this->success();
             }
         }
         return $this->error("未找到该记录");
@@ -79,7 +80,7 @@ class ShbController extends AdminAuthController
     public function listAction()
     {
         $request = $this->request->get();
-        $request['status'] = SecondBike::STATUS_CREATE;
+        //$request['status'] = SecondBike::STATUS_CREATE;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = $this->getList($request);
@@ -149,7 +150,6 @@ class ShbController extends AdminAuthController
     private function getList($request){
         $request['limit'] = $this->limit;
         $request['page'] = $this->page;
-        $request['status'] = SecondBike::STATUS_CREATE;
         $data = service("shb/query")->getAdminList($request);
         return $data;
     }
