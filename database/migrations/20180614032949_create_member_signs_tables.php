@@ -33,6 +33,5 @@ class CreateMemberSignsTables extends AbstractMigration
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "用户id"])
             ->addTimestamps()
             ->save();
-
     }
 }

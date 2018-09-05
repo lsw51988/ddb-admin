@@ -217,10 +217,10 @@ class MemberController extends WechatAuthController
             if ($member->getAvatarUrl() == null) {
                 $data['avatar_url'] = "";
             } else {
-                preg_match('/https/',$member->getAvatarUrl(),$matches);
-                if(sizeof($matches)>0){
+                preg_match('/https/', $member->getAvatarUrl(), $matches);
+                if (sizeof($matches) > 0) {
                     $data['avatar_url'] = $member->getAvatarUrl();
-                }else{
+                } else {
                     $data['avatar_url'] = di("config")->app->URL . "/wechat/avatar?path=" . $member->getAvatarUrl();
                 }
             }

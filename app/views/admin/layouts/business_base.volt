@@ -35,6 +35,13 @@
                     <dd><a href="/admin/business/shb/traded">交易完成</a></dd>
                 </dl>
             </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">维修点</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/admin/business/repair/list">总览</a></dd>
+                    <dd><a href="/admin/business/repair/to_auth">待审核</a></dd>
+                </dl>
+            </li>
         </ul>
     </div>
 {% endblock %}
