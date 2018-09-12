@@ -32,7 +32,7 @@
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
                     <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin-right: 10px;">
+                    <div class="layui-col-md2" style="margin: 0 10px 0 30px;">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
@@ -50,6 +50,8 @@
                 <div class="layui-col-md12">
                     <label class="layui-form-label">类型</label>
                     <div class="layui-input-block">
+                        <input type="radio" name="type" value="0" title="全部"
+                               {% if (search['type']==99 OR search['type']=='') %}checked{% endif %}>
                         <input type="radio" name="type" value="0" title="电动车维修点"
                                {% if search['type']==0 %}checked{% endif %}>
                         <input type="radio" name="type" value="1" title="电动车维修兼销售点"
