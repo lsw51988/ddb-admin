@@ -20,25 +20,6 @@ use Ddb\Helper\Wechat\WXBizDataCrypt;
 
 class Manager extends BaseService
 {
-    private static $times = 5;
-
-    public function getLocation($latitude, $longitude)
-    {
-        $url = "http://apis.map.qq.com/ws/geocoder/v1?location=" . $latitude . "," . $longitude . "&key=" . di("config")->app->tecent_addr_key;
-        $curl_data = curl_request($url);
-        $curl_data = json_decode($curl_data);
-        if ($curl_data->status == 0) {
-            return $curl_data;
-        } else {
-            self::$times--;
-            if (self::$times > 0) {
-                $this->getLocation($latitude, $longitude);
-            } else {
-                return null;
-            }
-        }
-    }
-
     public function getWechatLogin($js_code)
     {
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' . di("config")->app->APP_ID . '&secret=' . di("config")->app->APP_SECRET . '&js_code=' . $js_code . '&grant_type=authorization_code';

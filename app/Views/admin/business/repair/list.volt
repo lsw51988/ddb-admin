@@ -15,14 +15,14 @@
         <form id="form" class="layui-form layui-container" action="">
             <div class="layui-row layui-form-item ">
                 <div class="layui-col-md4">
-                    <label class="layui-form-label">姓名</label>
+                    <label class="layui-form-label" style="width: 100px;">姓名</label>
                     <div class="layui-input-block">
                         <input type="text" name="name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
                                value="{{ search['name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
-                    <label class="layui-form-label">手机号</label>
+                    <label class="layui-form-label" style="width: 100px;">手机号</label>
                     <div class="layui-input-block">
                         <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
                                value="{{ search['mobile'] }}">
@@ -31,8 +31,8 @@
             </div>
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
-                    <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin: 0 10px 0 30px;">
+                    <label class="layui-form-label" style="width: 100px;">区域</label>
+                    <div class="layui-col-md2" style="margin: 0 10px 0 10px;">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="layui-row layui-form-item ">
                 <div class="layui-col-md12">
-                    <label class="layui-form-label">类型</label>
+                    <label class="layui-form-label" style="width: 100px;">类型</label>
                     <div class="layui-input-block">
                         <input type="radio" name="type" value="0" title="全部"
                                {% if (search['type']==99 OR search['type']=='') %}checked{% endif %}>
@@ -63,7 +63,7 @@
             </div>
             <div class="layui-row layui-form-item ">
                 <div class="layui-col-md12">
-                    <label class="layui-form-label">审核状态</label>
+                    <label class="layui-form-label" style="width: 100px;">审核状态</label>
                     <div class="layui-input-block">
                         <input type="radio" name="status" value="99" title="全部"
                                {% if search['status']==99 %}checked{% endif %}>

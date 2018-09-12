@@ -13,15 +13,22 @@ use Ddb\Core\Service;
 
 class BaseService extends Service
 {
-    //单利模式
-    private static $instance = null;
+    private static $times = 5;
 
-    public static function getInstance()
+    public function getLocation($latitude, $longitude)
     {
-        $className = get_called_class();
-        if (is_null(self::$instance)) {
-            self::$instance = new $className;
+        $url = "http://apis.map.qq.com/ws/geocoder/v1?location=" . $latitude . "," . $longitude . "&key=" . di("config")->app->tecent_addr_key;
+        $curl_data = curl_request($url);
+        $curl_data = json_decode($curl_data);
+        if ($curl_data->status == 0) {
+            return $curl_data;
+        } else {
+            self::$times--;
+            if (self::$times > 0) {
+                $this->getLocation($latitude, $longitude);
+            } else {
+                return null;
+            }
         }
-        return self::$instance;
     }
 }
