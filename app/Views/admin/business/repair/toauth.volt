@@ -6,7 +6,7 @@
     <span class="layui-breadcrumb">
       <a href="">后台</a>
       <a href="">维修点</a>
-      <a><cite>总览</cite></a>
+      <a><cite>待审核</cite></a>
     </span>
     <fieldset class="layui-elem-field">
         <legend>
@@ -134,7 +134,8 @@
                 <td>{% if repair["create_by_type"]==1 %}member{% else %}user{% endif %}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ repair['id'] }}">查看照片</button>
-                    <button class="layui-btn layui-btn-normal edit" data-id="{{ repair['id'] }}">修改</button>
+                    <button class="layui-btn layui-btn-warm pass" data-id="{{ repair['id'] }}">通过</button>
+                    <button class="layui-btn layui-btn-danger refuse" data-id="{{ repair['id'] }}">拒绝</button>
                 </td>
             </tr>
         {% endfor %}
@@ -144,29 +145,6 @@
 
     <ul id="viewer" style="display:none;padding:20px;height:80px;">
     </ul>
-
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="top:300px;">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="repair_id">
-                    <label for="name">维修单名称</label>
-                    <input type="text" class="form-control" id="name">
-                    <label for="mobile">维修点手机</label>
-                    <input type="text" class="form-control" id="mobile">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" id="submit">提交</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
 
@@ -320,29 +298,20 @@
             $("#reset").click(function () {
                 window.location.href = "/admin/business/repair/list";
             });
-            $('.edit').click(function () {
+
+            $(".pass").click(function () {
                 var repair_id = $(this).data('id');
-                $('#myModal').modal();
-                $('.modal-backdrop').removeClass('modal-backdrop');
-                $("#repair_id").val(repair_id);
-            })
-            $("#submit").click(function () {
-                var mobile = $("#mobile").val();
-                var name = $("#name").val();
-                var repair_id = $("#repair_id").val();
                 var layer_load = layer.load();
                 $.ajax({
-                    url: "/admin/business/repair",
-                    method: "POST",
+                    url: "/admin/business/repair/auth",
                     data: {
-                        'mobile': mobile,
-                        'name': name,
+                        'type': 'pass',
                         'repair_id': repair_id
                     },
+                    type: "POST",
                     success: function (res) {
-                        $('#myModal').modal('hide');
                         if (res.status) {
-                            layer.msg("修改成功", function () {
+                            layer.msg('修改成功', function () {
                                 window.location.reload();
                             });
                         } else {
@@ -352,10 +321,38 @@
                     },
                     error: function () {
                         layer.close(layer_load);
-                        layer.msg("请求错误")
+                        layer.msg("请求错误,请联系大帅比李少文")
+                    }
+                })
+            });
+
+            $(".refuse").click(function () {
+                var repair_id = $(this).data('id');
+                var layer_load = layer.load();
+                $.ajax({
+                    url: "/admin/business/member/auth",
+                    data: {
+                        'type': 'refuse',
+                        'repair_id': repair_id
+                    },
+                    type: "POST",
+                    success: function (res) {
+                        if (res.status) {
+                            layer.msg('修改成功', function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            layer.close(layer_load);
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function () {
+                        layer.close(layer_load);
+                        layer.msg("请求错误,请联系大帅比李少文")
                     }
                 })
             })
+
         });
     </script>
 {% endblock %}

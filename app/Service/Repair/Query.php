@@ -10,6 +10,7 @@ namespace Ddb\Service\Repair;
 
 
 use Ddb\Core\Service;
+use Ddb\Models\Areas;
 use Ddb\Modules\Repair;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 
@@ -32,13 +33,13 @@ class Query extends Service
         $maxLati = round($latitude + $radius / 1000 / 105 / cos($latitude), 5);
 
         $mts = Repair::find([
-            "columns"=>"longitude,latitude,name,address,belonger_name,id",
-            "conditions"=> "longitude >= :minLong: AND longitude<= :maxLong: AND latitude>=:minLati: AND latitude <= :maxLati:",
-            "bind"=>[
-                "minLong"=>$minLong,
-                "maxLong"=>$maxLong,
-                "minLati"=>$minLati,
-                "maxLati"=>$maxLati,
+            "columns" => "longitude,latitude,name,address,belonger_name,id",
+            "conditions" => "longitude >= :minLong: AND longitude<= :maxLong: AND latitude>=:minLati: AND latitude <= :maxLati:",
+            "bind" => [
+                "minLong" => $minLong,
+                "maxLong" => $maxLong,
+                "minLati" => $minLati,
+                "maxLati" => $maxLati,
                 //"status"=>Repair::STATUS_NOT_OWNER_CREATE,
             ]
         ]);
@@ -48,23 +49,36 @@ class Query extends Service
 
     /**
      * 获取维修点列表
+     * @param $request
+     * @return \stdClass
      */
-    public function getList($request){
-        $columns = ['R.id', 'R.name','R.belonger_name','R.type','R.longitude','R.latitude','R.mobile','R.remark','R.status','R.refuse_reason','R.created_at','R.create_by_type'];
+    public function getList($request)
+    {
+        $columns = ['R.id', 'R.name', 'R.belonger_name', 'R.address', 'R.type', 'R.longitude', 'R.latitude', 'R.mobile', 'R.remark', 'R.status', 'R.refuse_reason', 'R.created_at', 'R.create_by_type', 'A.district_name', 'A.city_name', 'A.province_name'];
         $builder = $this->modelsManager->createBuilder()
             ->from(["R" => Repair::class])
+            ->leftJoin(Areas::class, "A.district_code = R.district", "A")
             ->columns($columns);
-        if (!empty($request['status']) && $request['status']!=99) {
+        if (ok($request,'status') && $request['status'] != 99) {
             $builder->andWhere("R.status=" . $request['status']);
         }
-        if (!empty($request['belonger_name'])) {
+        if (ok($request,'belonger_name')) {
             $builder->andWhere("R.belonger_name like '%" . $request['belonger_name'] . "%'");
         }
-        if (!empty($request['mobile'])) {
+        if (ok($request,'mobile')) {
             $builder->andWhere("R.mobile = " . $request['mobile']);
         }
-        if (!empty($request['type']) && $request['status']!=99) {
+        if (ok($request,'type') && $request['type'] != 99) {
             $builder->andWhere("R.type =" . $request['type']);
+        }
+        if (ok($request,'province')) {
+            $builder->andWhere("R.province =" . $request['province']);
+        }
+        if (ok($request,'city')) {
+            $builder->andWhere("R.city =" . $request['city']);
+        }
+        if (ok($request,'district')) {
+            $builder->andWhere("R.district =" . $request['district']);
         }
         $paginator = new QueryBuilder([
             'builder' => $builder,
