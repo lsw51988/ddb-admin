@@ -4,4 +4,11 @@
 /public/.htaccess
 /vendor
 /app/Controllers/TestController.php
-/app/Config/.*
+/app/Config/app.php
+/app/Config/config.ini
+/app/Config/database.php
+/app/Config/filesystem.php
+/app/Config/pay.php
+/app/Config/queue.php
+/app/Config/session.php
+/app/Config/view.php
