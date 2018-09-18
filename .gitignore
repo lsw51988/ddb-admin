@@ -4,3 +4,4 @@
 /public/.htaccess
 /vendor
 /app/Controllers/TestController.php
+/app/Config/.*
