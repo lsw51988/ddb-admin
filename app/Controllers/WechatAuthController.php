@@ -10,6 +10,7 @@ namespace Ddb\Controllers;
 
 
 use Ddb\Core\BaseController;
+use Ddb\Modules\Member;
 
 class WechatAuthController extends BaseController
 {
@@ -25,8 +26,10 @@ class WechatAuthController extends BaseController
         } else {
             $this->token = $token;
             //用户更新信息时,需求重新写入缓存
-            $this->currentMember = unserialize(di("cache")->get($token));
+            if (!$this->currentMember = unserialize(di("cache")->get($token))) {
+                $this->currentMember = Member::findFirst($this->data['member_id']);
+                di("cache")->save($token, serialize($this->currentMember), 30 * 24 * 60);
+            }
         }
-
     }
 }
