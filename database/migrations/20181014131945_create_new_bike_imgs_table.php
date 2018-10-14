@@ -1,10 +1,10 @@
 <?php
 
 
-use Phinx\Migration\AbstractMigration;
 use Phinx\Db\Adapter\MysqlAdapter;
+use Phinx\Migration\AbstractMigration;
 
-class CreateMemberInsTable extends AbstractMigration
+class CreateNewBikeImgsTable extends AbstractMigration
 {
     /**
      * Change Method.
@@ -27,11 +27,14 @@ class CreateMemberInsTable extends AbstractMigration
      * Remember to call "create()" or "update()" and NOT "save()" when working
      * with the Table class.
      */
-    //用户每日进入时间
+    //新车图片
     public function change()
     {
-        $this->table("member_ins")
-            ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联members"])
+        $this->table("new_bike_imgs")
+            ->addColumn("new_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "关联second_bikes"])
+            ->addColumn("size", "integer", ["limit" => MysqlAdapter::INT_MEDIUM, "null" => false, "comment" => "图片大小"])
+            ->addColumn("path", "string", ["limit" => MysqlAdapter::INT_TINY,"null" => false,  "comment" => "存储时间"])
+            ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "对应member"])
             ->addTimestamps()
             ->save();
     }

@@ -31,6 +31,8 @@ class CreateMemberSignsTables extends AbstractMigration
     {
         $this->table("member_signs")
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "用户id"])
+            ->addColumn("day", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "签到的日期-天"])
+            ->addColumn("week", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "签到的日期-周"])
             ->addTimestamps()
             ->save();
     }

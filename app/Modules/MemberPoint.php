@@ -33,6 +33,8 @@ class MemberPoint extends MemberPoints
     const TYPE_LOST_BIKE = -4;
     const TYPE_UPDATE_SHB = -5;
     const TYPE_REPUB_SHB = -6;
+    const TYPE_REFRESH_SHB = -7;
+    const TYPE_REFRESH_NB = -8;
 
     const LEVEL_BRONZE = 500;
     const LEVEL_SILVER = 1000;
@@ -62,6 +64,8 @@ class MemberPoint extends MemberPoints
         self::TYPE_LOST_BIKE => "车辆丢失",
         self::TYPE_UPDATE_SHB => "更新二手车信息",
         self::TYPE_REPUB_SHB => "重新发布二手车",
+        self::TYPE_REFRESH_SHB => "刷新二手车排名",
+        self::TYPE_REFRESH_NB => "刷新新车排名",
     ];
 
     public static $typeScore = [
@@ -86,17 +90,21 @@ class MemberPoint extends MemberPoints
         self::TYPE_LOST_BIKE => -10,
         self::TYPE_UPDATE_SHB => -10,
         self::TYPE_REPUB_SHB => -100,
+        self::TYPE_REFRESH_SHB => -10,
+        self::TYPE_REFRESH_NB => -10,
     ];
 
     //根据充值金额,返回具体的充值类型值
-    public static function getRechargeType($amount){
-        if($amount == 10){
+    public static function getRechargeType($amount)
+    {
+        $type = "";
+        if ($amount == 10) {
             $type = MemberPoint::TYPE_RECHARGE_10;
         }
-        if($amount == 50){
+        if ($amount == 50) {
             $type = MemberPoint::TYPE_RECHARGE_50;
         }
-        if($amount == 100){
+        if ($amount == 100) {
             $type = MemberPoint::TYPE_RECHARGE_100;
         }
         return $type;
