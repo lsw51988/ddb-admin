@@ -36,6 +36,7 @@ class CreateMemberPointsTable extends AbstractMigration
             ->addColumn("second_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "发布二手车时用到,对应second_bikes"])
             ->addColumn("appeal_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "求助拖车时用到 对应appeals"])
             ->addColumn("lost_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "丢失车辆 对应lost_bikes"])
+            ->addColumn("new_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => true, "comment" => "发布新车 对应new_bikes"])
             ->addTimestamps()
             ->save();
     }
