@@ -34,7 +34,7 @@ class NBController extends WechatAuthController
         $member = Member::findFirst($this->currentMember->getId());
         //需要首先判断用户积分是否足够
         $data = $this->data;
-        if (!$points = service("nb/query")->hasEnoughPoint($member, $data['days'])) {
+        if (!$points = service("nb/query")->hasEnoughPoint($member, $data['show_days_index'])) {
             return $this->error("积分不足");
         }
         if (!$repair = Repair::findFirstByBelongerId($member->getId())) {

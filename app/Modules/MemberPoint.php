@@ -36,6 +36,7 @@ class MemberPoint extends MemberPoints
     const TYPE_REFRESH_SHB = -7;
     const TYPE_REFRESH_NB = -8;
     const TYPE_PUBLISH_NB = -9;
+    const TYPE_SHOW_NB = -10;
 
 
     const LEVEL_BRONZE = 500;
@@ -69,6 +70,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_SHB => "刷新二手车排名",
         self::TYPE_REFRESH_NB => "刷新新车排名",
         self::TYPE_PUBLISH_NB => "发布新车信息",
+        self::TYPE_SHOW_NB => "展示新车信息",
     ];
 
     public static $typeScore = [
