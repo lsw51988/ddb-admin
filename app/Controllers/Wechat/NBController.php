@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\NewBikeImgs;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Models\Areas;
 use Ddb\Modules\Member;
@@ -38,6 +39,9 @@ class NBController extends WechatAuthController
         }
         if (!$repair = Repair::findFirstByBelongerId($member->getId())) {
             return $this->error("请先添加您的维修点店铺");
+        }
+        if ($repair->getStatus() != Repair::STATUS_PASS) {
+            return $this->error("您的店铺尚未审核通过");
         }
         if ($newBikeId = service("nb/manager")->create($member, $repair, $data, $points)) {
             return $this->success([
@@ -145,19 +149,19 @@ class NBController extends WechatAuthController
         $member = $this->currentMember;
         $file = $_FILES;
         $data = $this->data;
-        $secondBikeId = $data['second_bike_id'];
-        $path = "SecondBikeImages/" . $secondBikeId . DIRECTORY_SEPARATOR . $file['file']['name'];
-        $secondBikeImage = new SecondBikeImages();
-        $secondBikeImage->setSecondBikeId($secondBikeId)
+        $newBikeId = $data['new_bike_id'];
+        $path = "NewBikeImages/" . $newBikeId . DIRECTORY_SEPARATOR . $file['file']['name'];
+        $newBikeImage = new NewBikeImgs();
+        $newBikeImage->setNewBikeId($newBikeId)
             ->setSize($file['file']['size'])
             ->setPath($path)
             ->setCreateBy($member->getId());
-        if ($secondBikeImage->save()) {
+        if ($newBikeImage->save()) {
             try {
                 service("file/manager")->saveFile($path, $file['file']['tmp_name']);
                 return $this->success();
             } catch (Exception $e) {
-                $secondBikeImage->delete();
+                $newBikeImage->delete();
                 app_log()->error("新车发布,member_id:" . $member->getId() . ";上传图片失败,原因是:" . $e->getMessage());
                 return $this->error("图片保存失败");
             }
