@@ -126,7 +126,7 @@ class NBController extends WechatAuthController
         if (!empty($data['self_flag'])) {
             $data['member_id'] = $member->getId();
         }
-        $rData = service("shb/query")->getList($data);
+        $rData = service("nb/query")->getList($data);
         return $this->success($rData);
     }
 

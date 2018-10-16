@@ -57,19 +57,6 @@ class Query extends Service
     {
         $columns = "id,brand_name,out_price,city,district,created_at";
         $conditions = "1=1";
-        if (!empty($search['time'])) {
-            switch ($search['time']) {
-                case 1:
-                    $conditions = $conditions . " AND created_at>='" . date("Y-m-d 00:00:00") . "' AND created_at<='" . date("Y-m-d 23:59:59") . "'";
-                    break;
-                case 2:
-                    $conditions = $conditions . " AND created_at>='" . date("Y-m-d 00:00:00", strtotime("-7 day")) . "' AND created_at<='" . date("Y-m-d 23:59:59") . "'";
-                    break;
-                case 3:
-                    $conditions = $conditions . " AND created_at>='" . date("Y-m-d 00:00:00", strtotime("-1 month")) . "' AND created_at<='" . date("Y-m-d 23:59:59") . "'";
-                    break;
-            }
-        }
 
         if (!empty($search['district'])) {
             $conditions = $conditions . " AND city='" . $search['city'] . "' AND district='" . $search['district'] . "'";
@@ -79,10 +66,19 @@ class Query extends Service
         if (!empty($search['price'])) {
             switch ($search['price']) {
                 case 1:
-                    $order = "out_price ASC";
+                    $conditions = $conditions . " AND price>=1000 AND price <=2000";
                     break;
                 case 2:
-                    $order = "out_price DESC";
+                    $conditions = $conditions . " AND price>=2000 AND price <=3000";
+                    break;
+                case 3:
+                    $conditions = $conditions . " AND price>=3000 AND price <=4000";
+                    break;
+                case 4:
+                    $conditions = $conditions . " AND price>=4000 AND price <=5000";
+                    break;
+                case 5:
+                    $conditions = $conditions . " AND price>=5000";
                     break;
             }
         }
