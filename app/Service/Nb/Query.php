@@ -56,7 +56,7 @@ class Query extends Service
 
     public function getList($search = [])
     {
-        $columns = "id,brand_name,out_price,city,district,created_at";
+        $columns = "id,brand_name,price,city,district,created_at";
         $conditions = "1=1";
 
         if (!empty($search['district'])) {
