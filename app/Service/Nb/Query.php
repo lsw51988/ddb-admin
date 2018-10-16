@@ -11,6 +11,7 @@ namespace Ddb\Service\Nb;
 
 use Ddb\Core\Service;
 use Ddb\Models\Areas;
+use Ddb\Models\NewBikes;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
@@ -87,7 +88,7 @@ class Query extends Service
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
         }
 
-        $data = SecondBike::page($columns, $conditions, [], $order);
+        $data = NewBikes::page($columns, $conditions, [], $order);
         return $data;
     }
 
