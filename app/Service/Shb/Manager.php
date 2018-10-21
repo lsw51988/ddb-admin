@@ -20,7 +20,7 @@ use Ddb\Modules\SecondBike;
 
 class Manager extends Service
 {
-    public function create($member, $data,$points)
+    public function create($member, $data, $points)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -118,7 +118,7 @@ class Manager extends Service
 
         //如果有增加积分的操作
         if ($needPoints > 0) {
-            if ($member->setPoints($member->getPoints() - $needPoints)->save()) {
+            if (!$member->setPoints($member->getPoints() - $needPoints)->save()) {
                 $this->db->rollback();
                 return false;
             }
