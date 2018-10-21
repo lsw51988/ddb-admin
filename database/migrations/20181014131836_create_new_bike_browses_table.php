@@ -33,6 +33,7 @@ class CreateNewBikeBrowsesTable extends AbstractMigration
         $this->table("new_bike_browses")
             ->addColumn("new_bike_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR])
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR])
+            ->addColumn("call_time", "timestamp", [ "null" => true, "comment" => "打电话时间"])
             ->addTimestamps()
             ->save();
     }

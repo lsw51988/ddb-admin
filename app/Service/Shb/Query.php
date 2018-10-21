@@ -39,7 +39,7 @@ class Query extends Service
 
     public function getList($search = [])
     {
-        $columns = "id,brand_name,out_price,city,district,created_at";
+        $columns = "id,brand_name,out_price,city,district,created_at,status";
         $conditions = "1=1";
         if (!empty($search['time'])) {
             switch ($search['time']) {

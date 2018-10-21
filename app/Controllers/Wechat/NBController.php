@@ -178,7 +178,7 @@ class NBController extends WechatAuthController
     public function contactAction($id)
     {
         $member = $this->currentMember;
-        service("shb/manager")->contact($member, $id);
+        service("nb/manager")->contact($member, $id);
         return $this->success();
     }
 

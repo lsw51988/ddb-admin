@@ -11,6 +11,7 @@ namespace Ddb\Service\Nb;
 
 use Ddb\Core\Service;
 use Ddb\Models\Areas;
+use Ddb\Models\NewBikeBrowses;
 use Ddb\Models\NewBikes;
 use Ddb\Models\SecondBikes;
 use Ddb\Models\SecondBikeBrowses;
@@ -216,11 +217,11 @@ class Manager extends Service
 
     public function contact($member, $id)
     {
-        $secondBikeBrowse = SecondBikeBrowses::findFirst([
-            "conditions" => "second_bike_id = $id AND member_id = " . $member->getId(),
+        $newBikeBrowse = NewBikeBrowses::findFirst([
+            "conditions" => "new_bike_id = $id AND member_id = " . $member->getId(),
             "order" => "created_at DESC"
         ]);
-        $secondBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
+        $newBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
             ->save();
     }
 }
