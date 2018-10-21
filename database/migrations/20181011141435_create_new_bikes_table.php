@@ -50,6 +50,8 @@ class CreateNewBikesTable extends AbstractMigration
             ->addColumn("remark", "string", ["limit" => MysqlAdapter::INT_TINY,"null" => true, "comment" => "备注"])
             ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY,"default" => 1, "comment" => "状态 1提交 2审核成功 3审核失败 4自主取消"])
             ->addColumn("refuse_reason","string",["comment"=>"取消原因","null" => true])
+            ->addColumn("cancel_time","timestamp",["comment"=>"取消时间","null" => true])
+            ->addColumn("cancel_reason","string",["comment"=>"取消原因","null" => true])
             ->addTimestamps()
             ->save();
     }

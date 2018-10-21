@@ -13,6 +13,7 @@ use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Models\Areas;
 use Ddb\Modules\Member;
+use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SecondBike;
 use Phalcon\Exception;
 
@@ -35,7 +36,7 @@ class SHBController extends WechatAuthController
         if (!$points = service("shb/query")->hasEnoughPoint($member, $data['show_days_index'])) {
             return $this->error("积分不足");
         }
-        if ($shbId = service("shb/manager")->create($member, $data,$points)) {
+        if ($shbId = service("shb/manager")->create($member, $data, $points)) {
             return $this->success([
                 "shb_id" => $shbId
             ]);
@@ -51,10 +52,10 @@ class SHBController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = $this->data;
-
-        if (isset($data['add_days']) && !empty($data['add_days'])) {
+        $needPoints = 0;
+        if ($data['show_days_index'] != 0) {
             $member = Member::findFirst($member->getId());
-            $needPoints = $data['add_days'] * 10;
+            $needPoints = MemberPoint::getShowDays($data['show_days_index']) * 10;
             if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
                 $needPoints = $needPoints * 0.8;
             }
@@ -76,12 +77,25 @@ class SHBController extends WechatAuthController
     public function repubAction()
     {
         $member = $this->currentMember;
-        if (!service("shb/query")->hasEnoughPoint($member, "repub")) {
-            return $this->error("积分不足");
-        }
         $data = $this->data;
 
-        if ($shbId = service("shb/manager")->repub($member, $data)) {
+        $needPoints = 0;
+        if ($data['show_days_index'] != 0) {
+            $member = Member::findFirst($member->getId());
+            $needPoints = MemberPoint::getShowDays($data['show_days_index']) * 10;
+            if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+                $needPoints = $needPoints * 0.8;
+            }
+            if ($member->getPoints() < $needPoints) {
+                return $this->error('积分不足');
+            }
+        }
+        $shb = SecondBike::findFirst($data['id']);
+        if (strtotime($shb->getAvailTime()) < time() && $data['show_days_index'] == 0) {
+            return $this->error('您尚未设置展示天数');
+        }
+
+        if ($shbId = service("shb/manager")->repub($member, $data, $needPoints)) {
             return $this->success();
         }
         return $this->error();

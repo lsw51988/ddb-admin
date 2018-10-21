@@ -13,13 +13,12 @@ use Ddb\Core\Service;
 use Ddb\Models\Areas;
 use Ddb\Models\NewBikeBrowses;
 use Ddb\Models\NewBikes;
-use Ddb\Models\SecondBikes;
 use Ddb\Models\SecondBikeBrowses;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
+use Ddb\Modules\NewBike;
 use Ddb\Modules\Repair;
-use Ddb\Modules\SecondBike;
 
 class Manager extends Service
 {
@@ -40,27 +39,10 @@ class Manager extends Service
         if (!$area = Areas::findFirstByDistrictCode($repair->getDistrict())) {
             return false;
         }
-        switch ($data['voltage']) {
-            case 1:
-                $voltage = 48;
-                break;
-            case 2:
-                $voltage = 60;
-                break;
-            case 3:
-                $voltage = 72;
-                break;
-            case 4:
-                $voltage = 96;
-                break;
-            case 5:
-                $voltage = 'other';
-                break;
-        }
 
         //1.新车记录添加
         $nb->setMemberId($member->getId())
-            ->setVoltage($voltage)
+            ->setVoltage(MemberBike::$voltageDesc[$data['voltage']])
             ->setBrandName($data['brand_name'])
             ->setPrice($data['price'])
             ->setBatteryBrand($data['battery_brand'])
@@ -74,23 +56,8 @@ class Manager extends Service
             ->setDistrict($area->getDistrictName())
             ->setDetailAddr($repair->getAddress())
             ->setRemark($data['remark']);
-        switch ($data['show_days_index']) {
-            case 1:
-                $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+7 day")));
-                break;
-            case 2:
-                $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+14 day")));
-                break;
-            case 3:
-                $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+30 day")));
-                break;
-            case 4:
-                $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+90 day")));
-                break;
-            case 5:
-                $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+180 day")));
-                break;
-        }
+        $showDays = MemberPoint::getShowDays($data['show_days_index']);
+        $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
         if (isset($data['remark'])) {
             $nb->setRemark($data['remark']);
         }
@@ -109,6 +76,7 @@ class Manager extends Service
         $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB];
         $showPoints = $points + $point;
         $memberPoint->setMemberId($member->getId())
+            ->setNewBikeId($nb->getId())
             ->setType(MemberPoint::TYPE_SHOW_NB)
             ->setValue($showPoints);
         if (!$memberPoint->save()) {
@@ -152,20 +120,31 @@ class Manager extends Service
                 $this->db->rollback();
                 return false;
             }
+            //3.积分扣除 新车展示的积分
+            $memberPoint = new MemberPoint();
+            $memberPoint->setMemberId($member->getId())
+                ->setType(MemberPoint::TYPE_SHOW_NB)
+                ->setNewBikeId($nb->getId())
+                ->setValue($needPoints);
+            if (!$memberPoint->save()) {
+                $this->db->rollback();
+                return false;
+            }
         }
 
-        $nb->setAvailTime(date("Y-m-d H:i:s", strtotime($nb->getAvailTime()) + $data['add_days'] * 3600 * 24));
+        $showDays = MemberPoint::getShowDays($data['show_days_index']);
+        $nb->setAvailTime(date("Y-m-d H:i:s", strtotime($nb->getAvailTime()) + $showDays * 3600 * 24));
 
         if (!$nb->save()) {
             $this->db->rollback();
             return false;
-        } else {
-            $this->db->commit();
-            return $nb->getId();
         }
+
+        $this->db->commit();
+        return $nb->getId();
     }
 
-    public function repub($member, $data)
+    public function repub($member, $data,$needPoints)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -173,40 +152,47 @@ class Manager extends Service
         $data['district'] = $addr[2];
         $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']];
         $this->db->begin();
-        if (!$shb = SecondBikes::findFirst($data['id'])) {
+        if (!$nb = NewBikes::findFirst($data['id'])) {
             return false;
         }
-        $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
-        $shb->setMemberId($member->getId())
-            ->setBuyDate($data['buy_date'])
+        $nb->setMemberId($member->getId())
             ->setVoltage($data['voltage'])
             ->setBrandName($data['brand_name'])
-            ->setInPrice($data['in_price'])
-            ->setOutPrice($data['out_price'])
+            ->setPrice($data['price'])
             ->setProvince($data['province'])
             ->setCity($data['city'])
             ->setDistrict($data['district'])
             ->setDetailAddr($data['detail_addr'])
-            ->setNumber($data['number'])
-            ->setStatus(SecondBike::STATUS_CREATE);
+            ->setStatus(NewBike::STATUS_CREATE);
         if (isset($data['remark'])) {
-            $shb->setRemark($data['remark']);
+            $nb->setRemark($data['remark']);
         }
-        if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
-            $shb->setLastChangeTime($data['last_change_time']);
+
+        //如果有增加积分的操作
+        if ($needPoints > 0) {
+            if (!$member->setPoints($member->getPoints() - $needPoints)->save()) {
+                $this->db->rollback();
+                return false;
+            }
+            //3.积分扣除 新车展示的积分
+            $memberPoint = new MemberPoint();
+            $memberPoint->setMemberId($member->getId())
+                ->setType(MemberPoint::TYPE_SHOW_NB)
+                ->setNewBikeId($nb->getId())
+                ->setValue($needPoints);
+            if (!$memberPoint->save()) {
+                $this->db->rollback();
+                return false;
+            }
         }
-        if (!$shb->save()) {
+
+        if (!$nb->save()) {
             $this->db->rollback();
             return false;
         }
-        //扣除积分
-        $currentMember = Member::findFirst($member->getId());
-        if (service("point/manager")->create($currentMember, MemberPoint::TYPE_REPUB_SHB, $shb->getId())) {
-            $this->db->commit();
-            return $shb->getId();
-        } else {
-            return false;
-        }
+
+        $this->db->commit();
+        return $nb->getId();
     }
 
     public function browse($member, $id)

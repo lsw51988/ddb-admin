@@ -18,10 +18,10 @@ class MemberBike extends MemberBikes
 
     //1代表其他  电压
     public static $voltageDesc = [
-        "0" => 48,
-        "1" => 60,
-        "2" => 72,
-        "3" => 96,
-        "4" => 1
+        "1" => 48,
+        "2" => 60,
+        "3" => 72,
+        "4" => 96,
+        "5" => 1
     ];
 }

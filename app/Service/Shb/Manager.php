@@ -122,9 +122,20 @@ class Manager extends Service
                 $this->db->rollback();
                 return false;
             }
+            //3.积分扣除 新车展示的积分
+            $memberPoint = new MemberPoint();
+            $memberPoint->setMemberId($member->getId())
+                ->setType(MemberPoint::TYPE_SHOW_SHB)
+                ->setSecondBikeId($shb->getId())
+                ->setValue($needPoints);
+            if (!$memberPoint->save()) {
+                $this->db->rollback();
+                return false;
+            }
         }
 
-        $shb->setAvailTime(date("Y-m-d H:i:s", strtotime($shb->getAvailTime()) + $data['add_days'] * 3600 * 24));
+        $showDays = MemberPoint::getShowDays($data['show_days_index']);
+        $shb->setAvailTime(date("Y-m-d H:i:s", strtotime($shb->getAvailTime()) + $showDays * 3600 * 24));
 
         if (!$shb->save()) {
             $this->db->rollback();
@@ -135,7 +146,7 @@ class Manager extends Service
         }
     }
 
-    public function repub($member, $data)
+    public function repub($member, $data, $needPoints = 0)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -165,18 +176,33 @@ class Manager extends Service
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
+        //如果有增加积分的操作
+        if ($needPoints > 0) {
+            if (!$member->setPoints($member->getPoints() - $needPoints)->save()) {
+                $this->db->rollback();
+                return false;
+            }
+            //3.积分扣除 新车展示的积分
+            $memberPoint = new MemberPoint();
+            $memberPoint->setMemberId($member->getId())
+                ->setType(MemberPoint::TYPE_SHOW_SHB)
+                ->setSecondBikeId($shb->getId())
+                ->setValue($needPoints);
+            if (!$memberPoint->save()) {
+                $this->db->rollback();
+                return false;
+            }
+        }
+
+        $showDays = MemberPoint::getShowDays($data['show_days_index']);
+        $shb->setAvailTime(date("Y-m-d H:i:s", strtotime($shb->getAvailTime()) + $showDays * 3600 * 24));
+
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
         }
-        //扣除积分
-        $currentMember = Member::findFirst($member->getId());
-        if (service("point/manager")->create($currentMember, MemberPoint::TYPE_REPUB_SHB, $shb->getId())) {
-            $this->db->commit();
-            return $shb->getId();
-        } else {
-            return false;
-        }
+        $this->db->commit();
+        return $shb->getId();
     }
 
     public function browse($member, $id)

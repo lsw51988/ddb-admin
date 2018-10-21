@@ -120,4 +120,31 @@ class MemberPoint extends MemberPoints
         return $type;
     }
 
+    //根据选择展示天数key获取对应天数
+    public static function getShowDays($index)
+    {
+        $days = 0;
+        switch ($index) {
+            case 1:
+                $days = 7;
+                break;
+            case 2:
+                $days = 14;
+                break;
+            case 3:
+                $days = 30;
+                break;
+            case 4:
+                $days = 90;
+                break;
+            case 5:
+                $days = 180;
+                break;
+            case 6:
+                $days = 365;
+                break;
+        }
+        return $days;
+    }
+
 }
