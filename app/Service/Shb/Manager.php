@@ -20,7 +20,7 @@ use Ddb\Modules\SecondBike;
 
 class Manager extends Service
 {
-    public function create($member, $data)
+    public function create($member, $data,$points)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -60,6 +60,24 @@ class Manager extends Service
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
+
+        //2.积分扣除 发布二手车的积分
+        if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB, $shb->getId())) {
+            $this->db->rollback();
+            return false;
+        }
+        //3.积分扣除 二手车展示天数
+        $memberPoint = new MemberPoint();
+        $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB];
+        $showPoints = $points + $point;
+        $memberPoint->setMemberId($member->getId())
+            ->setType(MemberPoint::TYPE_SHOW_SHB)
+            ->setValue($showPoints);
+        if (!$memberPoint->save()) {
+            $this->db->rollback();
+            return false;
+        }
+
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
@@ -68,7 +86,7 @@ class Manager extends Service
         return $shb->getId();
     }
 
-    public function update($member, $data)
+    public function update($member, $data, $needPoints = 0)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -97,17 +115,23 @@ class Manager extends Service
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
+
+        //如果有增加积分的操作
+        if ($needPoints > 0) {
+            if ($member->setPoints($member->getPoints() - $needPoints)->save()) {
+                $this->db->rollback();
+                return false;
+            }
+        }
+
+        $shb->setAvailTime(date("Y-m-d H:i:s", strtotime($shb->getAvailTime()) + $data['add_days'] * 3600 * 24));
+
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
-        }
-        //扣除积分
-        $currentMember = Member::findFirst($member->getId());
-        if (service("point/manager")->create($currentMember, MemberPoint::TYPE_UPDATE_SHB, $shb->getId())) {
+        } else {
             $this->db->commit();
             return $shb->getId();
-        } else {
-            return false;
         }
     }
 

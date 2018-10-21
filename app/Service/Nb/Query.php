@@ -13,9 +13,9 @@ use Ddb\Core\Service;
 use Ddb\Models\Areas;
 use Ddb\Models\NewBikeImgs;
 use Ddb\Models\NewBikes;
-use Ddb\Models\SecondBikeImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
+use Ddb\Modules\NewBike;
 use Ddb\Modules\SecondBike;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 
@@ -39,6 +39,9 @@ class Query extends Service
                 break;
             case 5:
                 $days = 180;
+                break;
+            case 6:
+                $days = 365;
                 break;
         }
         //新车展示天数所需积分
@@ -87,8 +90,8 @@ class Query extends Service
 
         if (!empty($search['self_flag'])) {
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
-        }else{
-            $conditions = $conditions ." AND avail_time >= '" . date("Y-m-d H:i:s",time()) . "'";
+        } else {
+            $conditions = $conditions . " AND avail_time >= '" . date("Y-m-d H:i:s", time()) . "'";
         }
 
         $data = NewBikes::page($columns, $conditions, [], $order);
@@ -160,44 +163,47 @@ class Query extends Service
 
     public function getManageDetail($id)
     {
-        $shb = SecondBike::findFirst($id);
-        $seller = Member::findFirst($shb->getMemberId());
+        $nb = NewBike::findFirst($id);
+        $seller = Member::findFirst($nb->getMemberId());
 
-        $shbImages = SecondBikeImages::find([
-            "conditions" => "second_bike_id = $id",
+        $nbImages = NewBikeImgs::find([
+            "conditions" => "new_bike_id = $id",
             "columns" => "id"
         ]);
         $imgUrls = [];
-        foreach ($shbImages as $shbImage) {
-            $imgUrls[] = di("config")->app->URL . "/wechat/shb/bikeImg/" . $shbImage->id;
+        foreach ($nbImages as $nbImage) {
+            $imgUrls[] = di("config")->app->URL . "/wechat/nb/bikeImg/" . $nbImage->id;
         }
 
         $data = [];
         $data['member_name'] = $seller->getRealName();
         $data['mobile'] = $seller->getMobile();
         $data['imgUrls'] = $imgUrls;
-        $data['buy_date'] = substr($shb->getBuyDate(), 0, -3);
-        $data['voltage'] = $shb->getVoltage();
-        $data['brand_name'] = $shb->getBrandName();
-        $data['out_price'] = $shb->getOutPrice();
-        $data['in_price'] = $shb->getInPrice();
-        $data['in_status'] = $shb->getInStatus();
-        $data['last_change_time'] = $shb->getLastChangeTime();
-        $data['province'] = $shb->getProvince();
-        $data['city'] = $shb->getCity();
-        $data['district'] = $shb->getDistrict();
-        $data['detail_addr'] = $shb->getDetailAddr();
-        $data['number'] = $shb->getNumber();
-        $data['remark'] = $shb->getRemark();
-        $data['status'] = $shb->getStatus();
+        $data['voltage'] = $nb->getVoltage();
+        $data['battery_brand'] = $nb->getBatteryBrand();
+        $data['distance'] = $nb->getDistance();
+        $data['guarantee_period'] = $nb->getGuaranteePeriod();
+        $data['brand_name'] = $nb->getBrandName();
+        $data['price'] = $nb->getPrice();
+        $data['province'] = $nb->getProvince();
+        $data['city'] = $nb->getCity();
+        $data['district'] = $nb->getDistrict();
+        $data['detail_addr'] = $nb->getDetailAddr();
+        $data['remark'] = $nb->getRemark();
+        $data['status'] = $nb->getStatus();
+
+        $data['left_days'] = $this->getLeftDays($nb->getAvailTime());
 
         return $data;
     }
 
-    public function getDealCount($memberId)
+    private function getLeftDays($date)
     {
-        $count = 0;
-        $count = SecondBike::count(["member_id = $memberId"]);
-        return $count;
+        $seconds = strtotime($date) - time();
+        if ($seconds <= 0) {
+            return 0;
+        } else {
+            return intval($seconds / 86400);
+        }
     }
 }

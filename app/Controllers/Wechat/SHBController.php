@@ -30,12 +30,12 @@ class SHBController extends WechatAuthController
     public function createAction()
     {
         $member = Member::findFirst($this->currentMember->getId());
-        if (!service("shb/query")->hasEnoughPoint($member, "create")) {
+        $data = $this->data;
+        //需要首先判断用户积分是否足够
+        if (!$points = service("shb/query")->hasEnoughPoint($member, $data['show_days_index'])) {
             return $this->error("积分不足");
         }
-        //需要首先判断用户积分是否足够
-        $data = $this->data;
-        if ($shbId = service("shb/manager")->create($member, $data)) {
+        if ($shbId = service("shb/manager")->create($member, $data,$points)) {
             return $this->success([
                 "shb_id" => $shbId
             ]);
@@ -50,12 +50,20 @@ class SHBController extends WechatAuthController
     public function updateAction()
     {
         $member = $this->currentMember;
-        if (!service("shb/query")->hasEnoughPoint($member, "update")) {
-            return $this->error("积分不足");
-        }
         $data = $this->data;
 
-        if ($shbId = service("shb/manager")->update($member, $data)) {
+        if (isset($data['add_days']) && !empty($data['add_days'])) {
+            $member = Member::findFirst($member->getId());
+            $needPoints = $data['add_days'] * 10;
+            if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+                $needPoints = $needPoints * 0.8;
+            }
+            if ($member->getPoints() < $needPoints) {
+                return $this->error('积分不足');
+            }
+        }
+
+        if ($shbId = service("shb/manager")->update($member, $data, $needPoints)) {
             return $this->success();
         }
         return $this->error();
@@ -240,7 +248,7 @@ class SHBController extends WechatAuthController
                 $secondBikeImage->delete();
                 return $this->success();
             } else {
-                app_log()->error("用户删除电动车图片失败,bikeImageId=" . $secondBikeImage->getId());
+                app_log()->error("用户删除二手车图片失败,bikeImageId=" . $secondBikeImage->getId());
                 return $this->error("删除图片失败");
             }
         }

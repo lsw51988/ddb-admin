@@ -58,12 +58,20 @@ class NBController extends WechatAuthController
     public function updateAction()
     {
         $member = $this->currentMember;
-        if (!service("shb/query")->hasEnoughPoint($member, "update")) {
-            return $this->error("积分不足");
-        }
         $data = $this->data;
 
-        if ($shbId = service("shb/manager")->update($member, $data)) {
+        if (isset($data['add_days']) && !empty($data['add_days'])) {
+            $member = Member::findFirst($member->getId());
+            $needPoints = $data['add_days'] * 10;
+            if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+                $needPoints = $needPoints * 0.8;
+            }
+            if ($member->getPoints() < $needPoints) {
+                return $this->error('积分不足');
+            }
+        }
+
+        if ($nbId = service("nb/manager")->update($member, $data,$needPoints)) {
             return $this->success();
         }
         return $this->error();
@@ -199,7 +207,7 @@ class NBController extends WechatAuthController
      */
     public function manageDetailAction($id)
     {
-        $data = service("shb/query")->getManageDetail($id);
+        $data = service("nb/query")->getManageDetail($id);
         return $this->success($data);
     }
 
@@ -223,13 +231,13 @@ class NBController extends WechatAuthController
      */
     public function deleteBikeImgAction($id)
     {
-        if ($secondBikeImage = SecondBikeImages::findFirst($id)) {
-            $path = $secondBikeImage->getPath();
+        if ($newBikeImage = NewBikeImgs::findFirst($id)) {
+            $path = $newBikeImage->getPath();
             if (service("file/manager")->deleteFile($path)) {
-                $secondBikeImage->delete();
+                $newBikeImage->delete();
                 return $this->success();
             } else {
-                app_log()->error("用户删除电动车图片失败,bikeImageId=" . $secondBikeImage->getId());
+                app_log()->error("用户删除新车图片失败,bikeImageId=" . $newBikeImage->getId());
                 return $this->error("删除图片失败");
             }
         }

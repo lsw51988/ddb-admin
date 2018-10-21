@@ -19,22 +19,41 @@ use Phalcon\Paginator\Adapter\QueryBuilder;
 
 class Query extends Service
 {
-    public function hasEnoughPoint($member, $type)
+    public function hasEnoughPoint($member, $dayIndex)
     {
-        if ($type == "create") {
-            $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
+        $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
+        switch ($dayIndex) {
+            case 1:
+                $days = 7;
+                break;
+            case 2:
+                $days = 14;
+                break;
+            case 3:
+                $days = 30;
+                break;
+            case 4:
+                $days = 90;
+                break;
+            case 5:
+                $days = 180;
+                break;
+            case 6:
+                $days = 365;
+                break;
         }
-        if ($type == "update") {
-            $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
+        //新车展示天数所需积分
+        if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+            $showDaysPoints = $days * 10 * 0.8;
+        } else {
+            $showDaysPoints = $days * 10;
         }
-        if ($type == "repub") {
-            $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_REPUB_SHB]);
-        }
+        $point = $point + $showDaysPoints;
 
         if ($member->getPoints() < $point) {
             return false;
         }
-        return true;
+        return $point;
     }
 
     public function getList($search = [])
