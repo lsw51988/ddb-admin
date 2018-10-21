@@ -136,7 +136,7 @@ class NBController extends WechatAuthController
      */
     public function detailAction($id)
     {
-        $data = service("shb/query")->getShbDetail($id);
+        $data = service("nb/query")->getNbDetail($id);
         return $this->success($data);
     }
 
@@ -209,10 +209,10 @@ class NBController extends WechatAuthController
      */
     public function bikeImgAction($id)
     {
-        if (!$secondBikeImage = SecondBikeImages::findFirst($id)) {
+        if (!$newBikeImage = NewBikeImgs::findFirst($id)) {
             return $this->error("找不到图片");
         }
-        $path = $secondBikeImage->getPath();
+        $path = $newBikeImage->getPath();
         $data = service("file/manager")->read($path);
         return $this->response->setContent($data)->setContentType('image/jpeg');
     }

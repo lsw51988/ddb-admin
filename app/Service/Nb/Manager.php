@@ -69,7 +69,7 @@ class Manager extends Service
             ->setCityCode($repair->getCity())
             ->setDistrictCode($repair->getDistrict())
             ->setProvince($area->getProvinceName())
-            ->setCity($area->getDistrictName())
+            ->setCity($area->getCityName())
             ->setDistrict($area->getDistrictName())
             ->setDetailAddr($repair->getAddress())
             ->setRemark($data['remark']);

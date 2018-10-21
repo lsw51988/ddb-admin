@@ -11,6 +11,7 @@ namespace Ddb\Service\Nb;
 
 use Ddb\Core\Service;
 use Ddb\Models\Areas;
+use Ddb\Models\NewBikeImgs;
 use Ddb\Models\NewBikes;
 use Ddb\Models\SecondBikeImages;
 use Ddb\Modules\Member;
@@ -56,7 +57,7 @@ class Query extends Service
 
     public function getList($search = [])
     {
-        $columns = "id,brand_name,price,city,district,created_at";
+        $columns = "id,brand_name,price,city,district,detail_addr,status,avail_time,voltage";
         $conditions = "1=1";
 
         if (!empty($search['district'])) {
@@ -86,6 +87,8 @@ class Query extends Service
 
         if (!empty($search['self_flag'])) {
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
+        }else{
+            $conditions = $conditions ." AND avail_time >= '" . date("Y-m-d H:i:s",time()) . "'";
         }
 
         $data = NewBikes::page($columns, $conditions, [], $order);
@@ -124,32 +127,30 @@ class Query extends Service
         return $data;
     }
 
-    public function getShbDetail($id)
+    public function getNbDetail($id)
     {
-        $shb = SecondBike::findFirst($id);
-        $seller = Member::findFirst($shb->getMemberId());
+        $nb = NewBikes::findFirst($id);
+        $seller = Member::findFirst($nb->getMemberId());
 
-        $shbImages = SecondBikeImages::find([
-            "conditions" => "second_bike_id = $id",
+        $nbImages = NewBikeImgs::find([
+            "conditions" => "new_bike_id = $id",
             "columns" => "id"
         ]);
 
         $imgUrls = [];
-        foreach ($shbImages as $shbImage) {
-            $imgUrls[] = di("config")->app->URL . "/wechat/shb/bikeImg/" . $shbImage->id;
+        foreach ($nbImages as $nbImage) {
+            $imgUrls[] = di("config")->app->URL . "/wechat/nb/bikeImg/" . $nbImage->id;
         }
 
         $data = [];
-        $data['buy_date'] = substr($shb->getBuyDate(), 0, -3);
-        $data['voltage'] = $shb->getVoltage();
-        $data['brand_name'] = $shb->getBrandName();
-        $data['out_price'] = $shb->getOutPrice();
-        $data['city'] = $shb->getCity();
-        $data['district'] = $shb->getDistrict();
-        $data['detail_addr'] = $shb->getDetailAddr();
-        $data['number'] = $shb->getNumber();
-        $data['remark'] = $shb->getRemark();
-        $data['created_at'] = $shb->getCreatedAt();
+        $data['voltage'] = $nb->getVoltage();
+        $data['brand_name'] = $nb->getBrandName();
+        $data['price'] = $nb->getPrice();
+        $data['city'] = $nb->getCity();
+        $data['district'] = $nb->getDistrict();
+        $data['detail_addr'] = $nb->getDetailAddr();
+        $data['remark'] = $nb->getRemark();
+        $data['created_at'] = $nb->getCreatedAt();
         $data['member_name'] = $seller->getRealName();
         $data['mobile'] = $seller->getMobile();
         $data['imgUrls'] = $imgUrls;
