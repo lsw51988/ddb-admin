@@ -38,6 +38,10 @@ class MemberPoint extends MemberPoints
     const TYPE_PUBLISH_NB = -9;
     const TYPE_SHOW_NB = -10;
     const TYPE_SHOW_SHB = -11;
+    const TYPE_SHOW_SHB_REFUSE = -12;
+    const TYPE_PUBLISH_SHB_REFUSE = -13;
+    const TYPE_PUBLISH_NB_REFUSE = -14;
+    const TYPE_SHOW_NB_REFUSE = -15;
 
 
     const LEVEL_BRONZE = 500;
@@ -73,6 +77,11 @@ class MemberPoint extends MemberPoints
         self::TYPE_PUBLISH_NB => "发布新车信息",
         self::TYPE_SHOW_NB => "展示新车信息",
         self::TYPE_SHOW_SHB => "展示二手车信息",
+
+        self::TYPE_SHOW_SHB_REFUSE => "拒绝展示二手车信息",
+        self::TYPE_PUBLISH_SHB_REFUSE => "拒绝发布二手车信息",
+        self::TYPE_PUBLISH_NB_REFUSE => "拒绝展示新车信息",
+        self::TYPE_SHOW_NB_REFUSE => "拒绝展示新车信息",
     ];
 
     public static $typeScore = [
@@ -102,6 +111,11 @@ class MemberPoint extends MemberPoints
         self::TYPE_PUBLISH_NB => -100,
         self::TYPE_SHOW_NB => -10,
         self::TYPE_SHOW_SHB => -10,
+
+        self::TYPE_SHOW_SHB_REFUSE => 10,
+        self::TYPE_PUBLISH_SHB_REFUSE => 100,
+        self::TYPE_PUBLISH_NB_REFUSE => 100,
+        self::TYPE_SHOW_NB_REFUSE => 10,
     ];
 
     //根据充值金额,返回具体的充值类型值
@@ -109,13 +123,13 @@ class MemberPoint extends MemberPoints
     {
         $type = "";
         if ($amount == 10) {
-            $type = MemberPoint::TYPE_RECHARGE_10;
+            $type = self::TYPE_RECHARGE_10;
         }
         if ($amount == 50) {
-            $type = MemberPoint::TYPE_RECHARGE_50;
+            $type = self::TYPE_RECHARGE_50;
         }
         if ($amount == 100) {
-            $type = MemberPoint::TYPE_RECHARGE_100;
+            $type = self::TYPE_RECHARGE_100;
         }
         return $type;
     }

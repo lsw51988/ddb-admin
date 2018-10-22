@@ -32,4 +32,8 @@ class Member extends Members
         app_log()->info("写入token缓存:");
         di("cache")->save($this->getToken(), serialize($member), 24 * 3600 * 30);
     }
+
+    public function isPrivilege($member){
+
+    }
 }

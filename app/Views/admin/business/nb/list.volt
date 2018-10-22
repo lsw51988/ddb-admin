@@ -5,8 +5,8 @@
 
     <span class="layui-breadcrumb">
       <a href="">后台</a>
-      <a href="">二手车</a>
-      <a><cite>待审核</cite></a>
+      <a href="">新车</a>
+      <a><cite>总览</cite></a>
     </span>
     <fieldset class="layui-elem-field">
         <legend>
@@ -17,13 +17,15 @@
                 <div class="layui-col-md4">
                     <label class="layui-form-label">姓名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{{ search['real_name'] }}">
+                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
+                               value="{{ search['real_name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
                     <label class="layui-form-label">手机号</label>
                     <div class="layui-input-block">
-                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ search['mobile'] }}">
+                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
+                               value="{{ search['mobile'] }}">
                     </div>
                 </div>
             </div>
@@ -64,6 +66,7 @@
             <col width="120">
             <col width="120">
             <col width="120">
+            <col width="120">
             <col>
         </colgroup>
         <thead>
@@ -76,6 +79,7 @@
             <th>省</th>
             <th>市</th>
             <th>区</th>
+            <th>状态</th>
             <th>提交时间</th>
             <th>操作</th>
         </tr>
@@ -85,17 +89,17 @@
             <tr>
                 <td>{{ bike['id'] }}</td>
                 <td>{{ bike['brand_name'] }}</td>
-                <td>{{ bike['out_price']}}</td>
+                <td>{{ bike['price'] }}</td>
                 <td>{{ bike['real_name'] }}</td>
-                <td>{{ bike['mobile']}}</td>
+                <td>{{ bike['mobile'] }}</td>
                 <td>{{ bike['province'] }}</td>
                 <td>{{ bike['city'] }}</td>
                 <td>{{ bike['district'] }}</td>
+                <td>{{ statusDesc[bike['status']] }}</td>
                 <td>{{ bike['created_at'] }}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ bike['id'] }}">查看照片</button>
-                    <button class="layui-btn layui-btn-normal pass" data-id="{{ bike['id'] }}">通过</button>
-                    <button class="layui-btn layui-btn-danger refuse" data-id="{{ bike['id'] }}">拒绝</button>
+                    <button class="layui-btn layui-btn-normal edit" data-id="{{ bike['id'] }}">编辑</button>
                 </td>
             </tr>
         {% endfor %}
@@ -104,6 +108,25 @@
     <div id="page"></div>
     <ul id="viewer" style="display:none;padding:20px;height:80px;">
     </ul>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="top:300px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="bike_id">
+                    <label for="out_price">价格</label>
+                    <input type="text" class="form-control" id="out_price">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block css %}
@@ -132,7 +155,7 @@
                 , curr:{{ page }}
                 , jump: function (obj, first) {
                     if (!first) {
-                        window.location.href = "/admin/business/shb/list?page=" + obj.curr
+                        window.location.href = "/admin/business/nb/list?page=" + obj.curr
                     }
                 }
             });
@@ -141,7 +164,7 @@
                 $("#viewer").empty();
                 var member_id = $(this).data('id');
                 $.ajax({
-                    url: "/admin/business/member/" + member_id + "/imgs",
+                    url: "/admin/business/nb/" + member_id + "/imgs",
                     method: "GET",
                     success: function (res) {
                         if(res.status){
@@ -248,58 +271,41 @@
                 var id = data.value
                 getDistricts(id);
             })
-            $("#reset").click(function(){
-                window.location.href="/admin/business/shb/list";
+            $("#reset").click(function () {
+                window.location.href = "/admin/business/nb/list";
             });
-            $(".pass").click(function(){
-                var shb_id = $(this).data('id');
+            $('.edit').click(function () {
+                var bike_id = $(this).data('id');
+                $('#myModal').modal();
+                $('.modal-backdrop').removeClass('modal-backdrop');
+                $("#bike_id").val(bike_id);
+            })
+            $("#submit").click(function(){
+                var out_price = $("#out_price").val();
+                var bike_id = $("#bike_id").val();
                 var layer_load = layer.load();
                 $.ajax({
-                    url: "/admin/business/shb/audit",
+                    url: "/admin/business/shb/update",
+                    method: "POST",
                     data:{
-                        'shb_id':shb_id,
-                        'type':'pass'
+                        'bike_id':bike_id,
+                        'out_price':out_price
                     },
-                    method: "GET",
                     success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
+                        $('#myModal').modal('hide');
+                        if (res.status) {
+                            //layer.close(layer_load);
+                            layer.msg("修改成功",function () {
                                 window.location.reload();
                             });
-                        }else{
+                        } else {
                             layer.close(layer_load);
                             layer.msg(res.msg);
                         }
                     },
                     error: function () {
                         layer.close(layer_load);
-                        layer.msg("请求错误,请联系大帅比李少文")
-                    }
-                })
-            });
-
-            $(".refuse").click(function(){
-                var shb_id = $(this).data('id');
-                var layer_load = layer.load();
-                $.ajax({
-                    url: "/admin/business/shb/auth/" + shb_id,
-                    data:{
-                        'type':'refuse'
-                    },
-                    method: "GET",
-                    success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
-                                window.location.reload();
-                            });
-                        }else{
-                            layer.close(layer_load);
-                            layer.msg(res.msg);
-                        }
-                    },
-                    error: function () {
-                        layer.close(layer_load);
-                        layer.msg("请求错误,请联系大帅比李少文")
+                        layer.msg("请求错误")
                     }
                 })
             })

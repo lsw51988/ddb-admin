@@ -11,13 +11,13 @@ namespace Ddb\Controllers\Admin\Business;
 use Ddb\Controllers\AdminAuthController;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
-use Ddb\Modules\SecondBike;
+use Ddb\Modules\NewBike;
 
 /**
- * Class SHBController
- * @RoutePrefix("/admin/business/shb")
+ * Class NBController
+ * @RoutePrefix("/admin/business/nb")
  */
-class ShbController extends AdminAuthController
+class NbController extends AdminAuthController
 {
     /**
      * @Get("/audit")
@@ -26,19 +26,25 @@ class ShbController extends AdminAuthController
     public function auditAction()
     {
         $request = $this->data;
-        if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
+        if ($newBike = NewBike::findFirst($request['nb_id'])) {
             if ($request['type'] == 'pass') {
-                $status = SecondBike::STATUS_AUTH;
+                $status = NewBike::STATUS_AUTH;
+                //弥补审核的时间差
+                $memberPoint = MemberPoint::findFirst('new_bike_id = '.$request['nb_id'].' AND type = '.MemberPoint::TYPE_PUBLISH_NB.' ORDER BY id DESC');
+                $point = $memberPoint->getValue();
+
+
+                $newBike->setAvailTime($realAvailTime);
             } else {
-                $status = SecondBike::STATUS_DENIED;
-                $secondBike->setCancelReason($request['reason'])
+                $status = NewBike::STATUS_DENIED;
+                $newBike->setCancelReason($request['reason'])
                     ->setCancelTime(date('Y-m-d H:i:s'));
             }
-            if ($secondBike->setStatus($status)->save()) {
-                //退回用户积分
-                $member = Member::findFirst($secondBike->getMemberId());
-                if (!service("shb/manager")->returnPoints($member, $secondBike)) {
-                    return $this->error("积分取消扣除失败");
+            if ($newBike->setStatus($status)->save()) {
+                //取消扣除积分
+                $member = Member::findFirst($newBike->getMemberId());
+                if (!service("nb/manager")->returnPoints($member, $newBike)) {
+                    return $this->error("积分扣除失败");
                 }
                 return $this->success();
             }
@@ -60,8 +66,8 @@ class ShbController extends AdminAuthController
     public function editAction()
     {
         $request = $this->data;
-        if ($secondBike = SecondBike::findFirst($request['bike_id'])) {
-            if ($secondBike->setOutPrice($request['out_price'])->save()) {
+        if ($NewBike = NewBike::findFirst($request['bike_id'])) {
+            if ($NewBike->setOutPrice($request['out_price'])->save()) {
                 return $this->success();
             }
         }
@@ -90,7 +96,7 @@ class ShbController extends AdminAuthController
             'data' => $data->items->toArray(),
             'total' => $data->total_items,
             'search' => $request,
-            'statusDesc' => SecondBike::$statusDesc
+            'statusDesc' => NewBike::$statusDesc
         ]);
     }
 
@@ -100,7 +106,7 @@ class ShbController extends AdminAuthController
     public function toAuthAction()
     {
         $request = $this->request->get();
-        $request['status'] = SecondBike::STATUS_CREATE;
+        $request['status'] = NewBike::STATUS_CREATE;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = $this->getList($request);
@@ -118,7 +124,7 @@ class ShbController extends AdminAuthController
     public function tradingAction()
     {
         $request = $this->request->get();
-        $request['status'] = SecondBike::STATUS_AUTH;
+        $request['status'] = NewBike::STATUS_AUTH;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = $this->getList($request);
@@ -136,7 +142,7 @@ class ShbController extends AdminAuthController
     public function tradedAction()
     {
         $request = $this->request->get();
-        $request['status'] = SecondBike::STATUS_DEAL;
+        $request['status'] = NewBike::STATUS_DEAL;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = $this->getList($request);
@@ -152,7 +158,7 @@ class ShbController extends AdminAuthController
     {
         $request['limit'] = $this->limit;
         $request['page'] = $this->page;
-        $data = service("shb/query")->getAdminList($request);
+        $data = service("nb/query")->getAdminList($request);
         return $data;
     }
 }

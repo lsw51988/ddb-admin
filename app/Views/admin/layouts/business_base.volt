@@ -36,6 +36,15 @@
                 </dl>
             </li>
             <li class="layui-nav-item">
+                <a href="javascript:;">新车</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/admin/business/nb/list">总览</a></dd>
+                    <dd><a href="/admin/business/nb/to_auth">待审核</a></dd>
+                    <dd><a href="/admin/business/nb/trading">交易中</a></dd>
+                    <dd><a href="/admin/business/nb/traded">交易完成</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
                 <a href="javascript:;">维修点</a>
                 <dl class="layui-nav-child">
                     <dd><a href="/admin/business/repair/list">总览</a></dd>

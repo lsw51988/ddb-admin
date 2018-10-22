@@ -245,7 +245,7 @@
                 getDistricts(id);
             })
             $("#reset").click(function(){
-                window.location.href="/admin/business/member/list";
+                window.location.href="/admin/business/shb/list";
             });
             $(".check").click(function () {
                 console.log($(this).data('id'));

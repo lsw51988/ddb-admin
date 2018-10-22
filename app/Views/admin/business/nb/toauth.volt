@@ -5,7 +5,7 @@
 
     <span class="layui-breadcrumb">
       <a href="">后台</a>
-      <a href="">二手车</a>
+      <a href="">新车</a>
       <a><cite>待审核</cite></a>
     </span>
     <fieldset class="layui-elem-field">
@@ -249,7 +249,7 @@
                 getDistricts(id);
             })
             $("#reset").click(function(){
-                window.location.href="/admin/business/shb/list";
+                window.location.href="/admin/business/nb/list";
             });
             $(".pass").click(function(){
                 var shb_id = $(this).data('id');

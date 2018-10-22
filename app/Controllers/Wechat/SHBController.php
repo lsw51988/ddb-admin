@@ -56,10 +56,10 @@ class SHBController extends WechatAuthController
         if ($data['show_days_index'] != 0) {
             $member = Member::findFirst($member->getId());
             $needPoints = MemberPoint::getShowDays($data['show_days_index']) * 10;
-            if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+            if (service('member/query')->isPrivilege($member)) {
                 $needPoints = $needPoints * 0.8;
             }
-            if ($member->getPoints() < $needPoints) {
+            if ($member->getPoints() < abs($needPoints)) {
                 return $this->error('积分不足');
             }
         }

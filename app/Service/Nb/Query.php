@@ -23,7 +23,7 @@ class Query extends Service
 {
     public function hasEnoughPoint(Member $member, $dayIndex)
     {
-        $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB]);
+        $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB];
         switch ($dayIndex) {
             case 1:
                 $days = 7;
@@ -45,14 +45,14 @@ class Query extends Service
                 break;
         }
         //新车展示天数所需积分
-        if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+        if (service('member/query')->isPrivilege($member)) {
             $showDaysPoints = $days * 10 * 0.8;
         } else {
             $showDaysPoints = $days * 10;
         }
         $point = $point + $showDaysPoints;
 
-        if ($member->getPoints() < $point) {
+        if ($member->getPoints() < abs($point)) {
             return false;
         }
         return $point;
@@ -100,10 +100,10 @@ class Query extends Service
 
     public function getAdminList($search = [])
     {
-        $columns = "S.id,S.brand_name,S.out_price,S.province,S.city,S.district,S.created_at,S.status,M.real_name,M.mobile";
+        $columns = "S.id,S.brand_name,S.price,S.province,S.city,S.district,S.created_at,S.status,M.real_name,M.mobile";
         $builder = $this->modelsManager->createBuilder()
             ->columns($columns)
-            ->from(["S" => SecondBike::class])
+            ->from(["S" => NewBike::class])
             ->leftJoin(Member::class, "S.member_id = M.id", 'M')
             ->leftJoin(Areas::class, "A.district_code = S.district_code", "A");
         if (!empty($search['status'])) {

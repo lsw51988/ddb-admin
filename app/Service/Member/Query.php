@@ -163,4 +163,16 @@ class Query extends BaseService
         $data = $paginator->getPaginate();
         return $data;
     }
+
+    /**
+     * 检查用户是否会员
+     */
+    public function isPrivilege($member)
+    {
+        if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

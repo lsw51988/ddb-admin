@@ -21,7 +21,7 @@ class Query extends Service
 {
     public function hasEnoughPoint($member, $dayIndex)
     {
-        $point = abs(MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB]);
+        $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB];
         switch ($dayIndex) {
             case 1:
                 $days = 7;
@@ -43,14 +43,14 @@ class Query extends Service
                 break;
         }
         //新车展示天数所需积分
-        if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+        if (service('member/query')->isPrivilege($member)) {
             $showDaysPoints = $days * 10 * 0.8;
         } else {
             $showDaysPoints = $days * 10;
         }
         $point = $point + $showDaysPoints;
 
-        if ($member->getPoints() < $point) {
+        if ($member->getPoints() < abs($point)) {
             return false;
         }
         return $point;

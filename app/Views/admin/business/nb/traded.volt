@@ -5,8 +5,8 @@
 
     <span class="layui-breadcrumb">
       <a href="">后台</a>
-      <a href="">二手车</a>
-      <a><cite>待审核</cite></a>
+      <a href="">新车</a>
+      <a><cite>交易完成</cite></a>
     </span>
     <fieldset class="layui-elem-field">
         <legend>
@@ -94,8 +94,6 @@
                 <td>{{ bike['created_at'] }}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ bike['id'] }}">查看照片</button>
-                    <button class="layui-btn layui-btn-normal pass" data-id="{{ bike['id'] }}">通过</button>
-                    <button class="layui-btn layui-btn-danger refuse" data-id="{{ bike['id'] }}">拒绝</button>
                 </td>
             </tr>
         {% endfor %}
@@ -249,60 +247,14 @@
                 getDistricts(id);
             })
             $("#reset").click(function(){
-                window.location.href="/admin/business/shb/list";
+                window.location.href="/admin/business/nb/list";
             });
-            $(".pass").click(function(){
-                var shb_id = $(this).data('id');
-                var layer_load = layer.load();
-                $.ajax({
-                    url: "/admin/business/shb/audit",
-                    data:{
-                        'shb_id':shb_id,
-                        'type':'pass'
-                    },
-                    method: "GET",
-                    success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
-                                window.location.reload();
-                            });
-                        }else{
-                            layer.close(layer_load);
-                            layer.msg(res.msg);
-                        }
-                    },
-                    error: function () {
-                        layer.close(layer_load);
-                        layer.msg("请求错误,请联系大帅比李少文")
-                    }
-                })
+            $(".check").click(function () {
+                console.log($(this).data('id'));
             });
-
-            $(".refuse").click(function(){
-                var shb_id = $(this).data('id');
-                var layer_load = layer.load();
-                $.ajax({
-                    url: "/admin/business/shb/auth/" + shb_id,
-                    data:{
-                        'type':'refuse'
-                    },
-                    method: "GET",
-                    success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
-                                window.location.reload();
-                            });
-                        }else{
-                            layer.close(layer_load);
-                            layer.msg(res.msg);
-                        }
-                    },
-                    error: function () {
-                        layer.close(layer_load);
-                        layer.msg("请求错误,请联系大帅比李少文")
-                    }
-                })
-            })
+            $(".edit").click(function () {
+                console.log($(this).data('id'));
+            });
         });
     </script>
 {% endblock %}

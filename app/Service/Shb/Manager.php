@@ -38,7 +38,7 @@ class Manager extends Service
             $provinceCode = $data['province'];
             $cityCode = $data['city'];
             $districtCode = $data['district'];
-            app_log()->info("获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
+            app_log()->info("创建二手车时，获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
         }
         $shb->setMemberId($member->getId())
             ->setBuyDate($data['buy_date'])
@@ -69,7 +69,10 @@ class Manager extends Service
         //3.积分扣除 二手车展示天数
         $memberPoint = new MemberPoint();
         $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB];
-        $showPoints = $points + $point;
+        if (service('member/query')->isPrivilege($member)) {
+            $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB] * 0.8;
+        }
+        $showPoints = $points - $point;
         $memberPoint->setMemberId($member->getId())
             ->setType(MemberPoint::TYPE_SHOW_SHB)
             ->setValue($showPoints);
@@ -109,6 +112,13 @@ class Manager extends Service
             ->setDistrict($data['district'])
             ->setDetailAddr($data['detail_addr'])
             ->setNumber($data['number']);
+        if ($area = Areas::findFirst("province_name='" . $data['province'] . "' AND city_name='" . $data['city'] . "' AND district_name='" . $data['district'] . "'")) {
+            $shb->setProvinceCode($area->getProvinceCode())
+                ->setCityCode($area->getCityCode())
+                ->setDistrictCode($area->getDistrictCode());
+        }else{
+            app_log()->info("更新二手车时，获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
+        }
         if (isset($data['remark'])) {
             $shb->setRemark($data['remark']);
         }
@@ -118,7 +128,7 @@ class Manager extends Service
 
         //如果有增加积分的操作
         if ($needPoints > 0) {
-            if (!$member->setPoints($member->getPoints() - $needPoints)->save()) {
+            if (!$member->setPoints($member->getPoints() + $needPoints)->save()) {
                 $this->db->rollback();
                 return false;
             }
@@ -221,5 +231,32 @@ class Manager extends Service
         ]);
         $secondBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
             ->save();
+    }
+
+    public function returnPoints($member, $shb)
+    {
+        $this->db->begin();
+        //2.积分取消扣除 发布二手车的积分
+        if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB_REFUSE, $shb->getId())) {
+            $this->db->rollback();
+            return false;
+        }
+        //3.积分取消扣除 二手车展示天数
+        $memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_SHB . ' AND second_bike_id = ' . $shb->getId() . ' order by id DESC');
+        $showPoints = $memberPoint->getValue();
+        $memberPointModel = new MemberPoint();
+        $memberPointModel->setMemberId($member->getId())
+            ->setType(MemberPoint::TYPE_SHOW_SHB_REFUSE)
+            ->setValue($showPoints);
+        if (!$memberPointModel->save()) {
+            $this->db->rollback();
+            return false;
+        }
+        if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
+            $this->db->rollback();
+            return false;
+        }
+        $this->db->commit();
+        return true;
     }
 }

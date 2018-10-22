@@ -36,10 +36,16 @@ class Manager extends Service
     {
         $this->db->begin();
         $nb = new NewBikes();
-        if (!$area = Areas::findFirstByDistrictCode($repair->getDistrict())) {
-            return false;
+        if ($area = Areas::findFirst("province_code='" . $repair->getProvince() . "' AND city_code='" . $repair->getCity() . "' AND district_code='" . $repair->getDistrict() . "'")) {
+            $province = $area->getProvinceName();
+            $city = $area->getCityName();
+            $district = $area->getDistrictName();
+        } else {
+            $province = $repair->getProvince();
+            $city = $repair->getCity();
+            $district = $repair->getDistrict();
+            app_log()->info("创建新车时，获取地址信息失败: 区district_code=" . $repair->getDistrict());
         }
-
         //1.新车记录添加
         $nb->setMemberId($member->getId())
             ->setVoltage(MemberBike::$voltageDesc[$data['voltage']])
@@ -51,9 +57,9 @@ class Manager extends Service
             ->setProvinceCode($repair->getProvince())
             ->setCityCode($repair->getCity())
             ->setDistrictCode($repair->getDistrict())
-            ->setProvince($area->getProvinceName())
-            ->setCity($area->getCityName())
-            ->setDistrict($area->getDistrictName())
+            ->setProvince($province)
+            ->setCity($city)
+            ->setDistrict($district)
             ->setDetailAddr($repair->getAddress())
             ->setRemark($data['remark']);
         $showDays = MemberPoint::getShowDays($data['show_days_index']);
@@ -74,7 +80,11 @@ class Manager extends Service
         //3.积分扣除 新车展示的积分
         $memberPoint = new MemberPoint();
         $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB];
-        $showPoints = $points + $point;
+        if (service('member/query')->isPrivilege($member)) {
+            $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB] * 0.8;
+        }
+
+        $showPoints = $points - $point;
         $memberPoint->setMemberId($member->getId())
             ->setNewBikeId($nb->getId())
             ->setType(MemberPoint::TYPE_SHOW_NB)
@@ -110,6 +120,16 @@ class Manager extends Service
             ->setGuaranteePeriod($data['guarantee_period'])
             ->setBatteryBrand($data['battery_brand'])
             ->setDistance($data['distance']);
+        if ($area = Areas::findFirst("province_name='" . $data['province'] . "' AND city_name='" . $data['city'] . "' AND district_name='" . $data['district'] . "'")) {
+            $nb->setProvinceCode($area->getProvinceCode())
+                ->setCityCode($area->getCityCode())
+                ->setDistrictCode($area->getDistrictCode());
+        } else {
+            $nb->setProvinceCode($data['province'])
+                ->setCityCode($data['city'])
+                ->setDistrictCode($data['district']);
+            app_log()->info("更新新车时，获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
+        }
         if (isset($data['remark'])) {
             $nb->setRemark($data['remark']);
         }
@@ -144,7 +164,7 @@ class Manager extends Service
         return $nb->getId();
     }
 
-    public function repub($member, $data,$needPoints)
+    public function repub($member, $data, $needPoints)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -211,5 +231,32 @@ class Manager extends Service
         ]);
         $newBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
             ->save();
+    }
+
+    public function returnPoints($member, $nb)
+    {
+        $this->db->begin();
+        //2.积分取消扣除 发布新车的积分
+        if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_NB_REFUSE, null, null, null, $nb->getId())) {
+            $this->db->rollback();
+            return false;
+        }
+        //3.积分取消扣除 新车展示天数
+        $memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_NB . ' AND new_bike_id = ' . $nb->getId() . ' order by id DESC');
+        $showPoints = $memberPoint->getValue();
+        $memberPointModel = new MemberPoint();
+        $memberPointModel->setMemberId($member->getId())
+            ->setType(MemberPoint::TYPE_SHOW_NB_REFUSE)
+            ->setValue($showPoints);
+        if (!$memberPointModel->save()) {
+            $this->db->rollback();
+            return false;
+        }
+        if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
+            $this->db->rollback();
+            return false;
+        }
+        $this->db->commit();
+        return true;
     }
 }

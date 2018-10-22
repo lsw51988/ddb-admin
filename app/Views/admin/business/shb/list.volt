@@ -272,7 +272,7 @@
                 getDistricts(id);
             })
             $("#reset").click(function () {
-                window.location.href = "/admin/business/member/list";
+                window.location.href = "/admin/business/shb/list";
             });
             $('.edit').click(function () {
                 var bike_id = $(this).data('id');
