@@ -6,7 +6,7 @@
     <span class="layui-breadcrumb">
       <a href="">后台</a>
       <a href="">新车</a>
-      <a><cite>交易中</cite></a>
+      <a><cite>审核拒绝</cite></a>
     </span>
     <fieldset class="layui-elem-field">
         <legend>
@@ -17,20 +17,22 @@
                 <div class="layui-col-md4">
                     <label class="layui-form-label">姓名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{{ search['real_name'] }}">
+                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
+                               value="{{ search['real_name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
                     <label class="layui-form-label">手机号</label>
                     <div class="layui-input-block">
-                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ search['mobile'] }}">
+                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
+                               value="{{ search['mobile'] }}">
                     </div>
                 </div>
             </div>
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
                     <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin-right: 10px;">
+                    <div class="layui-col-md2" style="margin: 0 10px 0 30px">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
@@ -85,9 +87,9 @@
             <tr>
                 <td>{{ bike['id'] }}</td>
                 <td>{{ bike['brand_name'] }}</td>
-                <td>{{ bike['out_price']}}</td>
+                <td>{{ bike['price'] }}</td>
                 <td>{{ bike['real_name'] }}</td>
-                <td>{{ bike['mobile']}}</td>
+                <td>{{ bike['mobile'] }}</td>
                 <td>{{ bike['province'] }}</td>
                 <td>{{ bike['city'] }}</td>
                 <td>{{ bike['district'] }}</td>
@@ -100,6 +102,8 @@
         </tbody>
     </table>
     <div id="page"></div>
+    <ul id="viewer" style="display:none;padding:20px;height:80px;">
+    </ul>
 {% endblock %}
 
 {% block css %}
@@ -128,32 +132,32 @@
                 , curr:{{ page }}
                 , jump: function (obj, first) {
                     if (!first) {
-                        window.location.href = "/admin/business/shb/list?page=" + obj.curr
+                        window.location.href = "/admin/business/nb/list?page=" + obj.curr
                     }
                 }
             });
 
             $(".photo").click(function () {
                 $("#viewer").empty();
-                var member_id = $(this).data('id');
+                var bike_id = $(this).data('id');
                 $.ajax({
-                    url: "/admin/business/member/" + member_id + "/imgs",
-                    method: "GET",
+                    url: "/admin/business/nb/" + bike_id + "/imgs",
+                    type: "GET",
                     success: function (res) {
-                        if(res.status){
+                        if (res.status) {
                             var data = res.data;
                             for (var i = 0; i < data.length; i++) {
                                 $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px', '200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
                             $('#viewer').viewer();
                             $(".layui-layer-shade").removeClass('layui-layer-shade');
-                        }else{
+                        } else {
                             layer.msg(res.msg);
                         }
                     },
@@ -244,8 +248,8 @@
                 var id = data.value
                 getDistricts(id);
             })
-            $("#reset").click(function(){
-                window.location.href="/admin/business/nb/list";
+            $("#reset").click(function () {
+                window.location.href = "/admin/business/nb/list";
             });
             $(".check").click(function () {
                 console.log($(this).data('id'));

@@ -165,7 +165,7 @@
                 var member_id = $(this).data('id');
                 $.ajax({
                     url: "/admin/business/member/" + member_id + "/imgs",
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
                         if(res.status){
                             var data = res.data;
@@ -174,7 +174,7 @@
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px','200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
@@ -286,7 +286,7 @@
                 var layer_load = layer.load();
                 $.ajax({
                     url: "/admin/business/shb/update",
-                    method: "POST",
+                    type: "POST",
                     data:{
                         'bike_id':bike_id,
                         'out_price':out_price

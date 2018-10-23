@@ -9,6 +9,7 @@
 namespace Ddb\Controllers\Admin\Business;
 
 use Ddb\Controllers\AdminAuthController;
+use Ddb\Models\SecondBikeImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SecondBike;
@@ -20,7 +21,7 @@ use Ddb\Modules\SecondBike;
 class ShbController extends AdminAuthController
 {
     /**
-     * @Get("/audit")
+     * @Post("/audit")
      * 审核
      */
     public function auditAction()
@@ -29,10 +30,17 @@ class ShbController extends AdminAuthController
         if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
             if ($request['type'] == 'pass') {
                 $status = SecondBike::STATUS_AUTH;
+                //弥补审核的时间差
+                $memberPoint = MemberPoint::findFirst('second_bike_id = ' . $request['shb_id'] . ' AND type = ' . MemberPoint::TYPE_PUBLISH_SHB . ' ORDER BY id DESC');
+                $memberPointModel = new MemberPoint();
+                $showDays = $memberPointModel->getShowDaysByPoints($memberPoint);
+                $secondBike->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
             } else {
+                if ($secondBike->getStatus() == SecondBike::STATUS_DENIED) {
+                    return $this->error('无法重复拒绝');
+                }
                 $status = SecondBike::STATUS_DENIED;
-                $secondBike->setCancelReason($request['reason'])
-                    ->setCancelTime(date('Y-m-d H:i:s'));
+                $secondBike->setRefuseReason($request['reason']);
             }
             if ($secondBike->setStatus($status)->save()) {
                 //退回用户积分
@@ -146,6 +154,20 @@ class ShbController extends AdminAuthController
             'total' => $data->total_items,
             'search' => $request
         ]);
+    }
+
+    /**
+     * @Get("/{id:[0-9]+}/imgs")
+     */
+    public function imgsAction($bikeId)
+    {
+        $memberBikeImgs = SecondBikeImages::findBySecondBikeId($bikeId);
+        $ids = array_column($memberBikeImgs->toArray(), 'id');
+        $data = [];
+        foreach ($ids as $id) {
+            $data[] = "/wechat/shb/bikeImg/" . $id;
+        }
+        return $this->success($data);
     }
 
     private function getList($request)

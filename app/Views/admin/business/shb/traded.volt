@@ -140,7 +140,7 @@
                 var member_id = $(this).data('id');
                 $.ajax({
                     url: "/admin/business/member/" + member_id + "/imgs",
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
                         if(res.status){
                             var data = res.data;
@@ -149,7 +149,7 @@
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px','200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
@@ -188,7 +188,7 @@
                     return;
                 }
                 $.ajax({
-                    type: 'get',
+                    type: 'GET',
                     url: '/area/province/' + id,
                     dataType: 'json'
                 }).done(function (data, textStatus, jqXHR) {

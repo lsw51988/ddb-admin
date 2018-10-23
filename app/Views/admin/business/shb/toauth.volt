@@ -142,7 +142,7 @@
                 var member_id = $(this).data('id');
                 $.ajax({
                     url: "/admin/business/member/" + member_id + "/imgs",
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
                         if(res.status){
                             var data = res.data;
@@ -151,7 +151,7 @@
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px','200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
@@ -278,30 +278,35 @@
                 })
             });
 
+
             $(".refuse").click(function(){
                 var shb_id = $(this).data('id');
-                var layer_load = layer.load();
-                $.ajax({
-                    url: "/admin/business/shb/auth/" + shb_id,
-                    data:{
-                        'type':'refuse'
-                    },
-                    method: "GET",
-                    success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
-                                window.location.reload();
-                            });
-                        }else{
+                layer.prompt({title: '拒绝原因', formType: 2}, function (text, index) {
+                    var layer_load = layer.load();
+                    $.ajax({
+                        url: "/admin/business/shb/audit",
+                        data:{
+                            'shb_id':shb_id,
+                            'type':'refuse',
+                            'reason':text
+                        },
+                        type: "POST",
+                        success: function (res) {
+                            if(res.status){
+                                layer.msg('修改成功',function () {
+                                    window.location.reload();
+                                });
+                            }else{
+                                layer.close(layer_load);
+                                layer.msg(res.msg);
+                            }
+                        },
+                        error: function () {
                             layer.close(layer_load);
-                            layer.msg(res.msg);
+                            layer.msg("请求错误,请联系大帅比李少文")
                         }
-                    },
-                    error: function () {
-                        layer.close(layer_load);
-                        layer.msg("请求错误,请联系大帅比李少文")
-                    }
-                })
+                    })
+                });
             })
         });
     </script>

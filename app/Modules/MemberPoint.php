@@ -161,4 +161,16 @@ class MemberPoint extends MemberPoints
         return $days;
     }
 
+    public function getShowDaysByPoints($memberPoint)
+    {
+        $points = $memberPoint->getValue();
+        $member = Member::findFirst($memberPoint->getMemberId());
+        if (service('member/query')->isPrivilege($member)) {
+            $days = $points / 8;
+        } else {
+            $days = $points / 10;
+        }
+        return $days;
+    }
+
 }

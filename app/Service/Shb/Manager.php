@@ -116,7 +116,7 @@ class Manager extends Service
             $shb->setProvinceCode($area->getProvinceCode())
                 ->setCityCode($area->getCityCode())
                 ->setDistrictCode($area->getDistrictCode());
-        }else{
+        } else {
             app_log()->info("更新二手车时，获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
         }
         if (isset($data['remark'])) {
@@ -242,19 +242,20 @@ class Manager extends Service
             return false;
         }
         //3.积分取消扣除 二手车展示天数
-        $memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_SHB . ' AND second_bike_id = ' . $shb->getId() . ' order by id DESC');
-        $showPoints = $memberPoint->getValue();
-        $memberPointModel = new MemberPoint();
-        $memberPointModel->setMemberId($member->getId())
-            ->setType(MemberPoint::TYPE_SHOW_SHB_REFUSE)
-            ->setValue($showPoints);
-        if (!$memberPointModel->save()) {
-            $this->db->rollback();
-            return false;
-        }
-        if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
-            $this->db->rollback();
-            return false;
+        if ($memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_SHB . ' AND second_bike_id = ' . $shb->getId() . ' order by id DESC')) {
+            $showPoints = $memberPoint->getValue();
+            $memberPointModel = new MemberPoint();
+            $memberPointModel->setMemberId($member->getId())
+                ->setType(MemberPoint::TYPE_SHOW_SHB_REFUSE)
+                ->setValue($showPoints);
+            if (!$memberPointModel->save()) {
+                $this->db->rollback();
+                return false;
+            }
+            if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
+                $this->db->rollback();
+                return false;
+            }
         }
         $this->db->commit();
         return true;

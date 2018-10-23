@@ -242,20 +242,23 @@ class Manager extends Service
             return false;
         }
         //3.积分取消扣除 新车展示天数
-        $memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_NB . ' AND new_bike_id = ' . $nb->getId() . ' order by id DESC');
-        $showPoints = $memberPoint->getValue();
-        $memberPointModel = new MemberPoint();
-        $memberPointModel->setMemberId($member->getId())
-            ->setType(MemberPoint::TYPE_SHOW_NB_REFUSE)
-            ->setValue($showPoints);
-        if (!$memberPointModel->save()) {
-            $this->db->rollback();
-            return false;
+        if ($memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_NB . ' AND new_bike_id = ' . $nb->getId() . ' order by id DESC')) {
+            $showPoints = $memberPoint->getValue();
+            $memberPointModel = new MemberPoint();
+            $memberPointModel->setMemberId($member->getId())
+                ->setType(MemberPoint::TYPE_SHOW_NB_REFUSE)
+                ->setValue($showPoints);
+            if (!$memberPointModel->save()) {
+                $this->db->rollback();
+                return false;
+            }
+            if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
+                $this->db->rollback();
+                return false;
+            }
         }
-        if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
-            $this->db->rollback();
-            return false;
-        }
+
+
         $this->db->commit();
         return true;
     }

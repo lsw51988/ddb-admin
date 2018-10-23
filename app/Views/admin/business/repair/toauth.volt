@@ -185,7 +185,7 @@
                 var repair_id = $(this).data('id');
                 $.ajax({
                     url: "/admin/business/repair/" + repair_id + "/imgs",
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
                         if (res.status) {
                             var data = res.data;
@@ -198,7 +198,7 @@
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px','200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();

@@ -17,20 +17,22 @@
                 <div class="layui-col-md4">
                     <label class="layui-form-label">姓名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{{ search['real_name'] }}">
+                        <input type="text" name="real_name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
+                               value="{{ search['real_name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
                     <label class="layui-form-label">手机号</label>
                     <div class="layui-input-block">
-                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ search['mobile'] }}">
+                        <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
+                               value="{{ search['mobile'] }}">
                     </div>
                 </div>
             </div>
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
                     <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin-right: 10px;">
+                    <div class="layui-col-md2" style="margin: 0 10px 0 30px">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
@@ -85,9 +87,9 @@
             <tr>
                 <td>{{ bike['id'] }}</td>
                 <td>{{ bike['brand_name'] }}</td>
-                <td>{{ bike['out_price']}}</td>
+                <td>{{ bike['price'] }}</td>
                 <td>{{ bike['real_name'] }}</td>
-                <td>{{ bike['mobile']}}</td>
+                <td>{{ bike['mobile'] }}</td>
                 <td>{{ bike['province'] }}</td>
                 <td>{{ bike['city'] }}</td>
                 <td>{{ bike['district'] }}</td>
@@ -120,9 +122,10 @@
 {% endblock %}
 {% block scripts %}
     <script>
-        layui.use(['laypage', 'jquery', 'form'], function () {
+        layui.use(['laypage', 'jquery', 'form', 'layer'], function () {
             var laypage = layui.laypage;
             var form = layui.form;
+            var layer = layui.layer;
             var $ = layui.$;
             //执行一个laypage实例
             laypage.render({
@@ -132,32 +135,32 @@
                 , curr:{{ page }}
                 , jump: function (obj, first) {
                     if (!first) {
-                        window.location.href = "/admin/business/shb/list?page=" + obj.curr
+                        window.location.href = "/admin/business/nb/list?page=" + obj.curr
                     }
                 }
             });
 
             $(".photo").click(function () {
                 $("#viewer").empty();
-                var member_id = $(this).data('id');
+                var bike_id = $(this).data('id');
                 $.ajax({
-                    url: "/admin/business/member/" + member_id + "/imgs",
+                    url: "/admin/business/nb/" + bike_id + "/imgs",
                     method: "GET",
                     success: function (res) {
-                        if(res.status){
+                        if (res.status) {
                             var data = res.data;
                             for (var i = 0; i < data.length; i++) {
                                 $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px', '200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
                             $('#viewer').viewer();
                             $(".layui-layer-shade").removeClass('layui-layer-shade');
-                        }else{
+                        } else {
                             layer.msg(res.msg);
                         }
                     },
@@ -241,32 +244,32 @@
             getProvinces();
 
             form.on("select(province)", function (data) {
-                var id = data.value
+                var id = data.value;
                 getCities(id);
-            })
-            form.on("select(city)", function (data) {
-                var id = data.value
-                getDistricts(id);
-            })
-            $("#reset").click(function(){
-                window.location.href="/admin/business/nb/list";
             });
-            $(".pass").click(function(){
-                var shb_id = $(this).data('id');
+            form.on("select(city)", function (data) {
+                var id = data.value;
+                getDistricts(id);
+            });
+            $("#reset").click(function () {
+                window.location.href = "/admin/business/nb/list";
+            });
+            $(".pass").click(function () {
+                var bike_id = $(this).data('id');
                 var layer_load = layer.load();
                 $.ajax({
-                    url: "/admin/business/shb/audit",
-                    data:{
-                        'shb_id':shb_id,
-                        'type':'pass'
+                    url: "/admin/business/nb/audit",
+                    data: {
+                        'bike_id': bike_id,
+                        'type': 'pass'
                     },
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
+                        if (res.status) {
+                            layer.msg('修改成功', function () {
                                 window.location.reload();
                             });
-                        }else{
+                        } else {
                             layer.close(layer_load);
                             layer.msg(res.msg);
                         }
@@ -278,30 +281,34 @@
                 })
             });
 
-            $(".refuse").click(function(){
-                var shb_id = $(this).data('id');
-                var layer_load = layer.load();
-                $.ajax({
-                    url: "/admin/business/shb/auth/" + shb_id,
-                    data:{
-                        'type':'refuse'
-                    },
-                    method: "GET",
-                    success: function (res) {
-                        if(res.status){
-                            layer.msg('修改成功',function () {
-                                window.location.reload();
-                            });
-                        }else{
-                            layer.close(layer_load);
-                            layer.msg(res.msg);
+            $(".refuse").click(function () {
+                var bike_id = $(this).data('id');
+                layer.prompt({title: '拒绝原因', formType: 2}, function (text, index) {
+                    $.ajax({
+                        url: "/admin/business/nb/audit",
+                        data: {
+                            'bike_id': bike_id,
+                            'type': 'refuse',
+                            'reason': text
+                        },
+                        type: "POST",
+                        success: function (res) {
+                            layer.closeAll();
+                            if (res.status) {
+                                layer.msg('修改成功', function () {
+                                    window.location.reload();
+                                });
+                            } else {
+                                layer.msg(res.msg);
+                            }
+                        },
+                        error: function () {
+                            layer.closeAll();
+                            layer.msg("请求错误,请联系大帅比李少文")
                         }
-                    },
-                    error: function () {
-                        layer.close(layer_load);
-                        layer.msg("请求错误,请联系大帅比李少文")
-                    }
-                })
+                    })
+                });
+
             })
         });
     </script>

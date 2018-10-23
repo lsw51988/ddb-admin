@@ -32,7 +32,7 @@
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
                     <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin-right: 10px;">
+                    <div class="layui-col-md2" style="margin: 0 10px 0 30px">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
@@ -112,13 +112,14 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="myModalLabel">编辑</h4>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="bike_id">
-                    <label for="out_price">价格</label>
-                    <input type="text" class="form-control" id="out_price">
+                    <label for="price">价格</label>
+                    <input type="text" class="form-control" id="price">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -162,25 +163,25 @@
 
             $(".photo").click(function () {
                 $("#viewer").empty();
-                var member_id = $(this).data('id');
+                var bike_id = $(this).data('id');
                 $.ajax({
-                    url: "/admin/business/nb/" + member_id + "/imgs",
-                    method: "GET",
+                    url: "/admin/business/nb/" + bike_id + "/imgs",
+                    type: "GET",
                     success: function (res) {
-                        if(res.status){
+                        if (res.status) {
                             var data = res.data;
                             for (var i = 0; i < data.length; i++) {
                                 $("#viewer").append('<li><img class="img" src=' + data[i] + '></li>')
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px', '200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
                             $('#viewer').viewer();
                             $(".layui-layer-shade").removeClass('layui-layer-shade');
-                        }else{
+                        } else {
                             layer.msg(res.msg);
                         }
                     },
@@ -280,22 +281,21 @@
                 $('.modal-backdrop').removeClass('modal-backdrop');
                 $("#bike_id").val(bike_id);
             })
-            $("#submit").click(function(){
-                var out_price = $("#out_price").val();
+            $("#submit").click(function () {
+                var price = $("#price").val();
                 var bike_id = $("#bike_id").val();
                 var layer_load = layer.load();
                 $.ajax({
-                    url: "/admin/business/shb/update",
+                    url: "/admin/business/nb/update",
                     method: "POST",
-                    data:{
-                        'bike_id':bike_id,
-                        'out_price':out_price
+                    data: {
+                        'bike_id': bike_id,
+                        'price': price
                     },
                     success: function (res) {
                         $('#myModal').modal('hide');
                         if (res.status) {
-                            //layer.close(layer_load);
-                            layer.msg("修改成功",function () {
+                            layer.msg("修改成功", function () {
                                 window.location.reload();
                             });
                         } else {
