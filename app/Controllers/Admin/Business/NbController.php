@@ -25,7 +25,7 @@ class NbController extends AdminAuthController
      */
     public function listAction()
     {
-        $request = $this->request->get();
+        $request = $this->data;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = $this->getList($request);

@@ -21,75 +21,11 @@ use Ddb\Modules\SecondBike;
 class ShbController extends AdminAuthController
 {
     /**
-     * @Post("/audit")
-     * 审核
-     */
-    public function auditAction()
-    {
-        $request = $this->data;
-        if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
-            if ($request['type'] == 'pass') {
-                $status = SecondBike::STATUS_AUTH;
-                //弥补审核的时间差
-                $memberPoint = MemberPoint::findFirst('second_bike_id = ' . $request['shb_id'] . ' AND type = ' . MemberPoint::TYPE_PUBLISH_SHB . ' ORDER BY id DESC');
-                $memberPointModel = new MemberPoint();
-                $showDays = $memberPointModel->getShowDaysByPoints($memberPoint);
-                $secondBike->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
-            } else {
-                if ($secondBike->getStatus() == SecondBike::STATUS_DENIED) {
-                    return $this->error('无法重复拒绝');
-                }
-                $status = SecondBike::STATUS_DENIED;
-                $secondBike->setRefuseReason($request['reason']);
-            }
-            if ($secondBike->setStatus($status)->save()) {
-                //退回用户积分
-                $member = Member::findFirst($secondBike->getMemberId());
-                if (!service("shb/manager")->returnPoints($member, $secondBike)) {
-                    return $this->error("积分取消扣除失败");
-                }
-                return $this->success();
-            }
-        }
-        return $this->error("未找到该记录");
-    }
-
-    /**
-     * @Delete("/{id:[0-9]+}")
-     */
-    public function deleteAction($id)
-    {
-
-    }
-
-    /**
-     * @Post("/update")
-     */
-    public function editAction()
-    {
-        $request = $this->data;
-        if ($secondBike = SecondBike::findFirst($request['bike_id'])) {
-            if ($secondBike->setOutPrice($request['out_price'])->save()) {
-                return $this->success();
-            }
-        }
-        return $this->error("未找到该记录");
-    }
-
-    /**
-     * @Get("/{id:[0-9]+}")
-     */
-    public function showAction()
-    {
-
-    }
-
-    /**
      * @Get("/list")
      */
     public function listAction()
     {
-        $request = $this->request->get();
+        $request = $this->data;
         $request['real_name'] = empty($request['real_name']) ? $request['real_name'] : "";
         $request['mobile'] = empty($request['mobile']) ? $request['mobile'] : "";
         $data = $this->getList($request);
@@ -168,6 +104,70 @@ class ShbController extends AdminAuthController
             $data[] = "/wechat/shb/bikeImg/" . $id;
         }
         return $this->success($data);
+    }
+
+    /**
+     * @Post("/audit")
+     * 审核
+     */
+    public function auditAction()
+    {
+        $request = $this->data;
+        if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
+            if ($request['type'] == 'pass') {
+                $status = SecondBike::STATUS_AUTH;
+                //弥补审核的时间差
+                $memberPoint = MemberPoint::findFirst('second_bike_id = ' . $request['shb_id'] . ' AND type = ' . MemberPoint::TYPE_PUBLISH_SHB . ' ORDER BY id DESC');
+                $memberPointModel = new MemberPoint();
+                $showDays = $memberPointModel->getShowDaysByPoints($memberPoint);
+                $secondBike->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
+            } else {
+                if ($secondBike->getStatus() == SecondBike::STATUS_DENIED) {
+                    return $this->error('无法重复拒绝');
+                }
+                $status = SecondBike::STATUS_DENIED;
+                $secondBike->setRefuseReason($request['reason']);
+            }
+            if ($secondBike->setStatus($status)->save()) {
+                //退回用户积分
+                $member = Member::findFirst($secondBike->getMemberId());
+                if (!service("shb/manager")->returnPoints($member, $secondBike)) {
+                    return $this->error("积分取消扣除失败");
+                }
+                return $this->success();
+            }
+        }
+        return $this->error("未找到该记录");
+    }
+
+    /**
+     * @Delete("/{id:[0-9]+}")
+     */
+    public function deleteAction($id)
+    {
+
+    }
+
+    /**
+     * @Post("/update")
+     */
+    public function editAction()
+    {
+        $request = $this->data;
+        if ($secondBike = SecondBike::findFirst($request['bike_id'])) {
+            if ($secondBike->setOutPrice($request['out_price'])->save()) {
+                return $this->success();
+            }
+        }
+        return $this->error("未找到该记录");
+    }
+
+    /**
+     * @Get("/{id:[0-9]+}")
+     */
+    public function showAction()
+    {
+
     }
 
     private function getList($request)
