@@ -46,7 +46,12 @@ class Manager extends BaseService
         } else {
             if (MemberSigns::findFirst('member_id = ' . $member->getId() . ' AND day = \'' . date('Y-m-d', strtotime('-1 day')) . '\'')) {
                 $yesterdayFlag = true;
+                if($memberSignCollect->getWeekCount()==null){
+
+                }
                 $memberSignCollect->setWeekCount($memberSignCollect->getWeekCount() + 1);
+            }else{
+
             }
         }
         if ($yesterdayFlag) {
@@ -89,6 +94,7 @@ class Manager extends BaseService
             }
             $msg = '大满贯！您已连续签到365天，将免费获取一年会员！';
         }
+        $this->db->commit();
         return $msg;
     }
 }
