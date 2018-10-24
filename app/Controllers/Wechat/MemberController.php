@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\MemberSignCollects;
 use Ddb\Models\MemberSigns;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
@@ -317,11 +318,11 @@ class MemberController extends WechatAuthController
         if (MemberSigns::findFirst("member_id = " . $member->getId() . " AND created_at>='" . date("Y-m-d 00:00:00", time()) . "'")) {
             return $this->error("今日已经签过");
         } else {
-            $memberSign = new MemberSigns();
-            $memberSign->setMemberId($member->getId())->save();
-            $member = Member::findFirst($this->currentMember->getId());
-            service("point/manager")->create($member, MemberPoint::TYPE_SIGN);
-            return $this->success();
+            if ($msg = service('sign/manager')->sign($member)) {
+                return $this->success($msg);
+            } else {
+                return $this->error('请稍后重试');
+            }
         }
     }
 }

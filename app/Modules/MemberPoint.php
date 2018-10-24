@@ -14,6 +14,9 @@ class MemberPoint extends MemberPoints
 {
     const TYPE_REGISTER = 1;
     const TYPE_SIGN = 2;
+    const TYPE_SIGN_WEEK = 15;
+    const TYPE_SIGN_MONTH = 16;
+    const TYPE_SIGN_YEAR = 17;
     const TYPE_AUTH = 3;
     const TYPE_ADD_REPAIRS = 4;
     const TYPE_NEW_PAGE = 5;
@@ -53,6 +56,9 @@ class MemberPoint extends MemberPoints
     public static $typeDesc = [
         self::TYPE_REGISTER => "注册",
         self::TYPE_SIGN => "每日签到",
+        self::TYPE_SIGN_WEEK => "每周满签",
+        self::TYPE_SIGN_MONTH => "每月满签",
+        self::TYPE_SIGN_YEAR => "365天满签",
         self::TYPE_AUTH => "用户完善信息",
         self::TYPE_ADD_REPAIRS => "增加维修点",
         self::TYPE_NEW_PAGE => "第一次探索新的页面",
@@ -87,6 +93,8 @@ class MemberPoint extends MemberPoints
     public static $typeScore = [
         self::TYPE_REGISTER => 5,
         self::TYPE_SIGN => 2,
+        self::TYPE_SIGN_WEEK => 10,
+        self::TYPE_SIGN_MONTH => 20,
         self::TYPE_AUTH => 5,
         self::TYPE_ADD_REPAIRS => 10,
         self::TYPE_NEW_PAGE => 2,

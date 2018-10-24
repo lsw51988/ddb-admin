@@ -13,7 +13,6 @@ use Ddb\Core\Service;
 use Ddb\Models\Areas;
 use Ddb\Models\SecondBikes;
 use Ddb\Models\SecondBikeBrowses;
-use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SecondBike;

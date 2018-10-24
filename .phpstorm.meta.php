@@ -31,6 +31,7 @@ namespace PHPSTORM_META {
             'recommend/manager' instanceof \Ddb\Service\Recommend\Manager,
             'shb/query' instanceof \Ddb\Service\Shb\Query,
             'shb/manager' instanceof \Ddb\Service\Shb\Manager,
+            'sign/manager' instanceof \Ddb\Service\Sign\Manager,
             'sms/manager' instanceof \Ddb\Service\Sms\Manager,
             'suggestion/manager' instanceof \Ddb\Service\Suggestion\Manager,
             'user/manager' instanceof \Ddb\Service\User\Manager,
