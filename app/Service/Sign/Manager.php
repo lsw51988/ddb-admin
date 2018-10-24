@@ -34,11 +34,12 @@ class Manager extends BaseService
             $memberSign->setWeekCount(1);
         }
 
-        $lastSign = MemberSigns::findFirst('member_id = ' . $member->getId() . ' order by id DESC');
-        if ($lastSign->getDay() == date('Y-m-d')) {
-            $yesterdayFlag = true;
+        if ($lastSign = MemberSigns::findFirst('member_id = ' . $member->getId() . ' order by id DESC')) {
+            if ($lastSign->getDay() == date('Y-m-d')) {
+                $yesterdayFlag = true;
+            }
+            $memberSign->setMonthCount($lastSign->getMonthCount() + 1)->setWeekCount($lastSign->getWeekCount() + 1);
         }
-        $memberSign->setMonthCount($lastSign->getMonthCount() + 1)->setWeekCount($lastSign->getWeekCount() + 1);
 
         if ($yesterdayFlag) {
             $memberSign->setContinueCount($memberSign->getContinueCount() + 1);

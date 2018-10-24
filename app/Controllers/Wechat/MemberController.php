@@ -319,7 +319,7 @@ class MemberController extends WechatAuthController
             return $this->error("今日已经签过");
         } else {
             if ($msg = service('sign/manager')->sign($member)) {
-                return $this->success($msg);
+                return $this->success(null, $msg);
             } else {
                 return $this->error('请稍后重试');
             }
