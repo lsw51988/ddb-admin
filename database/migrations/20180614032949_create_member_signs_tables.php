@@ -33,10 +33,10 @@ class CreateMemberSignsTables extends AbstractMigration
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "用户id"])
             ->addColumn("day", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "签到的日期-天"])
             ->addColumn("week", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "签到的日期-周"])
-            ->addColumn("week_count", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "本周签到次数"])
-            ->addColumn("month_count", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "本月签到次数"])
-            ->addColumn("continue_count", "integer", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "持续签到次数，断一次则归0"])
-            ->addColumn("count", "integer", ["limit" => MysqlAdapter::INT_SMALL, "null" => false, "comment" => "总签到次数"])
+            ->addColumn("week_count", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 0, "comment" => "本周签到次数"])
+            ->addColumn("month_count", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 0, "comment" => "本月签到次数"])
+            ->addColumn("continue_count", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "持续签到次数，断一次则归1"])
+            ->addColumn("count", "integer", ["limit" => MysqlAdapter::INT_SMALL, "default" => 1, "comment" => "总签到次数"])
             ->addTimestamps()
             ->save();
     }
