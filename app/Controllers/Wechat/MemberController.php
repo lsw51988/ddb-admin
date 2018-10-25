@@ -325,4 +325,32 @@ class MemberController extends WechatAuthController
             }
         }
     }
+
+    /**
+     * @Post("/become_privilege")
+     * 成为会员
+     */
+    public function becomePrivilegeAction()
+    {
+        $request = $this->data;
+        $member = $this->currentMember;
+        if ($member->getPoints() < $request['point']) {
+            return $this->error('积分不足');
+        }
+        $type = MemberPoint::getPrivilegeType($request['point']);
+        $month = MemberPoint::getPrivilegeMonth($request['point']);
+        $this->db->begin();
+        //1.扣除积分
+        if (!service('point/manager')->create($member, $type)) {
+            $this->db->rollback();
+            return $this->error('积分扣除失败');
+        }
+        //变更会员
+        if (!service('member/manager')->becomePrivilege($member, $month, 'month')) {
+            $this->db->rollback();
+            return $this->error('更改会员失败');
+        }
+        $this->db->commit();
+        return $this->success();
+    }
 }

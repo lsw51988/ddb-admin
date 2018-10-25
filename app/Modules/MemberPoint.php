@@ -14,9 +14,7 @@ class MemberPoint extends MemberPoints
 {
     const TYPE_REGISTER = 1;
     const TYPE_SIGN = 2;
-    const TYPE_SIGN_WEEK = 15;
-    const TYPE_SIGN_MONTH = 16;
-    const TYPE_SIGN_YEAR = 17;
+
     const TYPE_AUTH = 3;
     const TYPE_ADD_REPAIRS = 4;
     const TYPE_NEW_PAGE = 5;
@@ -29,6 +27,17 @@ class MemberPoint extends MemberPoints
     const TYPE_RECHARGE_10 = 12;
     const TYPE_RECHARGE_50 = 13;
     const TYPE_RECHARGE_100 = 14;
+    const TYPE_SIGN_WEEK = 15;
+    const TYPE_SIGN_MONTH = 16;
+    const TYPE_SIGN_YEAR = 17;
+    const TYPE_RECHARGE_200 = 18;
+    const TYPE_RECHARGE_500 = 19;
+    const TYPE_RECHARGE_1000 = 20;
+
+    const TYPE_SHOW_SHB_REFUSE = 21;
+    const TYPE_PUBLISH_SHB_REFUSE = 22;
+    const TYPE_PUBLISH_NB_REFUSE = 23;
+    const TYPE_SHOW_NB_REFUSE = 24;
 
     const TYPE_PUBLISH_SHB = -1;
     const TYPE_CANCEL_APPEAL = -2;
@@ -41,10 +50,11 @@ class MemberPoint extends MemberPoints
     const TYPE_PUBLISH_NB = -9;
     const TYPE_SHOW_NB = -10;
     const TYPE_SHOW_SHB = -11;
-    const TYPE_SHOW_SHB_REFUSE = -12;
-    const TYPE_PUBLISH_SHB_REFUSE = -13;
-    const TYPE_PUBLISH_NB_REFUSE = -14;
-    const TYPE_SHOW_NB_REFUSE = -15;
+
+    const TYPE_PRIVILEGE_ONE_MONTH = -12;
+    const TYPE_PRIVILEGE_THREE_MONTH = -13;
+    const TYPE_PRIVILEGE_SIX_MONTH = -14;
+    const TYPE_PRIVILEGE_TWELVE_MONTH = -15;
 
 
     const LEVEL_BRONZE = 500;
@@ -69,8 +79,11 @@ class MemberPoint extends MemberPoints
         self::TYPE_APPEAL => "完成应答",
         self::TYPE_APPEAL_CALLBACK => "提交回访单",
         self::TYPE_RECHARGE_10 => "充值10元",
-        self::TYPE_RECHARGE_50 => "充值20元",
-        self::TYPE_RECHARGE_100 => "充值50元",
+        self::TYPE_RECHARGE_50 => "充值50元",
+        self::TYPE_RECHARGE_100 => "充值100元",
+        self::TYPE_RECHARGE_200 => "充值200元",
+        self::TYPE_RECHARGE_500 => "充值500元",
+        self::TYPE_RECHARGE_1000 => "充值1000元",
 
         self::TYPE_PUBLISH_SHB => "发布二手车信息",
         self::TYPE_CANCEL_APPEAL => "取消帮助",
@@ -88,6 +101,10 @@ class MemberPoint extends MemberPoints
         self::TYPE_PUBLISH_SHB_REFUSE => "拒绝发布二手车信息",
         self::TYPE_PUBLISH_NB_REFUSE => "拒绝展示新车信息",
         self::TYPE_SHOW_NB_REFUSE => "拒绝展示新车信息",
+        self::TYPE_PRIVILEGE_ONE_MONTH => "一个月会员",
+        self::TYPE_PRIVILEGE_THREE_MONTH => "三个月会员",
+        self::TYPE_PRIVILEGE_SIX_MONTH => "半年会员",
+        self::TYPE_PRIVILEGE_TWELVE_MONTH => "一年会员"
     ];
 
     public static $typeScore = [
@@ -105,8 +122,16 @@ class MemberPoint extends MemberPoints
         self::TYPE_APPEAL => 2,
         self::TYPE_APPEAL_CALLBACK => 2,
         self::TYPE_RECHARGE_10 => 100,
-        self::TYPE_RECHARGE_50 => 600,
-        self::TYPE_RECHARGE_100 => 1200,
+        self::TYPE_RECHARGE_50 => 520,
+        self::TYPE_RECHARGE_100 => 1050,
+        self::TYPE_RECHARGE_200 => 2100,
+        self::TYPE_RECHARGE_500 => 5200,
+        self::TYPE_RECHARGE_1000 => 10500,
+
+        self::TYPE_SHOW_SHB_REFUSE => 10,
+        self::TYPE_PUBLISH_SHB_REFUSE => 100,
+        self::TYPE_PUBLISH_NB_REFUSE => 100,
+        self::TYPE_SHOW_NB_REFUSE => 10,
 
         self::TYPE_PUBLISH_SHB => -100,
         self::TYPE_CANCEL_APPEAL => -10,
@@ -120,10 +145,10 @@ class MemberPoint extends MemberPoints
         self::TYPE_SHOW_NB => -10,
         self::TYPE_SHOW_SHB => -10,
 
-        self::TYPE_SHOW_SHB_REFUSE => 10,
-        self::TYPE_PUBLISH_SHB_REFUSE => 100,
-        self::TYPE_PUBLISH_NB_REFUSE => 100,
-        self::TYPE_SHOW_NB_REFUSE => 10,
+        self::TYPE_PRIVILEGE_ONE_MONTH => -100,
+        self::TYPE_PRIVILEGE_THREE_MONTH => -280,
+        self::TYPE_PRIVILEGE_SIX_MONTH => -520,
+        self::TYPE_PRIVILEGE_TWELVE_MONTH => -1000
     ];
 
     //根据充值金额,返回具体的充值类型值
@@ -139,7 +164,52 @@ class MemberPoint extends MemberPoints
         if ($amount == 100) {
             $type = self::TYPE_RECHARGE_100;
         }
+        if ($amount == 200) {
+            $type = self::TYPE_RECHARGE_200;
+        }
+        if ($amount == 500) {
+            $type = self::TYPE_RECHARGE_500;
+        }
+        if ($amount == 1000) {
+            $type = self::TYPE_RECHARGE_1000;
+        }
         return $type;
+    }
+
+    //获取会员类型
+    public static function getPrivilegeType($point)
+    {
+        if ($point == 100) {
+            $type = self::TYPE_PRIVILEGE_ONE_MONTH;
+        }
+        if ($point == 280) {
+            $type = self::TYPE_PRIVILEGE_THREE_MONTH;
+        }
+        if ($point == 520) {
+            $type = self::TYPE_PRIVILEGE_SIX_MONTH;
+        }
+        if ($point == 1000) {
+            $type = self::TYPE_PRIVILEGE_TWELVE_MONTH;
+        }
+        return $type;
+    }
+
+    //获取会员充值月数
+    public static function getPrivilegeMonth($point)
+    {
+        if ($point == 100) {
+            $month = 1;
+        }
+        if ($point == 280) {
+            $month = 3;
+        }
+        if ($point == 520) {
+            $month = 6;
+        }
+        if ($point == 1000) {
+            $month = 12;
+        }
+        return $month;
     }
 
     //根据选择展示天数key获取对应天数
