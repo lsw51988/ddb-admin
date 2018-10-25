@@ -76,4 +76,18 @@ class Manager extends BaseService
         }
     }
 
+    public function becomePrivilege($member, $day)
+    {
+        if (service('member/query')->isPrivilege($member)) {
+            $time = $member->getPrivilegeTime();
+            $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime(strtotime($time) . "+$day day")));
+
+        } else {
+            $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime("+$day day")));
+        }
+        if (!$member->setPrivilege(Member::IS_PRIVILEGE)->save()) {
+            return false;
+        }
+        return true;
+    }
 }

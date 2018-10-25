@@ -74,8 +74,7 @@ class Manager extends BaseService
             $msg = '恭喜！本周本月均满签，今日获取32积分';
         }
         if ($memberSign->getContinueCount() % 365 == 0) {
-            $member->setPrivilege(Member::IS_PRIVILEGE)->setPrivilegeTime(date('Y-m-d H:i:s', strtotime('+1 year')));
-            if (!$member->save()) {
+            if (!service('member/manager')->becomePrivilege($member, 365)) {
                 $this->db->rollback();
                 return false;
             }
