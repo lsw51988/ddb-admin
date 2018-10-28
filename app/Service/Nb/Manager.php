@@ -32,7 +32,7 @@ class Manager extends Service
      * 2.判断用户是否有足够积分
      * 3.
      */
-    public function create(Member $member, Repair $repair, $data, $points)
+    public function create(Member $member, Repair $repair, $data)
     {
         $this->db->begin();
         $nb = new NewBikes();
@@ -62,8 +62,6 @@ class Manager extends Service
             ->setDistrict($district)
             ->setDetailAddr($repair->getAddress())
             ->setRemark($data['remark']);
-        $showDays = MemberPoint::getShowDays($data['show_days_index']);
-        $nb->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
         if (isset($data['remark'])) {
             $nb->setRemark($data['remark']);
         }
@@ -77,28 +75,11 @@ class Manager extends Service
             return false;
         }
 
-        //3.积分扣除 新车展示的积分
-        $memberPoint = new MemberPoint();
-        $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB];
-        if (service('member/query')->isPrivilege($member)) {
-            $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_NB] * 0.8;
-        }
-
-        $showPoints = $points - $point;
-        $memberPoint->setMemberId($member->getId())
-            ->setNewBikeId($nb->getId())
-            ->setType(MemberPoint::TYPE_SHOW_NB)
-            ->setValue($showPoints);
-        if (!$memberPoint->save()) {
-            $this->db->rollback();
-            return false;
-        }
-
         $this->db->commit();
         return $nb->getId();
     }
 
-    public function update($member, $data, $needPoints = 0)
+    public function update($member, $data)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -134,27 +115,6 @@ class Manager extends Service
             $nb->setRemark($data['remark']);
         }
 
-        //如果有增加积分的操作
-        if ($needPoints > 0) {
-            if (!$member->setPoints($member->getPoints() - $needPoints)->save()) {
-                $this->db->rollback();
-                return false;
-            }
-            //3.积分扣除 新车展示的积分
-            $memberPoint = new MemberPoint();
-            $memberPoint->setMemberId($member->getId())
-                ->setType(MemberPoint::TYPE_SHOW_NB)
-                ->setNewBikeId($nb->getId())
-                ->setValue($needPoints);
-            if (!$memberPoint->save()) {
-                $this->db->rollback();
-                return false;
-            }
-        }
-
-        $showDays = MemberPoint::getShowDays($data['show_days_index']);
-        $nb->setAvailTime(date("Y-m-d H:i:s", strtotime($nb->getAvailTime()) + $showDays * 3600 * 24));
-
         if (!$nb->save()) {
             $this->db->rollback();
             return false;
@@ -164,7 +124,7 @@ class Manager extends Service
         return $nb->getId();
     }
 
-    public function repub($member, $data, $needPoints)
+    public function repub($member, $data)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -186,24 +146,6 @@ class Manager extends Service
             ->setStatus(NewBike::STATUS_CREATE);
         if (isset($data['remark'])) {
             $nb->setRemark($data['remark']);
-        }
-
-        //如果有增加积分的操作
-        if ($needPoints > 0) {
-            if (!$member->setPoints($member->getPoints() - $needPoints)->save()) {
-                $this->db->rollback();
-                return false;
-            }
-            //3.积分扣除 新车展示的积分
-            $memberPoint = new MemberPoint();
-            $memberPoint->setMemberId($member->getId())
-                ->setType(MemberPoint::TYPE_SHOW_NB)
-                ->setNewBikeId($nb->getId())
-                ->setValue($needPoints);
-            if (!$memberPoint->save()) {
-                $this->db->rollback();
-                return false;
-            }
         }
 
         if (!$nb->save()) {
@@ -235,31 +177,10 @@ class Manager extends Service
 
     public function returnPoints($member, $nb)
     {
-        $this->db->begin();
         //2.积分取消扣除 发布新车的积分
         if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_NB_REFUSE, null, null, null, $nb->getId())) {
-            $this->db->rollback();
             return false;
         }
-        //3.积分取消扣除 新车展示天数
-        if ($memberPoint = MemberPoint::findFirst('member_id = ' . $member->getId() . ' AND type = ' . MemberPoint::TYPE_SHOW_NB . ' AND new_bike_id = ' . $nb->getId() . ' order by id DESC')) {
-            $showPoints = $memberPoint->getValue();
-            $memberPointModel = new MemberPoint();
-            $memberPointModel->setMemberId($member->getId())
-                ->setType(MemberPoint::TYPE_SHOW_NB_REFUSE)
-                ->setValue($showPoints);
-            if (!$memberPointModel->save()) {
-                $this->db->rollback();
-                return false;
-            }
-            if (!$member->setPoints($member->getPoints() + $showPoints)->save()) {
-                $this->db->rollback();
-                return false;
-            }
-        }
-
-
-        $this->db->commit();
         return true;
     }
 }

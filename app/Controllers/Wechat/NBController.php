@@ -35,7 +35,7 @@ class NBController extends WechatAuthController
         $member = Member::findFirst($this->currentMember->getId());
         //需要首先判断用户积分是否足够
         $data = $this->data;
-        if (!$points = service("nb/query")->hasEnoughPoint($member, $data['show_days_index'])) {
+        if (!$points = service("nb/query")->hasEnoughPoint($member)) {
             return $this->error("积分不足");
         }
         if (!$repair = Repair::findFirstByBelongerId($member->getId())) {
@@ -44,7 +44,7 @@ class NBController extends WechatAuthController
         if ($repair->getStatus() != Repair::STATUS_PASS) {
             return $this->error("您的店铺尚未审核通过");
         }
-        if ($newBikeId = service("nb/manager")->create($member, $repair, $data, $points)) {
+        if ($newBikeId = service("nb/manager")->create($member, $repair, $data)) {
             return $this->success([
                 "nb_id" => $newBikeId
             ]);
@@ -60,19 +60,7 @@ class NBController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = $this->data;
-
-        if ($data['show_days_index'] != 0) {
-            $member = Member::findFirst($member->getId());
-            $needPoints = MemberPoint::getShowDays($data['show_days_index']) * 10;
-            if (service('member/query')->isPrivilege($member)) {
-                $needPoints = $needPoints * 0.8;
-            }
-            if ($member->getPoints() < abs($needPoints)) {
-                return $this->error('积分不足');
-            }
-        }
-
-        if ($nbId = service("nb/manager")->update($member, $data, $needPoints)) {
+        if ($nbId = service("nb/manager")->update($member, $data)) {
             return $this->success();
         }
         return $this->error();
@@ -87,24 +75,7 @@ class NBController extends WechatAuthController
         $member = $this->currentMember;
         $data = $this->data;
 
-        $needPoints = 0;
-        if ($data['show_days_index'] != 0) {
-            $member = Member::findFirst($member->getId());
-            $needPoints = MemberPoint::getShowDays($data['show_days_index']) * 10;
-            if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
-                $needPoints = $needPoints * 0.8;
-            }
-            if ($member->getPoints() < $needPoints) {
-                return $this->error('积分不足');
-            }
-        }
-
-        $nb = NewBikes::findFirst($data['id']);
-        if (strtotime($nb->getAvailTime()) < time() && $data['show_days_index'] == 0) {
-            return $this->error('您尚未设置展示天数');
-        }
-
-        if ($shbId = service("nb/manager")->repub($member, $data, $needPoints)) {
+        if ($nbId = service("nb/manager")->repub($member, $data)) {
             return $this->success();
         }
         return $this->error();

@@ -116,11 +116,6 @@ class NbController extends AdminAuthController
         if ($newBike = NewBike::findFirst($request['bike_id'])) {
             if ($request['type'] == 'pass') {
                 $status = NewBike::STATUS_AUTH;
-                //弥补审核的时间差
-                $memberPoint = MemberPoint::findFirst('new_bike_id = ' . $request['nb_id'] . ' AND type = ' . MemberPoint::TYPE_PUBLISH_NB . ' ORDER BY id DESC');
-                $memberPointModel = new MemberPoint();
-                $showDays = $memberPointModel->getShowDaysByPoints($memberPoint);
-                $newBike->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
             } else {
                 if ($newBike->getStatus() == NewBike::STATUS_DENIED) {
                     return $this->error('无法重复拒绝');

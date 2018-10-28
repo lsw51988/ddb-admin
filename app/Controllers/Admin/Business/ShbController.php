@@ -116,11 +116,6 @@ class ShbController extends AdminAuthController
         if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
             if ($request['type'] == 'pass') {
                 $status = SecondBike::STATUS_AUTH;
-                //弥补审核的时间差
-                $memberPoint = MemberPoint::findFirst('second_bike_id = ' . $request['shb_id'] . ' AND type = ' . MemberPoint::TYPE_PUBLISH_SHB . ' ORDER BY id DESC');
-                $memberPointModel = new MemberPoint();
-                $showDays = $memberPointModel->getShowDaysByPoints($memberPoint);
-                $secondBike->setAvailTime(date("Y-m-d H:i:s", strtotime("+$showDays day")));
             } else {
                 if ($secondBike->getStatus() == SecondBike::STATUS_DENIED) {
                     return $this->error('无法重复拒绝');

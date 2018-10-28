@@ -172,7 +172,7 @@ class Manager extends Service
     //每日发送短信上限为10条
     public function canSend($mobile)
     {
-        if (SmsCode::count("mobile=" . $mobile . " AND created_at>='" . Date("Y-m-d 00:00:00", time()) . "'") > 10) {
+        if (SmsCode::count("mobile=" . $mobile . " AND created_at>='" . date("Y-m-d 00:00:00", time()) . "'") > 10) {
             return false;
         }
         return true;

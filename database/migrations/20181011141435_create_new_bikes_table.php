@@ -39,7 +39,6 @@ class CreateNewBikesTable extends AbstractMigration
             ->addColumn("battery_brand", "string", ["limit" => MysqlAdapter::INT_TINY,"null" => false, "comment" => "电池品牌"])
             ->addColumn("distance", "integer", ["limit" => MysqlAdapter::INT_TINY,"null" => false, "comment" => "满负荷公里数"])
             ->addColumn("guarantee_period", "integer", ["limit" => MysqlAdapter::INT_TINY,"null" => false, "comment" => "质保期（月）"])
-            ->addColumn("avail_time","timestamp", [ "null" => false, "comment" => "有效展示时间"])
             ->addColumn("province", "string", ['limit' => 8,"null" => false, "comment" => "所在省"])
             ->addColumn("city", "string", ['limit' => 8,"null" => false, "comment" => "所在市"])
             ->addColumn("district", "string", ['limit' => 8,"null" => false, "comment" => "所在区"])

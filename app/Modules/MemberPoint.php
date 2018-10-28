@@ -48,8 +48,6 @@ class MemberPoint extends MemberPoints
     const TYPE_REFRESH_SHB = -7;
     const TYPE_REFRESH_NB = -8;
     const TYPE_PUBLISH_NB = -9;
-    const TYPE_SHOW_NB = -10;
-    const TYPE_SHOW_SHB = -11;
 
     const TYPE_PRIVILEGE_ONE_MONTH = -12;
     const TYPE_PRIVILEGE_THREE_MONTH = -13;
@@ -94,8 +92,6 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_SHB => "刷新二手车排名",
         self::TYPE_REFRESH_NB => "刷新新车排名",
         self::TYPE_PUBLISH_NB => "发布新车信息",
-        self::TYPE_SHOW_NB => "展示新车信息",
-        self::TYPE_SHOW_SHB => "展示二手车信息",
 
         self::TYPE_SHOW_SHB_REFUSE => "拒绝展示二手车信息",
         self::TYPE_PUBLISH_SHB_REFUSE => "拒绝发布二手车信息",
@@ -142,8 +138,6 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_SHB => -10,
         self::TYPE_REFRESH_NB => -10,
         self::TYPE_PUBLISH_NB => -100,
-        self::TYPE_SHOW_NB => -10,
-        self::TYPE_SHOW_SHB => -10,
 
         self::TYPE_PRIVILEGE_ONE_MONTH => -100,
         self::TYPE_PRIVILEGE_THREE_MONTH => -280,
@@ -211,44 +205,4 @@ class MemberPoint extends MemberPoints
         }
         return $month;
     }
-
-    //根据选择展示天数key获取对应天数
-    public static function getShowDays($index)
-    {
-        $days = 0;
-        switch ($index) {
-            case 1:
-                $days = 7;
-                break;
-            case 2:
-                $days = 14;
-                break;
-            case 3:
-                $days = 30;
-                break;
-            case 4:
-                $days = 90;
-                break;
-            case 5:
-                $days = 180;
-                break;
-            case 6:
-                $days = 365;
-                break;
-        }
-        return $days;
-    }
-
-    public function getShowDaysByPoints($memberPoint)
-    {
-        $points = $memberPoint->getValue();
-        $member = Member::findFirst($memberPoint->getMemberId());
-        if (service('member/query')->isPrivilege($member)) {
-            $days = $points / 8;
-        } else {
-            $days = $points / 10;
-        }
-        return $days;
-    }
-
 }
