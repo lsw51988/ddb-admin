@@ -33,7 +33,7 @@ class Query extends Service
 
     public function getList($search = [])
     {
-        $columns = "id,brand_name,price,city,district,detail_addr,status,avail_time,voltage";
+        $columns = "id,brand_name,price,city,district,detail_addr,status,voltage";
         $conditions = "1=1";
 
         if (!empty($search['district'])) {
