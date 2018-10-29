@@ -6,7 +6,7 @@
  * Date: 2018/10/29
  * Time: 21:35
  */
-namespace Ddb\Service\Bikerefresh;
+namespace Ddb\Service\Refresh;
 
 use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\Member;
