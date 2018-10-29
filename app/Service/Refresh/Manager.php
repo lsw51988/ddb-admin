@@ -12,6 +12,8 @@ use Ddb\Core\Service;
 use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
+use Ddb\Modules\NewBike;
+use Ddb\Modules\SecondBike;
 
 class Manager extends Service
 {
@@ -31,8 +33,18 @@ class Manager extends Service
                     $this->db->rollback();
                     return false;
                 }
+                $newBike = NewBike::findFirst($data['bike_id']);
+                if (!$newBike->setUpdatedAt(date('Y-m-d H:i:s'))->save()) {
+                    $this->db->rollback();
+                    return false;
+                }
             } else {
                 if (!service('point/manager')->create($member, MemberPoint::TYPE_REFRESH_SHB, $data['bike_id'])) {
+                    $this->db->rollback();
+                    return false;
+                }
+                $secondBike = SecondBike::findFirst($data['bike_id']);
+                if (!$secondBike->setUpdatedAt(date('Y-m-d H:i:s'))->save()) {
                     $this->db->rollback();
                     return false;
                 }
