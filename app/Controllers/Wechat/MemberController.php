@@ -366,11 +366,11 @@ class MemberController extends WechatAuthController
         $bikeId = $request['bike_id'];
         $request['member_id'] = $this->currentMember->id;
         $needPoint = false;
-        if ($count = BikeRefresh::where("type = $type AND bike_id = $bikeId")->count() < 3) {
+        if ($count = BikeRefresh::where("type = $type AND bike_id = $bikeId AND created_at >= '" . date('Y-m-d 00:00:00') . "'")->count() < 3) {
             $needPoint = true;
         }
         if (service('bikeRefresh/manage')->refresh($request, $needPoint)) {
-            $count = 2-$count;
+            $count = 2 - $count;
             return $this->success($count);
         }
         return $this->error();
