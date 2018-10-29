@@ -9,9 +9,9 @@
 namespace Ddb\Modules;
 
 
-use Ddb\Models\BaseModel;
+use Ddb\Models\BikeRefreshes;
 
-class BikeRefresh extends BaseModel
+class BikeRefresh extends BikeRefreshes
 {
     const TYPE_NEW = 1;
     const TYPE_SECOND = 2;
