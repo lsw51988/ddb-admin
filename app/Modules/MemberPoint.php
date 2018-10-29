@@ -54,7 +54,6 @@ class MemberPoint extends MemberPoints
     const TYPE_PRIVILEGE_SIX_MONTH = -14;
     const TYPE_PRIVILEGE_TWELVE_MONTH = -15;
 
-
     const LEVEL_BRONZE = 500;
     const LEVEL_SILVER = 1000;
     const LEVEL_GOLD = 2000;

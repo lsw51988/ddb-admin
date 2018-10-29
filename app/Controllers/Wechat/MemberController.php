@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\MemberSignCollects;
 use Ddb\Models\MemberSigns;
+use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
@@ -352,5 +353,26 @@ class MemberController extends WechatAuthController
         }
         $this->db->commit();
         return $this->success();
+    }
+
+    /**
+     * @Get("/flush")
+     * 刷新车辆
+     */
+    public function flushAction()
+    {
+        $request = $this->data;
+        $type = $request['type'];
+        $bikeId = $request['bike_id'];
+        $request['member_id'] = $this->currentMember->id;
+        $needPoint = false;
+        if ($count = BikeRefresh::where("type = $type AND bike_id = $bikeId")->count() < 3) {
+            $needPoint = true;
+        }
+        if (service('bikeRefresh/manage')->refresh($request, $needPoint)) {
+            $count = 2-$count;
+            return $this->success($count);
+        }
+        return $this->error();
     }
 }

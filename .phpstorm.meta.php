@@ -17,6 +17,7 @@ namespace PHPSTORM_META {
             'appealanswer/query' instanceof \Ddb\Service\AppealAnswer\Query,
             'appealanswer/manager' instanceof \Ddb\Service\AppealAnswer\Manager,
             'area/query' instanceof \Ddb\Service\Area\Query,
+            'bikeRefresh/manager' instanceof \Ddb\Service\BikeRefresh\Manager,
             'file/manager' instanceof \Ddb\Service\File\Manager,
             'lost/query' instanceof \Ddb\Service\Lost\Query,
             'lost/manager' instanceof \Ddb\Service\Lost\Manager,
