@@ -8,12 +8,12 @@
  */
 namespace Ddb\Service\Refresh;
 
+use Ddb\Core\Service;
 use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
-use Ddb\Service\BaseService;
 
-class Manager extends BaseService
+class Manager extends Service
 {
     public function refresh($data, $needPoint)
     {
@@ -27,12 +27,12 @@ class Manager extends BaseService
         if ($needPoint) {
             $member = Member::findFirst($data['member_id']);
             if ($data['type'] == BikeRefresh::TYPE_NEW) {
-                if (service('point/manager')->create($member, MemberPoint::TYPE_REFRESH_NB, null, null, null, $data['bike_id'])) {
+                if (!service('point/manager')->create($member, MemberPoint::TYPE_REFRESH_NB, null, null, null, $data['bike_id'])) {
                     $this->db->rollback();
                     return false;
                 }
             } else {
-                if (service('point/manager')->create($member, MemberPoint::TYPE_REFRESH_SHB, $data['bike_id'])) {
+                if (!service('point/manager')->create($member, MemberPoint::TYPE_REFRESH_SHB, $data['bike_id'])) {
                     $this->db->rollback();
                     return false;
                 }
