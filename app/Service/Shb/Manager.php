@@ -13,14 +13,13 @@ use Ddb\Core\Service;
 use Ddb\Models\Areas;
 use Ddb\Models\SecondBikes;
 use Ddb\Models\SecondBikeBrowses;
-use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\SecondBike;
 
 class Manager extends Service
 {
-    public function create($member, $data)
+    public function create($member, $data, $points)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -38,7 +37,7 @@ class Manager extends Service
             $provinceCode = $data['province'];
             $cityCode = $data['city'];
             $districtCode = $data['district'];
-            app_log()->info("获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
+            app_log()->info("创建二手车时，获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
         }
         $shb->setMemberId($member->getId())
             ->setBuyDate($data['buy_date'])
@@ -60,6 +59,13 @@ class Manager extends Service
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
+
+        //2.积分扣除 发布二手车的积分
+        if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB, $shb->getId())) {
+            $this->db->rollback();
+            return false;
+        }
+
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
@@ -91,23 +97,26 @@ class Manager extends Service
             ->setDistrict($data['district'])
             ->setDetailAddr($data['detail_addr'])
             ->setNumber($data['number']);
+        if ($area = Areas::findFirst("province_name='" . $data['province'] . "' AND city_name='" . $data['city'] . "' AND district_name='" . $data['district'] . "'")) {
+            $shb->setProvinceCode($area->getProvinceCode())
+                ->setCityCode($area->getCityCode())
+                ->setDistrictCode($area->getDistrictCode());
+        } else {
+            app_log()->info("更新二手车时，获取地址信息失败：省==" . $data['province'] . " 市==" . $data['city'] . " 区==" . $data['district']);
+        }
         if (isset($data['remark'])) {
             $shb->setRemark($data['remark']);
         }
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
+
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
-        }
-        //扣除积分
-        $currentMember = Member::findFirst($member->getId());
-        if (service("point/manager")->create($currentMember, MemberPoint::TYPE_UPDATE_SHB, $shb->getId())) {
+        } else {
             $this->db->commit();
             return $shb->getId();
-        } else {
-            return false;
         }
     }
 
@@ -141,18 +150,13 @@ class Manager extends Service
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
             $shb->setLastChangeTime($data['last_change_time']);
         }
+
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
         }
-        //扣除积分
-        $currentMember = Member::findFirst($member->getId());
-        if (service("point/manager")->create($currentMember, MemberPoint::TYPE_REPUB_SHB, $shb->getId())) {
-            $this->db->commit();
-            return $shb->getId();
-        } else {
-            return false;
-        }
+        $this->db->commit();
+        return $shb->getId();
     }
 
     public function browse($member, $id)
@@ -171,5 +175,14 @@ class Manager extends Service
         ]);
         $secondBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
             ->save();
+    }
+
+    public function returnPoints($member, $shb)
+    {
+        //2.积分取消扣除 发布二手车的积分
+        if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB_REFUSE, $shb->getId())) {
+            return false;
+        }
+        return true;
     }
 }

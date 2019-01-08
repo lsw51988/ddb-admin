@@ -24,18 +24,14 @@ class Repair extends Repairs
 
     /**
      * status
-     * 1被主人创建 2被非主人创建 3后台审核通过 4后台审核拒绝
+     * 1被创建 2后台审核通过 3后台审核拒绝
      */
-    const STATUS_OWNER_CREATE = 1;
-    const STATUS_NOT_OWNER_CREATE = 2;
-    const STATUS_CLAIM = 3;
-    const STATUS_PASS = 4;
-    const STATUS_REFUSE = 5;
+    const STATUS_CREATE = 1;
+    const STATUS_PASS = 2;
+    const STATUS_REFUSE = 3;
 
     public static $statusDesc = [
-        self::STATUS_OWNER_CREATE=>"被主人创建",
-        self::STATUS_NOT_OWNER_CREATE=>"被非主人创建",
-        self::STATUS_CLAIM=>"主人认领",
+        self::STATUS_CREATE=>"被创建",
         self::STATUS_PASS=>"后台审核通过",
         self::STATUS_REFUSE=>"后台审核拒绝"
     ];

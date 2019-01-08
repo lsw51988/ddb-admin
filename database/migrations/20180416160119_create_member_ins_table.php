@@ -27,6 +27,7 @@ class CreateMemberInsTable extends AbstractMigration
      * Remember to call "create()" or "update()" and NOT "save()" when working
      * with the Table class.
      */
+    //用户每日进入时间
     public function change()
     {
         $this->table("member_ins")

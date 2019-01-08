@@ -74,24 +74,39 @@ class IndexController extends BaseController
         if (!$member->getUnionId()) {
             di("cache")->save($member->getId() . '_sessionKey', $sessionKey, 30 * 24 * 3600);
         }
+        $repairFlag = service("member/query")->isRepair($member);
+        $unionFlag = $member->getUnionId() == null ? false : true;
+        $retData = [
+            "token" => $member->getToken(),
+            "avatarUrl" => $member->getAvatarUrl(),
+            "nickName" => $member->getNickName(),
+            "auth_time" => $member->getAuthTime(),
+            "mobile" => $member->getMobile(),
+            "id" => $member->getId(),
+            "union_flag" => $unionFlag,
+            "repair_flag" => $repairFlag,
+        ];
         if ($location->status == 0) {
             service("member/manager")->saveLocation($member, $location);
-            $repairFlag = service("member/query")->isRepair($member);
-            $unionFlag = $member->getUnionId() == null ? false : true;
-            return $this->success([
-                "token" => $member->getToken(),
-                "avatarUrl" => $member->getAvatarUrl(),
-                "nickName" => $member->getNickName(),
-                "auth_time" => $member->getAuthTime(),
-                "mobile" => $member->getMobile(),
-                "id" => $member->getId(),
-                "union_flag" => $unionFlag,
-                "repair_flag" => $repairFlag,
-                "location" => [$location->result->address_component->province, $location->result->address_component->city, $location->result->address_component->district]
-            ]);
-        } else {
-            return $this->success($location);
+            $retData['location'] = [
+                $location->result->address_component->province,
+                $location->result->address_component->city,
+                $location->result->address_component->district
+            ];
+        }else{
+            $retData['location'] = [
+                '未知',
+                '未知',
+                '未知'
+            ];
         }
+        if(service('member/query')->isPrivilege($member)){
+            $retData['privilege_time'] = $member->getPrivilegeTime();
+            $retData['is_privilege'] = true;
+        }else{
+            $retData['is_privilege'] = false;
+        }
+        return $this->success($retData);
     }
 
     /**
@@ -179,6 +194,12 @@ class IndexController extends BaseController
             $rData['token'] = $member->getToken();
             $rData['union_flag'] = $unionFlag;
             $rData['location'] = [$memberLocation->getProvince(), $memberLocation->getCity(), $memberLocation->getDistrict()];
+            if(service('member/query')->isPrivilege($member)){
+                $rData['privilege_time'] = $member->getPrivilegeTime();
+                $rData['is_privilege'] = true;
+            }else{
+                $rData['is_privilege'] = false;
+            }
             return $this->error($rData);
         }
     }

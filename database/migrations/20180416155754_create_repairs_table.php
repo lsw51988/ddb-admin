@@ -31,7 +31,6 @@ class CreateRepairsTable extends AbstractMigration
     {
         $this->table("repairs")
             ->addColumn("name", "string", ["limit" => 20, "null" => false, "comment" => "名称"])
-            ->addColumn("address", "string", ["limit" => 60, "null" => false, "comment" => "地址"])
             ->addColumn("belonger_name", "string", ["limit" => 20, "null" => false, "comment" => "店主姓名或姓氏"])
             ->addColumn("type", "integer", ["limit" => 20, "default" => 0, "comment" => "类型 0电动车维修点 1电动车维修兼销售点 2便民开锁点"])
             ->addColumn("longitude", "string", ["limit" => 10, "null" => false, "comment" => "经度"])
@@ -39,6 +38,7 @@ class CreateRepairsTable extends AbstractMigration
             ->addColumn("province", "string", ["comment" => "所在省", "limit" => 6, "null" => false])
             ->addColumn("city", "string", ["comment" => "所在市", "limit" => 6, "null" => false])
             ->addColumn("district", "string", ["comment" => "所在区", "limit" => 6, "null" => false])
+            ->addColumn("address", "string", ["limit" => 60, "null" => false, "comment" => "详细街道地址"])
             ->addColumn("mobile", "string", ["limit" => 11, "null" => false, "comment" => "手机号码"])
             ->addColumn("remark", "string", ["limit" => 60, "null" => true, "comment" => "备注,更好辨识地址"])
             ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "创建人id"])

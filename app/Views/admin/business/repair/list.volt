@@ -15,14 +15,15 @@
         <form id="form" class="layui-form layui-container" action="">
             <div class="layui-row layui-form-item ">
                 <div class="layui-col-md4">
-                    <label class="layui-form-label">姓名</label>
+                    <label class="layui-form-label" style="width: 100px;">姓名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="name" placeholder="请输入姓名" autocomplete="off" class="layui-input"
-                               value="{{ search['name'] }}">
+                        <input type="text" name="belonger_name" placeholder="请输入姓名" autocomplete="off"
+                               class="layui-input"
+                               value="{{ search['belonger_name'] }}">
                     </div>
                 </div>
                 <div class="layui-col-md4">
-                    <label class="layui-form-label">手机号</label>
+                    <label class="layui-form-label" style="width: 100px;">手机号</label>
                     <div class="layui-input-block">
                         <input type="text" name="mobile" placeholder="请输入手机号" autocomplete="off" class="layui-input"
                                value="{{ search['mobile'] }}">
@@ -31,8 +32,8 @@
             </div>
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
-                    <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin-right: 10px;">
+                    <label class="layui-form-label" style="width: 100px;">区域</label>
+                    <div class="layui-col-md2" style="margin: 0 10px 0 10px;">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
@@ -48,8 +49,10 @@
             </div>
             <div class="layui-row layui-form-item ">
                 <div class="layui-col-md12">
-                    <label class="layui-form-label">类型</label>
+                    <label class="layui-form-label" style="width: 100px;">类型</label>
                     <div class="layui-input-block">
+                        <input type="radio" name="type" value="0" title="全部"
+                               {% if (search['type']==99 OR search['type']=='') %}checked{% endif %}>
                         <input type="radio" name="type" value="0" title="电动车维修点"
                                {% if search['type']==0 %}checked{% endif %}>
                         <input type="radio" name="type" value="1" title="电动车维修兼销售点"
@@ -61,7 +64,7 @@
             </div>
             <div class="layui-row layui-form-item ">
                 <div class="layui-col-md12">
-                    <label class="layui-form-label">审核状态</label>
+                    <label class="layui-form-label" style="width: 100px;">审核状态</label>
                     <div class="layui-input-block">
                         <input type="radio" name="status" value="99" title="全部"
                                {% if search['status']==99 %}checked{% endif %}>
@@ -83,16 +86,18 @@
 
     <table class="layui-table">
         <colgroup>
+            <col width="80">
+            <col width="150">
+            <col width="120">
             <col width="120">
             <col width="150">
             <col width="120">
-            <col width="150">
             <col width="120">
             <col width="120">
+            <col width="80">
             <col width="120">
             <col width="120">
-            <col width="120">
-            <col width="120">
+            <col width="100">
             <col>
         </colgroup>
         <thead>
@@ -100,6 +105,8 @@
             <th>ID</th>
             <th>维修点名称</th>
             <th>归属人名称</th>
+            <th>地址</th>
+            <th>详细地址</th>
             <th>类型</th>
             <th>手机</th>
             <th>备注</th>
@@ -116,13 +123,15 @@
                 <td>{{ repair['id'] }}</td>
                 <td>{{ repair['name'] }}</td>
                 <td>{{ repair['belonger_name'] }}</td>
+                <td>{{ repair['province_name'] }}{{ repair['city_name'] }}{{ repair['district_name'] }}</td>
+                <td>{{ repair['address'] }}</td>
                 <td>{{ repair['type']=="0"?"电动车维修点":repair['type']=="1"?"电动车维修兼销售点":"便民开锁点" }}</td>
                 <td>{{ repair['mobile'] }}</td>
                 <td>{{ repair['remark'] }}</td>
-                <td>{{ repair['status'] }}</td>
+                <td>{% if repair["status"]==1 %}被创建{% elseif repair["status"]==2 %}后台审核通过 {% else %}后台审核拒绝{% endif %}</td>
                 <td>{{ repair['refuse_reason'] }}</td>
                 <td>{{ repair['created_at'] }}</td>
-                <td>{{ repair['create_by_type'] }}</td>
+                <td>{% if repair["create_by_type"]==1 %}member{% else %}user{% endif %}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ repair['id'] }}">查看照片</button>
                     <button class="layui-btn layui-btn-normal edit" data-id="{{ repair['id'] }}">修改</button>
@@ -198,7 +207,7 @@
                 var repair_id = $(this).data('id');
                 $.ajax({
                     url: "/admin/business/repair/" + repair_id + "/imgs",
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
                         if (res.status) {
                             var data = res.data;
@@ -211,7 +220,7 @@
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px','200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
@@ -324,7 +333,7 @@
                 var layer_load = layer.load();
                 $.ajax({
                     url: "/admin/business/repair",
-                    method: "POST",
+                    type: "POST",
                     data: {
                         'mobile': mobile,
                         'name': name,

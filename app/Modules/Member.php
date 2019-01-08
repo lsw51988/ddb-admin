@@ -21,6 +21,9 @@ class Member extends Members
     const STATUS_AUTHED = 3;
     const STATUS_AUTH_DENIED = 4;
 
+    const IS_NOT_PRIVILEGE = 0;
+    const IS_PRIVILEGE = 1;
+
     public function afterUpdate()
     {
         $token = $this->getToken();

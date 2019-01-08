@@ -138,7 +138,7 @@
                 var member_id = $(this).data('id');
                 $.ajax({
                     url: "/admin/business/member/" + member_id + "/imgs",
-                    method: "GET",
+                    type: "GET",
                     success: function (res) {
                         if(res.status){
                             var data = res.data;
@@ -147,7 +147,7 @@
                             }
                             layer.open({
                                 type: 1,
-                                area: '500px',
+                                area: ['500px','200px'],
                                 content: $("#viewer")
                             });
                             $("#viewer").show();
@@ -245,7 +245,7 @@
                 getDistricts(id);
             })
             $("#reset").click(function(){
-                window.location.href="/admin/business/member/list";
+                window.location.href="/admin/business/shb/list";
             });
             $(".check").click(function () {
                 console.log($(this).data('id'));

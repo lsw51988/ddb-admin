@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\Areas;
 use Ddb\Models\RepairAuthImages;
 use Ddb\Models\RepairImages;
 use Ddb\Modules\Member;
@@ -51,6 +52,17 @@ class RepairsController extends WechatAuthController
             ->setAddress($data['address'])
             ->setCreateBy($member->getId())
             ->setStatus(Repair::STATUS_NOT_OWNER_CREATE);
+        $location = service("member/manager")->getLocation($data['latitude'], $data['longitude']);
+        if ($location->status != 0) {
+            $repair->setProvince('未知')
+                ->setCity('未知')
+                ->setDistrict('未知');
+        } else {
+            $area = Areas::findFirstByDistrictName($location->result->address_component->district);
+            $repair->setProvince($area->getProvinceCode())
+                ->setCity($area->getCityCode())
+                ->setDistrict($area->getDistrictCode());
+        }
         if ($data['belong_creator'] == 1) {
             $repair->setBelongerId($member->getId())
                 ->setStatus(Repair::STATUS_OWNER_CREATE);

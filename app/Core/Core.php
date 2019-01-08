@@ -82,3 +82,25 @@ if (!function_exists('service')) {
         return di($serviceName, $parameters);
     }
 }
+if (!function_exists('ok')) {
+    function ok($arr, $key)
+    {
+        if (isset($arr[$key]) && $arr[$key] != "") {
+            return true;
+        }
+        return false;
+    }
+}
+
+if (!function_exists('set_default_values')) {
+    function set_default_values(&$data, $keys)
+    {
+        foreach ($keys as $key) {
+            if (!ok($data, $key)) {
+                $data[$key] = "";
+            }
+        }
+        return $data;
+    }
+}
+

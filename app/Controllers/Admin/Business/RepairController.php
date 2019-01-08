@@ -51,10 +51,30 @@ class RepairController extends AdminAuthController
         $request = $this->request->get();
         $request['limit'] = $this->limit;
         $request['page'] = $this->page;
-        $request['real_name'] = isset($request['real_name']) ? $request['real_name'] : "";
-        $request['mobile'] = isset($request['mobile']) ? $request['mobile'] : "";
+        set_default_values($request, ['belonger_name', 'mobile', 'province', 'city', 'district']);
         $request['status'] = isset($request['status']) ? $request['status'] : 99;
         $request['type'] = isset($request['type']) ? $request['type'] : 99;
+        $data = service("repair/query")->getList($request);
+        $this->view->setVars([
+            'page' => $this->page,
+            'data' => $data->items->toArray(),
+            'total' => $data->total_items,
+            'search' => $request
+        ]);
+    }
+
+    /**
+     * @Get("/to_auth")
+     */
+    public function toAuthAction()
+    {
+        $request = $this->request->get();
+        $request['limit'] = $this->limit;
+        $request['page'] = $this->page;
+        set_default_values($request, ['belonger_name', 'mobile', 'province', 'city', 'district']);
+        $request['status'] = isset($request['status']) ? $request['status'] : 99;
+        $request['type'] = isset($request['type']) ? $request['type'] : 99;
+        $request['status'] = Repair::STATUS_CREATE;
         $data = service("repair/query")->getList($request);
         $this->view->setVars([
             'page' => $this->page,
@@ -82,22 +102,34 @@ class RepairController extends AdminAuthController
     }
 
     /**
-     * @Post("/audit/{id:[0-9+]}")
+     * @Post("/auth")
      * 审核
      */
-    public function authAction($id)
+    public function authAction()
     {
-
+        $request = $this->data;
+        if ($repair = Repair::findFirst($request['repair_id'])) {
+            if ($request['type'] == 'pass') {
+                $status = Repair::STATUS_PASS;
+            } else {
+                $status = Repair::STATUS_REFUSE;
+            }
+            if ($repair->setStatus($status)->save()) {
+                return $this->success();
+            }
+        }
+        return $this->error();
     }
 
     /**
      * @Post("")
      * 修改维修点的信息
      */
-    public function updateAction(){
+    public function updateAction()
+    {
         $request = $this->request->get();
-        if($repair = Repair::findFirst($request['repair_id'])){
-            if($repair->setName($request['name'])->setMobile($request['mobile'])->save()){
+        if ($repair = Repair::findFirst($request['repair_id'])) {
+            if ($repair->setName($request['name'])->setMobile($request['mobile'])->save()) {
                 return $this->success();
             }
         }

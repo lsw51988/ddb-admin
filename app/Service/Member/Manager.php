@@ -20,25 +20,6 @@ use Ddb\Helper\Wechat\WXBizDataCrypt;
 
 class Manager extends BaseService
 {
-    private static $times = 5;
-
-    public function getLocation($latitude, $longitude)
-    {
-        $url = "http://apis.map.qq.com/ws/geocoder/v1?location=" . $latitude . "," . $longitude . "&key=" . di("config")->app->tecent_addr_key;
-        $curl_data = curl_request($url);
-        $curl_data = json_decode($curl_data);
-        if ($curl_data->status == 0) {
-            return $curl_data;
-        } else {
-            self::$times--;
-            if (self::$times > 0) {
-                $this->getLocation($latitude, $longitude);
-            } else {
-                return null;
-            }
-        }
-    }
-
     public function getWechatLogin($js_code)
     {
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' . di("config")->app->APP_ID . '&secret=' . di("config")->app->APP_SECRET . '&js_code=' . $js_code . '&grant_type=authorization_code';
@@ -95,4 +76,25 @@ class Manager extends BaseService
         }
     }
 
+    public function becomePrivilege($member, $count, $type = 'day')
+    {
+        if (service('member/query')->isPrivilege($member)) {
+            $time = $member->getPrivilegeTime();
+            if ($type != 'day') {
+                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime(strtotime($time) . "+$count month")));
+            } else {
+                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime(strtotime($time) . "+$count day")));
+            }
+        } else {
+            if ($type != 'day') {
+                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime("+$count month")));
+            } else {
+                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime("+$count day")));
+            }
+        }
+        if (!$member->setPrivilege(Member::IS_PRIVILEGE)->save()) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -132,7 +132,7 @@ class Query extends BaseService
             ->from(["M" => Member::class])
             ->leftJoin(Areas::class, "A.district_code = M.district", "A")
             ->columns($columns);
-        if (!empty($request['status']) && $request['status']!=99) {
+        if (!empty($request['status']) && $request['status'] != 99) {
             $builder->andWhere("M.status=" . $request['status']);
         }
         if (!empty($request['real_name'])) {
@@ -162,5 +162,17 @@ class Query extends BaseService
         ]);
         $data = $paginator->getPaginate();
         return $data;
+    }
+
+    /**
+     * 检查用户是否会员
+     */
+    public function isPrivilege($member)
+    {
+        if ($member->getPrivilege() == Member::IS_PRIVILEGE && strtotime($member->getPrivilegeTime()) > time()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

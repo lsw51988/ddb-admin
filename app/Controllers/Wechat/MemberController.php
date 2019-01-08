@@ -10,7 +10,9 @@ namespace Ddb\Controllers\Wechat;
 
 
 use Ddb\Controllers\WechatAuthController;
+use Ddb\Models\MemberSignCollects;
 use Ddb\Models\MemberSigns;
+use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
@@ -317,11 +319,61 @@ class MemberController extends WechatAuthController
         if (MemberSigns::findFirst("member_id = " . $member->getId() . " AND created_at>='" . date("Y-m-d 00:00:00", time()) . "'")) {
             return $this->error("今日已经签过");
         } else {
-            $memberSign = new MemberSigns();
-            $memberSign->setMemberId($member->getId())->save();
-            $member = Member::findFirst($this->currentMember->getId());
-            service("point/manager")->create($member, MemberPoint::TYPE_SIGN);
-            return $this->success();
+            if ($msg = service('sign/manager')->sign($member)) {
+                return $this->success(null, $msg);
+            } else {
+                return $this->error('请稍后重试');
+            }
         }
+    }
+
+    /**
+     * @Post("/become_privilege")
+     * 成为会员
+     */
+    public function becomePrivilegeAction()
+    {
+        $request = $this->data;
+        $member = $this->currentMember;
+        if ($member->getPoints() < $request['point']) {
+            return $this->error('积分不足');
+        }
+        $type = MemberPoint::getPrivilegeType($request['point']);
+        $month = MemberPoint::getPrivilegeMonth($request['point']);
+        $this->db->begin();
+        //1.扣除积分
+        if (!service('point/manager')->create($member, $type)) {
+            $this->db->rollback();
+            return $this->error('积分扣除失败');
+        }
+        //变更会员
+        if (!service('member/manager')->becomePrivilege($member, $month, 'month')) {
+            $this->db->rollback();
+            return $this->error('更改会员失败');
+        }
+        $this->db->commit();
+        return $this->success();
+    }
+
+    /**
+     * @Get("/flush")
+     * 刷新车辆
+     */
+    public function flushAction()
+    {
+        $request = $this->data;
+        $type = $request['type'];
+        $bikeId = $request['bike_id'];
+        $request['member_id'] = $this->currentMember->id;
+        $needPoint = false;
+        $bikeRefresh = new BikeRefresh();
+        if ($count = $bikeRefresh->count("type = $type AND bike_id = $bikeId AND created_at >= '" . date('Y-m-d 00:00:00') . "'")< 3) {
+            $needPoint = true;
+        }
+        if (service("refresh/manager")->refresh($request, $needPoint)) {
+            $count = 3 - $count;
+            return $this->success($count);
+        }
+        return $this->error();
     }
 }

@@ -2,6 +2,7 @@
 
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateMembersTable extends AbstractMigration
 {
@@ -47,7 +48,9 @@ class CreateMembersTable extends AbstractMigration
             ->addColumn("open_id", "string", ["comment" => "小程序openid", "limit" => 50, "null" => true])
             ->addColumn("platform_open_id", "string", ["comment" => "微信开放平台openid", "limit" => 50, "null" => true])
             ->addColumn("union_id", "string", ["comment" => "union_id", "limit" => 50, "null" => true])
-            ->addColumn("status", "integer", ["comment" => "状态 1初次注册 2提交认证 3认证通过 4认证拒绝", "limit" => \Phinx\Db\Adapter\MysqlAdapter::INT_TINY, "default" => 1])
+            ->addColumn("status", "integer", ["comment" => "状态 1初次注册 2提交认证 3认证通过 4认证拒绝", "limit" => MysqlAdapter::INT_TINY, "default" => 1])
+            ->addColumn("privilege", "integer", ["comment" => "会员状态 0普通会员 1会员", "limit" => MysqlAdapter::INT_TINY, "default" => 0])
+            ->addColumn("privilege_time", "timestamp", ["comment" => "会员到期时间", "null" => true])
             ->addTimestamps()
             ->save();
     }
