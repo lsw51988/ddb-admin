@@ -41,6 +41,7 @@ if (!function_exists("app_log")) {
         return new \Phalcon\Logger\Adapter\File($path . DIRECTORY_SEPARATOR . $loggerName . '.log');
     }
 }
+
 if (!function_exists("curl_request")) {
     function curl_request($url, $method = "GET", $param = "")
     {
@@ -58,6 +59,7 @@ if (!function_exists("curl_request")) {
         return $result;
     }
 }
+
 if (!function_exists('service')) {
     /**
      * 利用DI容器注册和管理用户自定义的服务
