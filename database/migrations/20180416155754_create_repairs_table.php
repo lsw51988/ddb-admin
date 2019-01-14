@@ -39,7 +39,7 @@ class CreateRepairsTable extends AbstractMigration
             ->addColumn("city", "string", ["comment" => "所在市", "limit" => 6, "null" => false])
             ->addColumn("district", "string", ["comment" => "所在区", "limit" => 6, "null" => false])
             ->addColumn("address", "string", ["limit" => 60, "null" => false, "comment" => "详细街道地址"])
-            ->addColumn("mobile", "string", ["limit" => 11, "null" => false, "comment" => "手机号码"])
+            ->addColumn("mobile", "string", ["limit" => 11, "null" => true, "comment" => "手机号码"])
             ->addColumn("remark", "string", ["limit" => 60, "null" => true, "comment" => "备注,更好辨识地址"])
             ->addColumn("create_by", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "创建人id"])
             ->addColumn("create_by_type", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "创建人类型 1member 2user"])

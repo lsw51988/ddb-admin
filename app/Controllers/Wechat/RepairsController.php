@@ -33,25 +33,26 @@ class RepairsController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = $this->data;
-        //验证短信验证码
-        $mobile = $member->getMobile();
-        if (!service("sms/manager")->verify($mobile, $data['sms_code'])) {
-            return $this->error("短信验证码不正确,请重新获取");
-        }
-        if (Repair::findFirstByMobile($mobile)) {
-            return $this->error("该维修点已经添加");
-        }
         $repair = new Repair();
         $repair->setName($data['name'])
             ->setBelongerName($data['belonger_name'])
             ->setType($data['type'])
             ->setLongitude($data['longitude'])
             ->setLatitude($data['latitude'])
-            ->setMobile($data['mobile'])
             ->setRemark($data['remark'])
             ->setAddress($data['address'])
             ->setCreateBy($member->getId())
-            ->setStatus(Repair::STATUS_NOT_OWNER_CREATE);
+            ->setStatus(Repair::STATUS_CREATE);
+        if (isset($data['mobile'])) {
+            //验证短信验证码
+            if (!service("sms/manager")->verify($data['mobile'], $data['sms_code'])) {
+                return $this->error("短信验证码不正确,请重新获取");
+            }
+            if (Repair::findFirstByMobile($data['mobile'])) {
+                return $this->error("该维修点已经添加");
+            }
+            $repair->setMobile($data['mobile']);
+        }
         $location = service("member/manager")->getLocation($data['latitude'], $data['longitude']);
         if ($location->status != 0) {
             $repair->setProvince('未知')
@@ -63,10 +64,7 @@ class RepairsController extends WechatAuthController
                 ->setCity($area->getCityCode())
                 ->setDistrict($area->getDistrictCode());
         }
-        if ($data['belong_creator'] == 1) {
-            $repair->setBelongerId($member->getId())
-                ->setStatus(Repair::STATUS_OWNER_CREATE);
-        }
+
         $this->db->begin();
         if (!$repair->save()) {
             app_log()->error("用户增加维修点错误,member_id:" . $member->getId());
