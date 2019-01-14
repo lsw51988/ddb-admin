@@ -82,10 +82,10 @@ class AppealsController extends WechatAuthController
                 }
                 service("point/manager")->create($member, MemberPoint::TYPE_APPEAL_SOS, null, $appeal->getId());
             }
-            //付费拖车服务 积分奖励暂时取消,前期并不会很拥挤
-            if ($data['method'] == Appeal::METHOD_SOS) {
-                $appeal->setPoints(10);
-            }
+            //付费拖车服务 积分奖励暂时取消,前期并不会很拥挤 暂时取消拖车的服务
+//            if ($data['method'] == Appeal::METHOD_SOS) {
+//                $appeal->setPoints(10);
+//            }
             $location = service("member/manager")->getLocation($data['latitude'], $data['longitude']);
             $appeal->setMethod($data['method'])
                 ->setType($data['type'])
@@ -106,7 +106,7 @@ class AppealsController extends WechatAuthController
                     ->setDistrict($area->getDistrictCode());
             }
             if ($appeal->save()) {
-                di("cache")->delete($data['mobile'] . "_auth");
+                //di("cache")->delete($data['mobile'] . "_auth");
                 return $this->success([
                     "appeal_id" => $appeal->getId()
                 ]);
