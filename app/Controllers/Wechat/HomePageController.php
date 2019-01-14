@@ -45,6 +45,7 @@ class HomePageController extends WechatAuthController
             $data['appeal_times'] = service("appeal/query")->getAnswerCount($member);
         }
         $data['deal_times'] = service("shb/query")->getDealCount($member->getId());
+        $data['member'] = $member;
         return $this->success($data);
     }
 
