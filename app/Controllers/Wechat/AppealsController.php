@@ -59,9 +59,7 @@ class AppealsController extends WechatAuthController
             }
             $nearMts = service("repair/query")->getNearMtsByRadius($data['longitude'], $data['latitude']);
             if (sizeof($nearMts) == 0) {
-                return $this->error([
-                    "no_repairs" => true
-                ]);
+                return $this->error('附近没有记录的维修点,您如果看到可手动添加,获得很多积分哦');
             }
             if (!ok($data, 'desc')) {
                 return $this->error("请描述您的问题");
