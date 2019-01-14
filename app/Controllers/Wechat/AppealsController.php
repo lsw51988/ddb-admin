@@ -83,7 +83,6 @@ class AppealsController extends WechatAuthController
                     return $this->error("积分不足");
                 }
                 service("point/manager")->create($member, MemberPoint::TYPE_APPEAL_SOS, null, $appeal->getId());
-                $member->setPoints($member->getPoints() + MemberPoint::TYPE_APPEAL_SOS)->save();
             }
             //付费拖车服务 积分奖励暂时取消,前期并不会很拥挤
             if ($data['method'] == Appeal::METHOD_SOS) {
