@@ -43,7 +43,7 @@ class RepairsController extends WechatAuthController
             ->setAddress($data['address'])
             ->setCreateBy($member->getId())
             ->setStatus(Repair::STATUS_CREATE);
-        if (isset($data['mobile'])) {
+        if (ok($data, 'mobile')) {
             //验证短信验证码
             if (!service("sms/manager")->verify($data['mobile'], $data['sms_code'])) {
                 return $this->error("短信验证码不正确,请重新获取");
@@ -64,7 +64,6 @@ class RepairsController extends WechatAuthController
                 ->setCity($area->getCityCode())
                 ->setDistrict($area->getDistrictCode());
         }
-
         $this->db->begin();
         if (!$repair->save()) {
             app_log()->error("用户增加维修点错误,member_id:" . $member->getId());
