@@ -117,8 +117,7 @@ class LostController extends WechatAuthController
     /**
      * @Get("/list")
      */
-    public
-    function listAction()
+    public function listAction()
     {
         $member = $this->currentMember;
         $data = $this->data;
@@ -138,8 +137,7 @@ class LostController extends WechatAuthController
      * @Get("/contact/{id:[0-9]+}")
      * 联系相应发布者
      */
-    public
-    function contactAction($id)
+    public function contactAction($id)
     {
         $member = $this->currentMember;
         service("lost/manager")->contact($member, $id);
@@ -151,8 +149,7 @@ class LostController extends WechatAuthController
      * id值得是lostBikeId
      * 详情
      */
-    public
-    function detailAction($id)
+    public function detailAction($id)
     {
         $data = service("lost/query")->getDetail($id);
         return $this->success($data);
@@ -162,12 +159,10 @@ class LostController extends WechatAuthController
      * @Get("/browse/{id:[0-9]+}")
      * 浏览详情
      */
-    public
-    function browseAction($id)
+    public function browseAction($id)
     {
         $member = $this->currentMember;
         service("lost/manager")->browse($member, $id);
         return $this->success();
     }
-
 }

@@ -11,6 +11,9 @@ namespace Ddb\Service\Lost;
 
 use Ddb\Core\Service;
 use Ddb\Models\LostBikeContacts;
+use Ddb\Modules\LostBike;
+use Ddb\Modules\Member;
+use Ddb\Modules\MemberPoint;
 
 class Manager extends Service
 {
@@ -30,5 +33,29 @@ class Manager extends Service
         $lostBikeBrowse->setMemberId($member->getId())
             ->setLostBikeId($id)
             ->save();
+    }
+
+    public function auth(LostBike $lostBike,$request){
+        if ($request['type'] == 'pass') {
+            $status = LostBike::STATUS_PASS;
+        } else {
+            $status = LostBike::STATUS_REFUSE;
+            $lostBike->setReason($request['reason']);
+        }
+        $this->db->begin();
+        if (!$lostBike->setStatus($status)->save()) {
+            $this->db->rollback();
+            return false;
+        }
+        if($status == LostBike::STATUS_REFUSE){
+            //取消扣除积分
+            $member = Member::findFirst($lostBike->getMemberId());
+            if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_LB_REFUSE, null, null, $request['bike_id'], null)) {
+                $this->db->rollback();
+                return false;
+            }
+        }
+        $this->db->commit();
+        return true;
     }
 }
