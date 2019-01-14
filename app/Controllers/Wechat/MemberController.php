@@ -238,6 +238,9 @@ class MemberController extends WechatAuthController
                 $this->db->rollback();
                 return $this->error();
             }
+            if (!ok($data, 'nick_name')) {
+                $data['nick_name'] = '骑行侠';
+            }
             $currentMember->setNickName($data['nick_name'])->setAvatarUrl($path);
             if (!$currentMember->save()) {
                 $this->db->rollback();
@@ -367,7 +370,7 @@ class MemberController extends WechatAuthController
         $request['member_id'] = $this->currentMember->id;
         $needPoint = false;
         $bikeRefresh = new BikeRefresh();
-        if ($count = $bikeRefresh->count("type = $type AND bike_id = $bikeId AND created_at >= '" . date('Y-m-d 00:00:00') . "'")< 3) {
+        if ($count = $bikeRefresh->count("type = $type AND bike_id = $bikeId AND created_at >= '" . date('Y-m-d 00:00:00') . "'") < 3) {
             $needPoint = true;
         }
         if (service("refresh/manager")->refresh($request, $needPoint)) {
