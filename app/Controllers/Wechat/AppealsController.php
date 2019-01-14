@@ -42,7 +42,8 @@ class AppealsController extends WechatAuthController
             if ($appeal = Appeal::findFirst([
                 "conditions" => "created_at>='" . date("Y-m-d H:i:s", time() - 30 * 60) . "'",
                 "order" => "created_at DESC"
-            ])) {
+            ])
+            ) {
                 return $this->success([
                     "mobile" => $currentMember->getMobile(),
                     "appeal" => $appeal
@@ -53,7 +54,7 @@ class AppealsController extends WechatAuthController
                 ]);
             }
         } else {
-            if (Appeal::count("created_at>='" . date("Y-m-d 00:00:00") . "'") > 3) {
+            if (Appeal::count("created_at>='" . date("Y-m-d 00:00:00") . "' AND ask_id = " . $this->currentMember->getId()) > 3) {
                 return $this->error("一天最多只能请求3次帮助");
             }
             $nearMts = service("repair/query")->getNearMtsByRadius($data['longitude'], $data['latitude']);
@@ -62,11 +63,17 @@ class AppealsController extends WechatAuthController
                     "no_repairs" => true
                 ]);
             }
-
-            //验证短信验证码
-            if (di("cache")->get($data['mobile'] . "_auth") != $data['sms_code']) {
-                return $this->error("短信验证码不正确或过期");
+            if (!ok($data, 'desc')) {
+                return $this->error("请描述您的问题");
             }
+            //暂时取消短信验证功能
+//            if(!ok($data,'sms_code')){
+//                return $this->error("请输入验证码");
+//            }
+//            //验证短信验证码
+//            if (di("cache")->get($data['mobile'] . "_auth") != $data['sms_code']) {
+//                return $this->error("短信验证码不正确或过期");
+//            }
             if (isset($data['appeal_id'])) {
                 $appeal = Appeal::findFirst($data['appeal_id']);
             } else {

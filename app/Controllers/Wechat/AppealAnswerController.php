@@ -36,7 +36,6 @@ class AppealAnswerController extends WechatAuthController
         }else{
             return $this->error("没有任何帮助请求");
         }
-
     }
 
     /**
@@ -49,5 +48,4 @@ class AppealAnswerController extends WechatAuthController
         service("appealanswer/manager")->browse($member->getId(), $appealId);
         return $this->success();
     }
-
 }
