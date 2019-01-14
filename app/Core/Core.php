@@ -85,7 +85,7 @@ if (!function_exists('service')) {
 if (!function_exists('ok')) {
     function ok($arr, $key)
     {
-        if (isset($arr[$key]) && $arr[$key] != "") {
+        if (isset($arr[$key]) && $arr[$key] !== "") {
             return true;
         }
         return false;

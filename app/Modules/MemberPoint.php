@@ -34,10 +34,9 @@ class MemberPoint extends MemberPoints
     const TYPE_RECHARGE_500 = 19;
     const TYPE_RECHARGE_1000 = 20;
 
-    const TYPE_SHOW_SHB_REFUSE = 21;
     const TYPE_PUBLISH_SHB_REFUSE = 22;
     const TYPE_PUBLISH_NB_REFUSE = 23;
-    const TYPE_SHOW_NB_REFUSE = 24;
+    const TYPE_PUBLISH_LB_REFUSE = 25;
 
     const TYPE_PUBLISH_SHB = -1;
     const TYPE_CANCEL_APPEAL = -2;
@@ -48,6 +47,7 @@ class MemberPoint extends MemberPoints
     const TYPE_REFRESH_SHB = -7;
     const TYPE_REFRESH_NB = -8;
     const TYPE_PUBLISH_NB = -9;
+    const TYPE_PUBLISH_LB = -10;
 
     const TYPE_PRIVILEGE_ONE_MONTH = -12;
     const TYPE_PRIVILEGE_THREE_MONTH = -13;
@@ -63,9 +63,7 @@ class MemberPoint extends MemberPoints
     public static $typeDesc = [
         self::TYPE_REGISTER => "注册",
         self::TYPE_SIGN => "每日签到",
-        self::TYPE_SIGN_WEEK => "每周满签",
-        self::TYPE_SIGN_MONTH => "每月满签",
-        self::TYPE_SIGN_YEAR => "365天满签",
+
         self::TYPE_AUTH => "用户完善信息",
         self::TYPE_ADD_REPAIRS => "增加维修点",
         self::TYPE_NEW_PAGE => "第一次探索新的页面",
@@ -81,6 +79,9 @@ class MemberPoint extends MemberPoints
         self::TYPE_RECHARGE_200 => "充值200元",
         self::TYPE_RECHARGE_500 => "充值500元",
         self::TYPE_RECHARGE_1000 => "充值1000元",
+        self::TYPE_SIGN_WEEK => "每周满签",
+        self::TYPE_SIGN_MONTH => "每月满签",
+        self::TYPE_SIGN_YEAR => "365天满签",
 
         self::TYPE_PUBLISH_SHB => "发布二手车信息",
         self::TYPE_CANCEL_APPEAL => "取消帮助",
@@ -91,11 +92,11 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_SHB => "刷新二手车排名",
         self::TYPE_REFRESH_NB => "刷新新车排名",
         self::TYPE_PUBLISH_NB => "发布新车信息",
+        self::TYPE_PUBLISH_LB => "发布丢失车辆信息",
 
-        self::TYPE_SHOW_SHB_REFUSE => "拒绝展示二手车信息",
         self::TYPE_PUBLISH_SHB_REFUSE => "拒绝发布二手车信息",
         self::TYPE_PUBLISH_NB_REFUSE => "拒绝展示新车信息",
-        self::TYPE_SHOW_NB_REFUSE => "拒绝展示新车信息",
+        self::TYPE_PUBLISH_LB_REFUSE => "拒绝展示丢失车辆信息",
         self::TYPE_PRIVILEGE_ONE_MONTH => "一个月会员",
         self::TYPE_PRIVILEGE_THREE_MONTH => "三个月会员",
         self::TYPE_PRIVILEGE_SIX_MONTH => "半年会员",
@@ -123,10 +124,9 @@ class MemberPoint extends MemberPoints
         self::TYPE_RECHARGE_500 => 5200,
         self::TYPE_RECHARGE_1000 => 10500,
 
-        self::TYPE_SHOW_SHB_REFUSE => 10,
         self::TYPE_PUBLISH_SHB_REFUSE => 100,
         self::TYPE_PUBLISH_NB_REFUSE => 100,
-        self::TYPE_SHOW_NB_REFUSE => 10,
+        self::TYPE_PUBLISH_LB_REFUSE => 10,
 
         self::TYPE_PUBLISH_SHB => -100,
         self::TYPE_CANCEL_APPEAL => -10,
@@ -137,6 +137,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_SHB => -10,
         self::TYPE_REFRESH_NB => -10,
         self::TYPE_PUBLISH_NB => -100,
+        self::TYPE_PUBLISH_LB => -10,
 
         self::TYPE_PRIVILEGE_ONE_MONTH => -100,
         self::TYPE_PRIVILEGE_THREE_MONTH => -280,
