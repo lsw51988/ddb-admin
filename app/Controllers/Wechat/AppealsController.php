@@ -80,7 +80,11 @@ class AppealsController extends WechatAuthController
                 if ($member->getPoints() < 10) {
                     return $this->error("积分不足");
                 }
-                service("point/manager")->create($member, MemberPoint::TYPE_APPEAL_SOS, null, $appeal->getId());
+            }
+            $this->db->begin();
+            if(!service("point/manager")->create($member, MemberPoint::TYPE_APPEAL_SOS, null, $appeal->getId())){
+                $this->db->rollback();
+                return $this->error("扣除积分失败");
             }
             //付费拖车服务 积分奖励暂时取消,前期并不会很拥挤 暂时取消拖车的服务
 //            if ($data['method'] == Appeal::METHOD_SOS) {
@@ -105,14 +109,15 @@ class AppealsController extends WechatAuthController
                     ->setCity($area->getCityCode())
                     ->setDistrict($area->getDistrictCode());
             }
-            if ($appeal->save()) {
+            if (!$appeal->save()) {
+                $this->db->rollback();
                 //di("cache")->delete($data['mobile'] . "_auth");
                 return $this->success([
                     "appeal_id" => $appeal->getId()
                 ]);
-            } else {
-                return $this->error("保存不成功");
             }
+            $this->db->commit();
+            return $this->success();
         }
     }
 
