@@ -22,6 +22,8 @@ class BaseController extends Controller
         $this->data = $this->request->get();
         $this->limit = $this->request->get('limit', "int", 20, true);
         $this->page = $this->request->get('page', "int", 1, true);
+        $this->data['page'] = $this->page;
+        $this->data['limit'] = $this->limit;
     }
 
     protected function success($data = null, $msg = '')

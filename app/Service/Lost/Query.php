@@ -23,7 +23,7 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,rewards,city,district,created_at";
-        $conditions = "1=1";
+        $conditions = "status=".LostBike::STATUS_PASS;
         if (!empty($search['time'])) {
             switch ($search['time']) {
                 case 1:
@@ -53,7 +53,7 @@ class Query extends Service
             }
         }
 
-        $data = LostBikes::page($columns, $conditions, [], $order, $search['current_page']);
+        $data = LostBikes::page($columns, $conditions, [], $order, $search['page']);
         return $data;
     }
 

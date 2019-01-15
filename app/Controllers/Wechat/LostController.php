@@ -121,14 +121,16 @@ class LostController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = $this->data;
-        if (!isset($data['district'])) {
+        if (!ok($data, 'district')) {
             $district = $member->getDistrict();
             $area = Areas::findFirstByDistrictCode($district);
-
-            $data['city'] = $area->getCityName();
-            $data['district'] = $area->getDistrictName();
+        } else {
+            $area = Areas::findFirst([
+                'conditions' => "city_name = '" . $data['city'] . "' AND district_name = '" . $data['district'] . "'"
+            ]);
         }
-
+        $data['city'] = $area->getCityCode();
+        $data['district'] = $area->getDistrictCode();
         $rData = service("lost/query")->getList($data);
         return $this->success($rData);
     }
