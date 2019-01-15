@@ -51,6 +51,11 @@ class Manager extends BaseService
             $this->db->rollback();
             return false;
         }
+        if (!service("point/manager")->create($member, MemberPoint::TYPE_SIGN)) {
+            $this->db->rollback();
+            return false;
+        }
+
         $weekFlag = false;
         if ($memberSign->getWeekCount() == 7) {
             if (!service("point/manager")->create($member, MemberPoint::TYPE_SIGN_WEEK)) {

@@ -79,7 +79,7 @@ class PointController extends WechatAuthController
             ];
             $member = Member::findFirst($memberId);
             try{
-                $order->setFinishTime(Date("Y-m-d H:i:s",time()))->save();
+                $order->setFinishTime(date("Y-m-d H:i:s",time()))->save();
                 service("point/manager")->create($member, $type);
                 $member->setPoints($member->getPoints()+$order->getTotalFee()/10)->save();
                 $this->db->commit();
