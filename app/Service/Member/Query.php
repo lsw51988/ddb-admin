@@ -48,21 +48,6 @@ class Query extends BaseService
     }
 
     /**
-     * 获取用户获取的总积分
-     */
-    public function getTotalPoints(Members $member)
-    {
-        $totalPoints = MemberPoints::sum([
-            "column" => "value",
-            "conditions" => "member_id = :member_id: AND type>0",
-            "bind" => [
-                "member_id" => $member->getId()
-            ]
-        ]);
-        return is_null($totalPoints) ? 0 : $totalPoints;
-    }
-
-    /**
      * 获取用户的详细信息
      */
     public function getAuthInfo($member)

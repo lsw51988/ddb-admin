@@ -33,8 +33,6 @@ class HomePageController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = [];
-        $point = service("member/query")->getTotalPoints($member);
-        $data['point'] = $point;
         //$data['level'] = service("member/query")->getLevel($point);
         $data['appeal_times'] = 0;
         $data['deal_times'] = 0;
