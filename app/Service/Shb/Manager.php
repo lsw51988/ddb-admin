@@ -19,13 +19,13 @@ use Ddb\Modules\SecondBike;
 
 class Manager extends Service
 {
-    public function create($member, $data, $points)
+    public function create($member, $data)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
         $data['city'] = $addr[1];
         $data['district'] = $addr[2];
-        $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']];
+        $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']+1];
         $this->db->begin();
         $shb = new SecondBikes();
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
@@ -57,7 +57,7 @@ class Manager extends Service
             $shb->setRemark($data['remark']);
         }
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
-            $shb->setLastChangeTime($data['last_change_time']);
+            $shb->setLastChangeTime($data['last_change_time']. "-01 00:00:00");
         }
 
         //2.积分扣除 发布二手车的积分

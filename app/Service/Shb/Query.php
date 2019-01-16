@@ -19,37 +19,9 @@ use Phalcon\Paginator\Adapter\QueryBuilder;
 
 class Query extends Service
 {
-    public function hasEnoughPoint($member, $dayIndex)
+    public function hasEnoughPoint($member)
     {
         $point = MemberPoint::$typeScore[MemberPoint::TYPE_PUBLISH_SHB];
-        switch ($dayIndex) {
-            case 1:
-                $days = 7;
-                break;
-            case 2:
-                $days = 14;
-                break;
-            case 3:
-                $days = 30;
-                break;
-            case 4:
-                $days = 90;
-                break;
-            case 5:
-                $days = 180;
-                break;
-            case 6:
-                $days = 365;
-                break;
-        }
-        //新车展示天数所需积分
-        if (service('member/query')->isPrivilege($member)) {
-            $showDaysPoints = $days * 10 * 0.8;
-        } else {
-            $showDaysPoints = $days * 10;
-        }
-        $point = $point + $showDaysPoints;
-
         if ($member->getPoints() < abs($point)) {
             return false;
         }

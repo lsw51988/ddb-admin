@@ -33,15 +33,15 @@ class SHBController extends WechatAuthController
         $member = Member::findFirst($this->currentMember->getId());
         $data = $this->data;
         //需要首先判断用户积分是否足够
-        if (!$points = service("shb/query")->hasEnoughPoint($member, $data['show_days_index'])) {
+        if (!$points = service("shb/query")->hasEnoughPoint($member)) {
             return $this->error("积分不足");
         }
-        if ($shbId = service("shb/manager")->create($member, $data, $points)) {
+        if ($shbId = service("shb/manager")->create($member, $data)) {
             return $this->success([
                 "shb_id" => $shbId
             ]);
         }
-        return $this->error();
+        return $this->error('发布失败');
     }
 
     /**
