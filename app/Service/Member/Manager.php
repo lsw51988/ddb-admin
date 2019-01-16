@@ -81,9 +81,9 @@ class Manager extends BaseService
         if (service('member/query')->isPrivilege($member)) {
             $time = $member->getPrivilegeTime();
             if ($type != 'day') {
-                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime(strtotime($time) . "+$count month")));
+                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime($time . "+$count month")));
             } else {
-                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime(strtotime($time) . "+$count day")));
+                $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime($time . "+$count day")));
             }
         } else {
             if ($type != 'day') {
