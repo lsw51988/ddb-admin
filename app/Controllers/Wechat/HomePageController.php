@@ -29,7 +29,7 @@ class HomePageController extends WechatAuthController
      * times骑行者代表求助次数 修理者代表应助次数
      * 暂时无返回交易次数
      */
-    public function indeAction()
+    public function indexAction()
     {
         $member = $this->currentMember;
         $data = [];

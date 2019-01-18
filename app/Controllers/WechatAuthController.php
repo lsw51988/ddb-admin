@@ -25,11 +25,12 @@ class WechatAuthController extends BaseController
             return $this->error("请重新登录");
         } else {
             $this->token = $token;
+            $this->currentMember = Member::findFirst($this->data['member_id']);
             //用户更新信息时,需求重新写入缓存
-            if (!$this->currentMember = unserialize(di("cache")->get($token))) {
-                $this->currentMember = Member::findFirst($this->data['member_id']);
-                di("cache")->save($token, serialize($this->currentMember), 30 * 24 * 60);
-            }
+//            if (!$this->currentMember = unserialize(di("cache")->get($token))) {
+//                $this->currentMember = Member::findFirst($this->data['member_id']);
+//                di("cache")->save($token, serialize($this->currentMember), 30 * 24 * 60);
+//            }
         }
     }
 }
