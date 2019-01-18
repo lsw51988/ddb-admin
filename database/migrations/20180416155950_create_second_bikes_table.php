@@ -53,6 +53,7 @@ class CreateSecondBikesTable extends AbstractMigration
             ->addColumn("deal_time","timestamp",["comment"=>"成交时间","null" => true])
             ->addColumn("cancel_time","timestamp",["comment"=>"取消时间","null" => true])
             ->addColumn("cancel_reason","string",["comment"=>"取消原因","null" => true])
+            ->addColumn("refuse_reason","string",["comment"=>"拒绝原因","null" => true])
             ->addTimestamps()
             ->save();
     }
