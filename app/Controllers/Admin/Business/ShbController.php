@@ -123,7 +123,7 @@ class ShbController extends AdminAuthController
                 $status = SecondBike::STATUS_DENIED;
                 $secondBike->setRefuseReason($request['reason']);
             }
-            if ($secondBike->setStatus($status)->save()) {
+            if ($secondBike->setStatus($status)->setUpdated(date('Y-m-d H:i;s'))->save()) {
                 //退回用户积分
                 $member = Member::findFirst($secondBike->getMemberId());
                 if (!service("shb/manager")->returnPoints($member, $secondBike)) {
