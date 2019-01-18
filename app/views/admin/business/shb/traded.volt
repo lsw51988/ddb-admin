@@ -137,9 +137,9 @@
 
             $(".photo").click(function () {
                 $("#viewer").empty();
-                var member_id = $(this).data('id');
+                var bike_id = $(this).data('id');
                 $.ajax({
-                    url: "/admin/business/member/" + member_id + "/imgs",
+                    url: "/admin/business/shb/" + bike_id + "/imgs",
                     type: "GET",
                     success: function (res) {
                         if(res.status){

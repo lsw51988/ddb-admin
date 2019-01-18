@@ -31,7 +31,7 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,brand_name,out_price,city,district,created_at,status";
-        $conditions = "1=1";
+        $conditions = "status=".SecondBike::STATUS_AUTH;
         if (!empty($search['time'])) {
             switch ($search['time']) {
                 case 1:
