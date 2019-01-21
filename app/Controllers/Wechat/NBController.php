@@ -127,7 +127,7 @@ class NBController extends WechatAuthController
     }
 
     /**
-     * @Get("/detail/{id:[0-9]}")
+     * @Get("/detail/{id:[0-9]+}")
      * 详情
      */
     public function detailAction($id)
