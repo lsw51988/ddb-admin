@@ -114,8 +114,8 @@ class NBController extends WechatAuthController
             $district = $member->getDistrict();
             $area = Areas::findFirstByDistrictCode($district);
 
-            $data['city'] = $area->getCityName();
-            $data['district'] = $area->getDistrictName();
+            $data['city'] = $area->getCityCode();
+            $data['district'] = $district;
         }
         if (!empty($data['self_flag'])) {
             $data['member_id'] = $member->getId();

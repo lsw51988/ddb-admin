@@ -263,7 +263,7 @@
                         'bike_id': bike_id,
                         'type': 'pass'
                     },
-                    type: "GET",
+                    type: "POST",
                     success: function (res) {
                         if (res.status) {
                             layer.msg('修改成功', function () {
