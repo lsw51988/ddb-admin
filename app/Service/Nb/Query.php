@@ -34,10 +34,12 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,brand_name,price,city,district,detail_addr,status,voltage";
-        $conditions = "status=".NewBike::STATUS_AUTH;
+        $conditions = "status=" . NewBike::STATUS_AUTH;
 
-        if (!empty($search['district'])) {
+        if (!empty($search['district']) && !empty($search['city'])) {
             $conditions = $conditions . " AND city_code='" . $search['city'] . "' AND district_code='" . $search['district'] . "'";
+        } else {
+            $conditions = $conditions . " AND city_code='" . $search['city'] . "'";
         }
 
         $order = "";

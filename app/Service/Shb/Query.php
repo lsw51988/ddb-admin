@@ -31,7 +31,7 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,brand_name,out_price,city,district,created_at,status";
-        $conditions = "status=".SecondBike::STATUS_AUTH;
+        $conditions = "status=" . SecondBike::STATUS_AUTH;
         if (!empty($search['time'])) {
             switch ($search['time']) {
                 case 1:
@@ -46,8 +46,10 @@ class Query extends Service
             }
         }
 
-        if (!empty($search['district'])) {
+        if (!empty($search['city']) && !empty($search['district'])) {
             $conditions = $conditions . " AND city='" . $search['city'] . "' AND district='" . $search['district'] . "'";
+        } else {
+            $conditions = $conditions . " AND city='" . $search['city'] . "'";
         }
         $order = "";
         if (!empty($search['price'])) {
