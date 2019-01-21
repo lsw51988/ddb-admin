@@ -63,8 +63,6 @@ class Query extends Service
 
         if (!empty($search['self_flag'])) {
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
-        } else {
-            $conditions = $conditions . " AND created_at >= '" . date("Y-m-d H:i:s", time()) . "'";
         }
 
         $data = NewBikes::page($columns, $conditions, [], $order);

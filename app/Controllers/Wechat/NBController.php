@@ -108,7 +108,8 @@ class NBController extends WechatAuthController
      */
     public function listAction()
     {
-        $member = $this->currentMember;
+        //$member = $this->currentMember;
+        $member = Member::findFirst(12);
         $data = $this->data;
         if (!isset($data['district'])) {
             $district = $member->getDistrict();
