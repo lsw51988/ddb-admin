@@ -23,7 +23,7 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,rewards,city,district,created_at";
-        $conditions = "status=".LostBike::STATUS_PASS;
+        $conditions = "status=" . LostBike::STATUS_PASS;
         if (!empty($search['time'])) {
             switch ($search['time']) {
                 case 1:
@@ -38,8 +38,10 @@ class Query extends Service
             }
         }
 
-        if (!empty($search['district'])) {
+        if (!empty($search['city']) && !empty($search['district'])) {
             $conditions = $conditions . " AND city='" . $search['city'] . "' AND district='" . $search['district'] . "'";
+        } else {
+            $conditions = $conditions . " AND city='" . $search['city'] . "'";
         }
         $order = "";
         if (!empty($search['rewards'])) {
