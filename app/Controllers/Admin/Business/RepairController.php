@@ -89,7 +89,7 @@ class RepairController extends AdminAuthController
      */
     public function imgsAction($repairId)
     {
-        $repairImages = RepairImages::findFirstByRepairId($repairId);
+        $repairImages = RepairImages::findByRepairId($repairId);
         if (count($repairImages->toArray()) == 0) {
             return $this->error('暂无照片');
         }

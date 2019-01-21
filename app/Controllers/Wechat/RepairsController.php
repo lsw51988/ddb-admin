@@ -43,6 +43,9 @@ class RepairsController extends WechatAuthController
             ->setAddress($data['address'])
             ->setCreateBy($member->getId())
             ->setStatus(Repair::STATUS_CREATE);
+        if(ok($data,'belong_creator') && $data['belong_creator'] == 1){
+            $repair->setBelongerId($member->getId());
+        }
         if (ok($data, 'mobile')) {
             //验证短信验证码
             if (!service("sms/manager")->verify($data['mobile'], $data['sms_code'])) {
@@ -228,6 +231,6 @@ class RepairsController extends WechatAuthController
         }
         $path = $repairImage->getPath();
         $data = service("file/manager")->read($path);
-        return $this->response->setContent($data['contents'])->setContentType('image/jpeg');
+        return $this->response->setContent($data)->setContentType('image/jpeg');
     }
 }

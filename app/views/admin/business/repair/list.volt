@@ -125,7 +125,11 @@
                 <td>{{ repair['belonger_name'] }}</td>
                 <td>{{ repair['province_name'] }}{{ repair['city_name'] }}{{ repair['district_name'] }}</td>
                 <td>{{ repair['address'] }}</td>
-                <td>{{ repair['type']=="0"?"电动车维修点":repair['type']=="1"?"电动车维修兼销售点":"便民开锁点" }}</td>
+                <td>
+                    {% if repair['type']==0 %}电动车维修点{% endif %}
+                    {% if repair['type']==1 %}电动车维修兼销售点{% endif %}
+                    {% if repair['type']==2 %}便民开锁点{% endif %}
+                </td>
                 <td>{{ repair['mobile'] }}</td>
                 <td>{{ repair['remark'] }}</td>
                 <td>{% if repair["status"]==1 %}被创建{% elseif repair["status"]==2 %}后台审核通过 {% else %}后台审核拒绝{% endif %}</td>
