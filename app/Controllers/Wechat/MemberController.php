@@ -75,12 +75,12 @@ class MemberController extends WechatAuthController
         }
         $memberBike->setMemberId($member->getId())
             ->setBrandName($data['brand_name'])
-            ->setBuyDate($data['buy_date'])
+            ->setBuyDate($data['buy_date'] . " 00:00:00")
             ->setNumber($data['number'])
-            ->setVoltage($data['voltage'])
+            ->setVoltage(MemberBike::$voltageDesc[$data['voltage'] + 1])
             ->setPrice($data['price'])
             ->setStatus($data['status']);
-        if (!empty($data['last_change_time'])) {
+        if (ok($data, 'last_change_time')) {
             $memberBike->setLastChangeTime($data['last_change_time']);
         }
         if (!$memberBike->save()) {
@@ -135,7 +135,7 @@ class MemberController extends WechatAuthController
         if ($smsCode->save($smsCodeData)) {
             $key = $data['mobile'] . "_auth";
             di("cache")->save($key, $code, 5 * 60);
-            if (service("sms/manager")->send($smsCode->getId(), $token,$data)) {
+            if (service("sms/manager")->send($smsCode->getId(), $token, $data)) {
                 return $this->success("发送成功");
             }
 
@@ -239,13 +239,13 @@ class MemberController extends WechatAuthController
             $file = $_FILES;
             $data = $this->data;
             $this->db->begin();
-            if($file!=[]){
+            if ($file != []) {
                 $path = "AvatarImages/" . $member->getId() . '-' . $file['file']['name'];
                 if (!service("member/manager")->updateAvatar($member, $file)) {
                     $this->db->rollback();
                     return $this->error();
                 }
-            }else{
+            } else {
                 $path = $member->getAvatarUrl();
             }
             if (!ok($data, 'nick_name')) {

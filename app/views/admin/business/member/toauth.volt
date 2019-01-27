@@ -100,7 +100,7 @@
                 <td>{{ member['province_name'] }}</td>
                 <td>{{ member['city_name'] }}</td>
                 <td>{{ member['district_name'] }}</td>
-                <td>{{ member['updated_at'] }}</td>
+                <td>{{ member['created_at'] }}</td>
                 <td>
                     <button class="layui-btn photo" data-id="{{ member['id'] }}">查看照片</button>
                     <button class="layui-btn layui-btn-warm pass" data-id="{{ member['id'] }}">通过</button>

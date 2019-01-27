@@ -16,10 +16,9 @@ class Member extends Members
     const TYPE_RIDE = 1;//骑行者
     const TYPE_FIX = 2;//修理者
 
-    const STATUS_REGISTER = 1;
-    const STATUS_TO_AUTH = 2;
-    const STATUS_AUTHED = 3;
-    const STATUS_AUTH_DENIED = 4;
+    const STATUS_TO_AUTH = 1;
+    const STATUS_AUTHED = 2;
+    const STATUS_AUTH_DENIED = 3;
 
     const IS_NOT_PRIVILEGE = 0;
     const IS_PRIVILEGE = 1;
