@@ -126,14 +126,14 @@ class IndexController extends BaseController
      */
     public function captchaAction()
     {
-        app_log('ddb')->info('start','短信缓存开始');
+        app_log('ddb')->info('start',['start']);
         $data = $this->data;
         $token = $data['token'];
         $key = $token . 'captcha';
         $_vc = new Captcha();
         $_vc->doimg();
-        app_log('ddb')->info('token',$key);
-        app_log('ddb')->info('token-code',$_vc->getCode());
+        app_log('ddb')->info('token',[$key]);
+        app_log('ddb')->info('token-code',[$_vc->getCode()]);
         di("cache")->save($key, $_vc->getCode(), 300);
     }
 
