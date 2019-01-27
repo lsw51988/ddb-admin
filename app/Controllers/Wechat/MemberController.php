@@ -122,6 +122,9 @@ class MemberController extends WechatAuthController
         if (!service("sms/manager")->canSend($data['mobile'])) {
             return $this->error("已经超过今日发送短信上限");
         }
+        if(Member::findFirst("mobile=$data[mobile] AND id!=".$this->currentMember->getId())){
+            return $this->error("该手机已被注册！");
+        }
         $code = service("sms/manager")->getSmsCode();
         $smsCode = new SmsCode();
         $smsCodeData['mobile'] = $data['mobile'];
