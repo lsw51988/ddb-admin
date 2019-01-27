@@ -231,28 +231,31 @@ class MemberController extends WechatAuthController
         } else {
             $file = $_FILES;
             $data = $this->data;
-            $currentMember = Member::findFirst($member->getId());
-            $path = "AvatarImages/" . $member->getId() . '-' . $file['file']['name'];
             $this->db->begin();
-            if (!service("member/manager")->updateAvatar($currentMember, $file)) {
-                $this->db->rollback();
-                return $this->error();
+            if($file!=[]){
+                $path = "AvatarImages/" . $member->getId() . '-' . $file['file']['name'];
+                if (!service("member/manager")->updateAvatar($member, $file)) {
+                    $this->db->rollback();
+                    return $this->error();
+                }
+            }else{
+                $path = $member->getAvatarUrl();
             }
             if (!ok($data, 'nick_name')) {
                 $data['nick_name'] = '骑行侠';
             }
-            $currentMember->setNickName($data['nick_name'])->setAvatarUrl($path);
-            if (!$currentMember->save()) {
+            $member->setNickName($data['nick_name'])->setAvatarUrl($path);
+            if (!$member->save()) {
                 $this->db->rollback();
                 return $this->error("用户信息保存错误");
             }
             $this->db->commit();
             $rData = [];
-            $rData['nickName'] = $currentMember->getNickName();
-            $rData['auth_time'] = $currentMember->getAuthTime();
-            $rData['avatarUrl'] = $currentMember->getAvatarUrl();
-            $rData['id'] = $currentMember->getId();
-            $rData['token'] = $currentMember->getToken();
+            $rData['nickName'] = $member->getNickName();
+            $rData['auth_time'] = $member->getAuthTime();
+            $rData['avatarUrl'] = $member->getAvatarUrl();
+            $rData['id'] = $member->getId();
+            $rData['token'] = $member->getToken();
             return $this->success($rData);
         }
     }
