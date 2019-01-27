@@ -23,13 +23,4 @@ class Member extends Members
 
     const IS_NOT_PRIVILEGE = 0;
     const IS_PRIVILEGE = 1;
-
-    public function afterUpdate()
-    {
-        $token = $this->getToken();
-        app_log()->info("触发afterUpdate事件" . $this->getToken());
-        $member = $this->findFirstByToken($token);
-        app_log()->info("写入token缓存:");
-        di("cache")->save($this->getToken(), serialize($member), 24 * 3600 * 30);
-    }
 }
