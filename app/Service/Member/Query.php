@@ -180,7 +180,7 @@ class Query extends BaseService
         $items = $data->items->toArray();
         foreach ($items as $k => $v) {
             $items[$k]['type_desc'] = MemberPoint::$typeDesc[$v['type']];
-            $items[$k]['value'] = $v['value'] > 0 ? '+' . $v['value'] : '-' . $v['value'];
+            $items[$k]['value'] = $v['value'] > 0 ? '+' . $v['value'] : $v['value'];
         }
         $data->items = $items;
         return $data;
