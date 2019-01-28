@@ -182,7 +182,7 @@ class Query extends BaseService
             $items[$k]['type_desc'] = MemberPoint::$typeDesc[$v['type']];
             $items[$k]['value'] = $v['value'] > 0 ? '+' . $v['value'] : '-' . $v['value'];
         }
-        $data['items'] = $items;
+        $data->items = $items;
         return $data;
     }
 }
