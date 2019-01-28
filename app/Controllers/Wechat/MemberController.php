@@ -389,4 +389,13 @@ class MemberController extends WechatAuthController
         }
         return $this->error();
     }
+
+    /**
+     * 获取用户积分记录
+     * @Get("/point_log")
+     */
+    public function pointLogAction(){
+        $data = service("member/query")->getPointLog($this->currentMember,$this->data);
+        return $this->success($data);
+    }
 }

@@ -14,6 +14,7 @@ use Ddb\Models\MemberPoints;
 use Ddb\Models\Members;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
+use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Repair;
 use Ddb\Service\BaseService;
 use Ddb\Models\Areas;
@@ -159,5 +160,29 @@ class Query extends BaseService
         } else {
             return false;
         }
+    }
+
+    /**
+     * 获取用户积分记录
+     */
+    public function getPointLog($member, $request)
+    {
+        $builder = $this->modelsManager->createBuilder()
+            ->from(["MP" => MemberPoint::class])
+            ->where("MP.member_id=" . $member->getId())
+            ->orderBy("MP.id DESC");
+        $paginator = new QueryBuilder([
+            'builder' => $builder,
+            'limit' => $request['limit'],
+            'page' => $request['page']
+        ]);
+        $data = $paginator->getPaginate();
+        $items = $data->items->toArray();
+        foreach ($items as $k => $v) {
+            $items[$k]['type_desc'] = MemberPoint::$typeDesc[$v['type']];
+            $items[$k]['value'] = $v['value'] > 0 ? '+' . $v['value'] : '-' . $v['value'];
+        }
+        $data['items'] = $items;
+        return $data;
     }
 }

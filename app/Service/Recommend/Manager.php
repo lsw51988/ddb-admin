@@ -15,8 +15,8 @@ use Ddb\Models\Recommends;
 class Manager extends Service
 {
     /**
-     * @param $tId 邀请人id
-     * @param $bId 被邀请人id
+     * @param $tId string 邀请人id
+     * @param $bId string 被邀请人id
      * @return mixed
      */
     public function create($tId,$bId){
