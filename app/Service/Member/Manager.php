@@ -24,7 +24,9 @@ class Manager extends BaseService
     public function getWechatLogin($js_code)
     {
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' . di("config")->app->APP_ID . '&secret=' . di("config")->app->APP_SECRET . '&js_code=' . $js_code . '&grant_type=authorization_code';
-        $curl_data = json_decode(curl_request($url));
+        $info = curl_request($url);
+        app_log('wechat')->info($info);
+        $curl_data = json_decode($info);
         return $curl_data;
     }
 
