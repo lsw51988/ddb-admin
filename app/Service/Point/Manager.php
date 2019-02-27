@@ -41,7 +41,9 @@ class Manager extends BaseService
         if ($new_bike_id) {
             $memberPoint->setNewBikeId($new_bike_id);
         }
+        $this->db->begin();
         if (!$memberPoint->save()) {
+            $this->db->rollback();
             return false;
         }
         $currentPoint = (int)$member->getPoints();
@@ -50,9 +52,14 @@ class Manager extends BaseService
             return false;
         }
         if (!$member->setPoints($endPoint)->save()) {
-            $memberPoint->delete();
+            $this->db->rollback();
             return false;
         }
+        if (!service('member/manager')->saveMessage($member->getId(), '积分变更,' . MemberPoint::$typeDesc[$type] . ':' . $point)) {
+            $this->db->rollback();
+            return false;
+        }
+        $this->db->commit();
         return true;
     }
 

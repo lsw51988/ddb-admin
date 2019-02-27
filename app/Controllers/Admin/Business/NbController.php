@@ -116,21 +116,32 @@ class NbController extends AdminAuthController
         if ($newBike = NewBike::findFirst($request['bike_id'])) {
             if ($request['type'] == 'pass') {
                 $status = NewBike::STATUS_AUTH;
+                $message = '新车审核通过';
             } else {
                 if ($newBike->getStatus() == NewBike::STATUS_DENIED) {
                     return $this->error('无法重复拒绝');
                 }
                 $status = NewBike::STATUS_DENIED;
                 $newBike->setRefuseReason($request['reason']);
+                $message = '新车审核拒绝，原因：'.$request['reason'];
             }
-            if ($newBike->setStatus($status)->save()) {
-                //取消扣除积分
-                $member = Member::findFirst($newBike->getMemberId());
-                if (!service("nb/manager")->returnPoints($member, $newBike)) {
-                    return $this->error("积分扣除失败");
-                }
-                return $this->success();
+            $this->db->begin();
+            if (!service('member/manager')->saveMessage($newBike->getMemberId(),$message)) {
+                $this->db->rollback();
+                return false;
             }
+            if (!$newBike->setStatus($status)->save()) {
+                $this->db->rollback();
+                $this->error("变更新车状态失败");
+            }
+            //取消扣除积分
+            $member = Member::findFirst($newBike->getMemberId());
+            if (!service("nb/manager")->returnPoints($member, $newBike)) {
+                $this->db->rollback();
+                return $this->error("积分扣除失败");
+            }
+            $this->db->commit();
+            return $this->success();
         }
         return $this->error("未找到该记录");
     }

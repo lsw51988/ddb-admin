@@ -14,6 +14,7 @@ use Ddb\Models\MemberPoints;
 use Ddb\Models\Members;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
+use Ddb\Modules\MemberMessage;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Repair;
 use Ddb\Service\BaseService;
@@ -183,6 +184,24 @@ class Query extends BaseService
             $items[$k]['value'] = $v['value'] > 0 ? '+' . $v['value'] : $v['value'];
         }
         $data->items = $items;
+        return $data;
+    }
+
+    /**
+     * 获取用户消息记录
+     */
+    public function getMessages($member, $request)
+    {
+        $builder = $this->modelsManager->createBuilder()
+            ->from(["MM" => MemberMessage::class])
+            ->where("MM.member_id=" . $member->getId())
+            ->orderBy("MM.id DESC");
+        $paginator = new QueryBuilder([
+            'builder' => $builder,
+            'limit' => $request['limit'],
+            'page' => $request['page']
+        ]);
+        $data = $paginator->getPaginate();
         return $data;
     }
 }

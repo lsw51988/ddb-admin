@@ -111,12 +111,22 @@ class RepairController extends AdminAuthController
         if ($repair = Repair::findFirst($request['repair_id'])) {
             if ($request['type'] == 'pass') {
                 $status = Repair::STATUS_PASS;
+                $message = '维修点审核通过';
             } else {
                 $status = Repair::STATUS_REFUSE;
+                $message = '维修点审核拒绝,原因：' . $request['reason'];
             }
-            if ($repair->setStatus($status)->save()) {
-                return $this->success();
+            $this->db->begin();
+            if (!service('member/manager')->saveMessage($repair->getCreateBy(), $message)) {
+                $this->db->rollback();
+                return $this->error('消息未发送成功');
             }
+            if (!$repair->setStatus($status)->save()) {
+                $this->db->rollback();
+                return $this->error('状态变更失败');
+            }
+            $this->db->commit();
+            return $this->success();
         }
         return $this->error();
     }

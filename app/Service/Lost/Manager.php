@@ -38,9 +38,11 @@ class Manager extends Service
     public function auth(LostBike $lostBike,$request){
         if ($request['type'] == 'pass') {
             $status = LostBike::STATUS_PASS;
+            $message = '丢失车辆审核通过';
         } else {
             $status = LostBike::STATUS_REFUSE;
             $lostBike->setReason($request['reason']);
+            $message = '丢失车辆审核拒绝，原因：'.$request['reason'];
         }
         $this->db->begin();
         if (!$lostBike->setStatus($status)->save()) {
@@ -54,6 +56,10 @@ class Manager extends Service
                 $this->db->rollback();
                 return false;
             }
+        }
+        if (!service('member/manager')->saveMessage($member->getId(),$message)) {
+            $this->db->rollback();
+            return false;
         }
         $this->db->commit();
         return true;

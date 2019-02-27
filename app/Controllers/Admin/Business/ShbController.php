@@ -116,21 +116,32 @@ class ShbController extends AdminAuthController
         if ($secondBike = SecondBike::findFirst($request['shb_id'])) {
             if ($request['type'] == 'pass') {
                 $status = SecondBike::STATUS_AUTH;
+                $message = '二手车审核通过';
             } else {
                 if ($secondBike->getStatus() == SecondBike::STATUS_DENIED) {
                     return $this->error('无法重复拒绝');
                 }
                 $status = SecondBike::STATUS_DENIED;
                 $secondBike->setRefuseReason($request['reason']);
+                $message = '二手车审核拒绝，原因：'.$request['reason'];
             }
-            if ($secondBike->setStatus($status)->setUpdatedAt(date('Y-m-d H:i;s'))->save()) {
+            $this->db->begin();
+            if (!$secondBike->setStatus($status)->setUpdatedAt(date('Y-m-d H:i;s'))->save()) {
                 //退回用户积分
-                $member = Member::findFirst($secondBike->getMemberId());
-                if (!service("shb/manager")->returnPoints($member, $secondBike)) {
-                    return $this->error("积分取消扣除失败");
-                }
-                return $this->success();
+                $this->db->rollback();
+                return $this->error('二手车状态更新失败');
             }
+            $member = Member::findFirst($secondBike->getMemberId());
+            if (!service("shb/manager")->returnPoints($member, $secondBike)) {
+                $this->db->rollback();
+                return $this->error("积分取消扣除失败");
+            }
+            if (!service('member/manager')->saveMessage($secondBike->getMemberId(), $message)) {
+                $this->db->rollback();
+                return $this->error('消息未发送成功');
+            }
+            $this->db->commit();
+            return $this->success();
         }
         return $this->error("未找到该记录");
     }

@@ -122,7 +122,7 @@ class MemberController extends WechatAuthController
         if (!service("sms/manager")->canSend($data['mobile'])) {
             return $this->error("已经超过今日发送短信上限");
         }
-        if(Member::findFirst("mobile=$data[mobile] AND id!=".$this->currentMember->getId())){
+        if (Member::findFirst("mobile=$data[mobile] AND id!=" . $this->currentMember->getId())) {
             return $this->error("该手机已被注册！");
         }
         $code = service("sms/manager")->getSmsCode();
@@ -394,8 +394,19 @@ class MemberController extends WechatAuthController
      * 获取用户积分记录
      * @Get("/point_log")
      */
-    public function pointLogAction(){
-        $data = service("member/query")->getPointLog($this->currentMember,$this->data);
+    public function pointLogAction()
+    {
+        $data = service("member/query")->getPointLog($this->currentMember, $this->data);
+        return $this->success($data);
+    }
+
+    /**
+     * 获取用户消息记录
+     * @Get("/messages")
+     */
+    public function messagesAction()
+    {
+        $data = service("member/query")->getMessages($this->currentMember, $this->data);
         return $this->success($data);
     }
 }

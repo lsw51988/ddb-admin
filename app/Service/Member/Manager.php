@@ -12,6 +12,7 @@ namespace Ddb\Service\Member;
 use Ddb\Models\MemberBikeImages;
 use Ddb\Models\MemberLocations;
 use Ddb\Modules\Member;
+use Ddb\Modules\MemberMessage;
 use Ddb\Service\BaseService;
 use Ddb\Models\Members;
 use Phalcon\Exception;
@@ -92,9 +93,30 @@ class Manager extends BaseService
                 $member->setPrivilegeTime(date('Y-m-d H:i:s', strtotime("+$count day")));
             }
         }
+        $this->db->begin();
         if (!$member->setPrivilege(Member::IS_PRIVILEGE)->save()) {
+            $this->db->rollback();
             return false;
         }
+        if (!$this->saveMessage($member->getId(), '成为会员')) {
+            $this->db->rollback();
+            return false;
+        }
+        $this->db->commit();
         return true;
+    }
+
+    public function saveMessage($memberId, $content)
+    {
+        $memberMessage = new MemberMessage();
+        $data = [
+            'member_id' => $memberId,
+            'content' => $content,
+            'status' => MemberMessage::STATUS_CREATE,
+        ];
+        if ($memberMessage->save($data)) {
+            return true;
+        }
+        return false;
     }
 }
