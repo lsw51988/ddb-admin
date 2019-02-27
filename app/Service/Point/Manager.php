@@ -55,10 +55,6 @@ class Manager extends BaseService
             $this->db->rollback();
             return false;
         }
-        if (!service('member/manager')->saveMessage($member->getId(), '积分变更,' . MemberPoint::$typeDesc[$type] . ':' . $point)) {
-            $this->db->rollback();
-            return false;
-        }
         $this->db->commit();
         return true;
     }
