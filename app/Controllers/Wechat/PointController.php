@@ -87,6 +87,7 @@ class PointController extends WechatAuthController
                 $order->setFinishTime(date("Y-m-d H:i:s", time()))->save();
                 service("point/manager")->create($member, $type);
                 $member->setPoints($member->getPoints() + $order->getTotalFee() / 10)->save();
+                service('member/manager')->saveMessage($member->getId(),"充值积分成功,增加积分：".$order->getTotalFee() / 10);
                 $this->db->commit();
                 return $this->success();
             } catch (Exception $e) {
