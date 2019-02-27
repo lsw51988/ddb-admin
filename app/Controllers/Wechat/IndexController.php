@@ -108,7 +108,7 @@ class IndexController extends BaseController
             $retData['is_privilege'] = false;
         }
         //加入是否有未读消息
-        $unReadMessageCount = MemberMessage::count("member_id = 15 AND status = " . MemberMessage::STATUS_CREATE);
+        $unReadMessageCount = MemberMessage::count("member_id = " . $member->getId() . " AND status = " . MemberMessage::STATUS_CREATE);
         if ($unReadMessageCount > 0) {
             $retData['unread_msg'] = true;
         } else {
