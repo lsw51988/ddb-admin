@@ -14,6 +14,7 @@ use Ddb\Models\Areas;
 use Ddb\Models\Members;
 use Ddb\Modules\Member;
 use Ddb\Models\MemberLocations;
+use Ddb\Modules\MemberMessage;
 use Ddb\Modules\MemberPoint;
 
 /**
@@ -93,18 +94,25 @@ class IndexController extends BaseController
                 $location->result->address_component->city,
                 $location->result->address_component->district
             ];
-        }else{
+        } else {
             $retData['location'] = [
                 '未知',
                 '未知',
                 '未知'
             ];
         }
-        if(service('member/query')->isPrivilege($member)){
+        if (service('member/query')->isPrivilege($member)) {
             $retData['privilege_time'] = $member->getPrivilegeTime();
             $retData['is_privilege'] = true;
-        }else{
+        } else {
             $retData['is_privilege'] = false;
+        }
+        //加入是否有未读消息
+        $unReadMessageCount = MemberMessage::count("member_id = 15 AND status = " . MemberMessage::STATUS_CREATE);
+        if ($unReadMessageCount > 0) {
+            $retData['unread_msg'] = true;
+        } else {
+            $retData['unread_msg'] = false;
         }
         return $this->success($retData);
     }
@@ -197,10 +205,10 @@ class IndexController extends BaseController
             $rData['token'] = $member->getToken();
             $rData['union_flag'] = $unionFlag;
             $rData['location'] = [$memberLocation->getProvince(), $memberLocation->getCity(), $memberLocation->getDistrict()];
-            if(service('member/query')->isPrivilege($member)){
+            if (service('member/query')->isPrivilege($member)) {
                 $rData['privilege_time'] = $member->getPrivilegeTime();
                 $rData['is_privilege'] = true;
-            }else{
+            } else {
                 $rData['is_privilege'] = false;
             }
             return $this->error($rData);

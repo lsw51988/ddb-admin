@@ -5,6 +5,7 @@ namespace Ddb\Controllers;
 use Ddb\Core\BaseController;
 use Ddb\Models\MemberBikeImages;
 use Ddb\Modules\Member;
+use Ddb\Modules\MemberMessage;
 
 class IndexController extends BaseController
 {
@@ -20,8 +21,7 @@ class IndexController extends BaseController
      * @Route("/test")
      */
     public function testAction(){
-        $member = Member::findFirstByToken('87101405469f326cab883b02f3690b78');
-        print_r($member->toArray());
+
     }
 
     public function route404Action()

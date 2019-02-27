@@ -173,7 +173,6 @@ class Query extends Service
 
     public function getDealCount($memberId)
     {
-        $count = 0;
         $count = SecondBike::count(["member_id = $memberId"]);
         return $count;
     }
