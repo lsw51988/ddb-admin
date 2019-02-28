@@ -10,6 +10,7 @@ namespace Ddb\Controllers\Admin\Business;
 
 use Ddb\Controllers\AdminAuthController;
 use Ddb\Models\NewBikeImgs;
+use Ddb\Models\NewBikes;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\NewBike;
@@ -123,10 +124,10 @@ class NbController extends AdminAuthController
                 }
                 $status = NewBike::STATUS_DENIED;
                 $newBike->setRefuseReason($request['reason']);
-                $message = '新车审核拒绝，原因：'.$request['reason'];
+                $message = '新车审核拒绝，原因：' . $request['reason'];
             }
             $this->db->begin();
-            if (!service('member/manager')->saveMessage($newBike->getMemberId(),$message)) {
+            if (!service('member/manager')->saveMessage($newBike->getMemberId(), $message)) {
                 $this->db->rollback();
                 return false;
             }
@@ -134,11 +135,17 @@ class NbController extends AdminAuthController
                 $this->db->rollback();
                 $this->error("变更新车状态失败");
             }
-            //取消扣除积分
-            $member = Member::findFirst($newBike->getMemberId());
-            if (!service("nb/manager")->returnPoints($member, $newBike)) {
-                $this->db->rollback();
-                return $this->error("积分扣除失败");
+            //审核拒绝 则取消扣除积分
+            if ($request['type'] != 'pass') {
+                $newBikeCount = NewBikes::count('member_id = ' . $newBike->getMemberId());
+                //付费信息才会扣除积分
+                if ($newBikeCount > 3) {
+                    $member = Member::findFirst($newBike->getMemberId());
+                    if (!service("nb/manager")->returnPoints($member, $newBike)) {
+                        $this->db->rollback();
+                        return $this->error("积分扣除失败");
+                    }
+                }
             }
             $this->db->commit();
             return $this->success();

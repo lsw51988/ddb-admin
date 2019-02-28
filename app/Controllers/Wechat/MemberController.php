@@ -385,7 +385,7 @@ class MemberController extends WechatAuthController
             $needPoint = true;
         }
         if (service("refresh/manager")->refresh($request, $needPoint)) {
-            $count = 3 - $count;
+            $count = 2 - $count;
             return $this->success($count);
         }
         return $this->error();

@@ -25,7 +25,7 @@ class Manager extends Service
         $data['province'] = $addr[0];
         $data['city'] = $addr[1];
         $data['district'] = $addr[2];
-        $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']+1];
+        $data['voltage'] = MemberBike::$voltageDesc[$data['voltage'] + 1];
         $this->db->begin();
         $shb = new SecondBikes();
         $data['buy_date'] = $data['buy_date'] . "-01 00:00:00";
@@ -57,11 +57,20 @@ class Manager extends Service
             $shb->setRemark($data['remark']);
         }
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
-            $shb->setLastChangeTime($data['last_change_time']. "-01 00:00:00");
+            $shb->setLastChangeTime($data['last_change_time'] . "-01 00:00:00");
         }
 
         //2.积分扣除 发布二手车的积分
-        if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB, $shb->getId())) {
+        //如果小于3辆车，则不扣除积分
+        $secondBikeCount = SecondBike::count('member_id = ' . $member->getId());
+        if ($secondBikeCount > 3) {
+            if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB, $shb->getId())) {
+                $this->db->rollback();
+                return false;
+            }
+        }
+        //3.消息通知
+        if (!service('member/manager')->saveMessage($member->getId(), '发布二手车成功')) {
             $this->db->rollback();
             return false;
         }
