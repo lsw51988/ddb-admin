@@ -114,7 +114,7 @@ class NBController extends WechatAuthController
             $district = $member->getDistrict();
             $area = Areas::findFirstByDistrictCode($district);
             $data['city'] = $area->getCityCode();
-        }else{
+        } else {
             $area = Areas::findFirstByDistrictName($data['district']);
             $data['city'] = $area->getCityCode();
             $data['district'] = $area->getDistrictCode();
@@ -230,5 +230,22 @@ class NBController extends WechatAuthController
             }
         }
         return $this->error("未找到或已经删除该记录");
+    }
+
+    /**
+     * 检查当前用户是否能发布新车
+     * @Get("/canCreate")
+     */
+    public function canCreate()
+    {
+        $member = Member::findFirst($this->currentMember->getId());
+        //需要首先判断用户积分是否足够
+        if (!$repair = Repair::findFirstByBelongerId($member->getId())) {
+            return $this->error("请先添加您的维修点店铺");
+        }
+        if ($repair->getStatus() != Repair::STATUS_PASS) {
+            return $this->error("您的店铺尚未审核通过");
+        }
+        return $this->success($member);
     }
 }

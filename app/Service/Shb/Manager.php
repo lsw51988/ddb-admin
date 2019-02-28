@@ -182,8 +182,9 @@ class Manager extends Service
             "conditions" => "second_bike_id = $id AND member_id = " . $member->getId(),
             "order" => "created_at DESC"
         ]);
-        $secondBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))
-            ->save();
+        if ($secondBikeBrowse) {
+            $secondBikeBrowse->setCallTime(date("Y-m-d H:i:s", time()))->save();
+        }
     }
 
     public function returnPoints($member, $shb)
