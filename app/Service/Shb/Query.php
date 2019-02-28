@@ -46,10 +46,10 @@ class Query extends Service
             }
         }
 
-        if (!empty($search['city']) && !empty($search['district'])) {
-            $conditions = $conditions . " AND city='" . $search['city'] . "' AND district='" . $search['district'] . "'";
+        if (!empty($search['city_code']) && !empty($search['district_code'])) {
+            $conditions = $conditions . " AND city_code='" . $search['city_code'] . "' AND district_code='" . $search['district_code'] . "'";
         } else {
-            $conditions = $conditions . " AND city='" . $search['city'] . "'";
+            $conditions = $conditions . " AND city_code='" . $search['city_code'] . "'";
         }
         $order = "";
         if (!empty($search['price'])) {

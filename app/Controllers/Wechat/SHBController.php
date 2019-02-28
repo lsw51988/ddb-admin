@@ -124,11 +124,11 @@ class SHBController extends WechatAuthController
         if (!isset($data['district'])) {
             $district = $member->getDistrict();
             $area = Areas::findFirstByDistrictCode($district);
-            $data['city'] = $area->getCityCode();
+            $data['city_code'] = $area->getCityCode();
         }else{
             $area = Areas::findFirstByDistrictName($data['district']);
-            $data['city'] = $area->getCityCode();
-            $data['district'] = $area->getDistrictCode();
+            $data['city_code'] = $area->getCityCode();
+            $data['district_code'] = $area->getDistrictCode();
         }
         if (!empty($data['self_flag'])) {
             $data['member_id'] = $member->getId();
