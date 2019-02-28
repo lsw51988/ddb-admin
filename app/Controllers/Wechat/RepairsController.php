@@ -43,7 +43,7 @@ class RepairsController extends WechatAuthController
             ->setAddress($data['address'])
             ->setCreateBy($member->getId())
             ->setStatus(Repair::STATUS_CREATE);
-        if(ok($data,'belong_creator') && $data['belong_creator'] == 1){
+        if (ok($data, 'belong_creator') && $data['belong_creator'] == 1) {
             $repair->setBelongerId($member->getId());
         }
         if (ok($data, 'mobile')) {
@@ -71,10 +71,6 @@ class RepairsController extends WechatAuthController
         if (!$repair->save()) {
             app_log()->error("用户增加维修点错误,member_id:" . $member->getId());
             return $this->error("维修点记录保存失败");
-        }
-        $currentMember = Member::findFirst($member->getId());
-        if (!service("point/manager")->create($currentMember, MemberPoint::TYPE_ADD_REPAIRS)) {
-            return $this->error("积分变更失败");
         }
         $this->db->commit();
         return $this->success(["repair_id" => $repair->getId()]);

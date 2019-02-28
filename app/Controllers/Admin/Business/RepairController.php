@@ -10,6 +10,8 @@ namespace Ddb\Controllers\Admin\Business;
 
 use Ddb\Controllers\AdminAuthController;
 use Ddb\Models\RepairImages;
+use Ddb\Modules\Member;
+use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Repair;
 
 /**
@@ -124,6 +126,13 @@ class RepairController extends AdminAuthController
             if (!$repair->setStatus($status)->save()) {
                 $this->db->rollback();
                 return $this->error('状态变更失败');
+            }
+            if ($request['type'] == 'pass') {
+                $member = Member::findFirst($repair->getCreateBy());
+                if (!service("point/manager")->create($member, MemberPoint::TYPE_ADD_REPAIRS)) {
+                    $this->db->rollback();
+                    return $this->error("积分变更失败");
+                }
             }
             $this->db->commit();
             return $this->success();
