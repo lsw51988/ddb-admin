@@ -236,7 +236,7 @@ class NBController extends WechatAuthController
      * 检查当前用户是否能发布新车
      * @Get("/canCreate")
      */
-    public function canCreate()
+    public function canCreateAction()
     {
         $member = Member::findFirst($this->currentMember->getId());
         //需要首先判断用户积分是否足够
