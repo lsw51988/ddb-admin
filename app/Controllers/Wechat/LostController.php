@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\LostBikes;
 use Ddb\Models\MemberBikeImages;
+use Ddb\Modules\LostBike;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
 use Ddb\Models\Areas;
@@ -74,7 +75,7 @@ class LostController extends WechatAuthController
             }
         } else {
             $data = $this->data;
-            if ($data["lostBikeId"]) {
+            /*if ($data["lostBikeId"]) {
                 $lostBike = LostBikes::findFirst($data["lostBikeId"]);
                 if ($lostBike->getUpdatedAt() != null && strtotime($lostBike->getUpdatedAt()) >= strtotime(Date("Y-m-d 00:00:00"))) {
                     return $this->error("今日已经刷新过了,明天再来吧");
@@ -86,6 +87,10 @@ class LostController extends WechatAuthController
                 if ($currentMember->getPoints() < MemberPoint::$typeScore[MemberPoint::TYPE_LOST_BIKE]) {
                     return $this->error("积分不足");
                 }
+            }*/
+            $lostBike = new LostBikes();
+            if ($currentMember->getPoints() < MemberPoint::$typeScore[MemberPoint::TYPE_LOST_BIKE]) {
+                return $this->error("积分不足");
             }
             $addr = explode(",", $data['addr']);
             $districtName = $addr['2'];
@@ -112,6 +117,40 @@ class LostController extends WechatAuthController
             }
             $this->db->commit();
             return $this->success();
+        }
+    }
+
+    /**
+     * @Post("/fresh")
+     * 刷新丢失车辆
+     */
+    public function refreshAction(){
+        $data = $this->data;
+        if($lostBike = LostBike::findFirst($data['lostBikeId'])){
+            if(service('lost/manager')->refresh($lostBike)){
+                return $this->success();
+            }else{
+                return $this->error('刷新失败');
+            }
+        }else{
+            return $this->error('未找到该记录');
+        }
+    }
+
+    /**
+     * @Post("/revoke")
+     * 撤回丢失车辆
+     */
+    public function revokeAction(){
+        $data = $this->data;
+        if($lostBike = LostBike::findFirst($data['lostBikeId'])){
+            if(service('lost/manager')->revoke($lostBike,$data)){
+                return $this->success();
+            }else{
+                return $this->error('刷新失败');
+            }
+        }else{
+            return $this->error('未找到该记录');
         }
     }
 

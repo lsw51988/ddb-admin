@@ -86,7 +86,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_PUBLISH_SHB => "发布二手车信息",
         self::TYPE_CANCEL_APPEAL => "取消帮助",
         self::TYPE_APPEAL_SOS => "无法移动,寻求帮助",
-        self::TYPE_LOST_BIKE => "车辆丢失",
+        self::TYPE_LOST_BIKE => "发布车辆丢失信息",
         self::TYPE_UPDATE_SHB => "更新二手车信息",
         self::TYPE_REPUB_SHB => "重新发布二手车",
         self::TYPE_REFRESH_SHB => "刷新二手车排名",

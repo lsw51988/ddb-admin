@@ -26,6 +26,9 @@ class Manager extends BaseService
     {
         $memberPoint = new MemberPoint();
         $point = MemberPoint::$typeScore[$type];
+        if (service('member/query')->isPrivilege($member)) {
+            $point = $point * 0.8;
+        }
         $memberPoint->setMemberId($member->getId())
             ->setType($type)
             ->setValue($point);
