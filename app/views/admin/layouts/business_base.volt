@@ -58,6 +58,13 @@
                     <dd><a href="/admin/business/lost/to_auth">待审核</a></dd>
                 </dl>
             </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">建议</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/admin/business/suggestion/list">总览</a></dd>
+                    <dd><a href="/admin/business/suggestion/to_auth">待审核</a></dd>
+                </dl>
+            </li>
         </ul>
     </div>
 {% endblock %}

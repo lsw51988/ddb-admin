@@ -35,6 +35,7 @@ namespace PHPSTORM_META {
             'sign/manager' instanceof \Ddb\Service\Sign\Manager,
             'sms/manager' instanceof \Ddb\Service\Sms\Manager,
             'suggestion/manager' instanceof \Ddb\Service\Suggestion\Manager,
+            'suggestion/queyr' instanceof \Ddb\Service\Suggestion\Query,
             'user/manager' instanceof \Ddb\Service\User\Manager,
             'user/query' instanceof \Ddb\Service\User\Query,
         ]

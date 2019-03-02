@@ -17,13 +17,13 @@ class Suggestion extends Suggestions
     const STATUS_REFUSE = 2;
     const STATUS_ACCEPT = 3;
 
-    const TYPE_MEMBER_DETAIL = 1;
-    const TYPE_FIX_AUTH = 2;
-    const TYPE_APPEAL = 3;
-    const TYPE_LOST_APPEAL = 4;
-    const TYPE_POINT = 5;
-    const TYPE_SHB = 6;
-    const TYPE_RECOMMEND = 7;
+    const TYPE_MEMBER_DETAIL = 0;
+    const TYPE_FIX_AUTH = 1;
+    const TYPE_APPEAL = 2;
+    const TYPE_LOST_APPEAL = 3;
+    const TYPE_POINT = 4;
+    const TYPE_SHB = 5;
+    const TYPE_RECOMMEND = 6;
 
     public static $typeDesc = [
         self::TYPE_MEMBER_DETAIL => "用户完善资料",
