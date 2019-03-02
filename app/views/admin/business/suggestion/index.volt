@@ -24,6 +24,8 @@
             <th>类型</th>
             <th>内容</th>
             <th>用户名</th>
+            <th>状态</th>
+            <th>拒绝原因</th>
             <th>创建时间</th>
         </tr>
         </thead>
@@ -34,6 +36,8 @@
                 <td>{{ typeDesc[suggestion['type']] }}</td>
                 <td>{{ suggestion['content'] }}</td>
                 <td>{{ suggestion['real_name'] }}</td>
+                <td>{{ statusDesc[suggestion['status']] }}</td>
+                <td>{{ suggestion['refuse_reason'] }}</td>
                 <td>{{ suggestion['created_at'] }}</td>
             </tr>
         {% endfor %}

@@ -25,6 +25,12 @@ class Suggestion extends Suggestions
     const TYPE_SHB = 5;
     const TYPE_RECOMMEND = 6;
 
+    public static $statusDesc = [
+        self::STATUS_CREATE=>'刚创建',
+        self::STATUS_REFUSE=>'拒绝',
+        self::STATUS_ACCEPT=>'通过',
+    ];
+
     public static $typeDesc = [
         self::TYPE_MEMBER_DETAIL => "用户完善资料",
         self::TYPE_FIX_AUTH => "修理者认证",

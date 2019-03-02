@@ -61,7 +61,7 @@
                 , curr:{{ page }}
                 , jump: function (obj, first) {
                     if (!first) {
-                        window.location.href = "/admin/business/suggestion/list?page=" + obj.curr
+                        window.location.href = "/admin/business/suggestion/to_auth?page=" + obj.curr
                     }
                 }
             });

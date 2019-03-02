@@ -23,7 +23,8 @@ class SuggestionController extends AdminAuthController
     /**
      * @Get("/list")
      */
-    public function indexAction(){
+    public function indexAction()
+    {
         $request = $this->data;
         $data = $this->getList($request);
         $this->view->setVars([
@@ -31,14 +32,16 @@ class SuggestionController extends AdminAuthController
             'data' => $data->items->toArray(),
             'total' => $data->total_items,
             'search' => $request,
-            'typeDesc' => Suggestion::$typeDesc
+            'typeDesc' => Suggestion::$typeDesc,
+            'statusDesc' => Suggestion::$statusDesc
         ]);
     }
 
     /**
      * @Get("/to_auth")
      */
-    public function toAuthAction(){
+    public function toAuthAction()
+    {
         $request = $this->request->get();
         $request['status'] = Suggestion::STATUS_CREATE;
         $data = $this->getList($request);
@@ -46,7 +49,8 @@ class SuggestionController extends AdminAuthController
             'page' => $this->page,
             'data' => $data->items->toArray(),
             'total' => $data->total_items,
-            'search' => $request
+            'search' => $request,
+            'typeDesc' => Suggestion::$typeDesc
         ]);
     }
 
@@ -60,7 +64,7 @@ class SuggestionController extends AdminAuthController
         if ($suggestion = Suggestion::findFirst($request['suggestion_id'])) {
             if ($request['type'] == 'pass') {
                 $status = Suggestion::STATUS_ACCEPT;
-                $message = '建议审核通过,获得'.MemberPoint::$typeScore[MemberPoint::TYPE_SUGGESTION_APPROVED].'积分';
+                $message = '建议审核通过,获得' . MemberPoint::$typeScore[MemberPoint::TYPE_SUGGESTION_APPROVED] . '积分';
             } else {
                 if ($suggestion->getStatus() == Suggestion::STATUS_REFUSE) {
                     return $this->error('无法重复拒绝');
@@ -73,11 +77,11 @@ class SuggestionController extends AdminAuthController
             if (!$suggestion->setStatus($status)->setUpdatedAt(date('Y-m-d H:i;s'))->save()) {
                 //退回用户积分
                 $this->db->rollback();
-                return $this->error('二手车状态更新失败');
+                return $this->error('状态更新失败');
             }
             if ($request['type'] == 'pass') {
                 $member = Member::findFirst($suggestion->getMemberId());
-                if(!service("point/manager")->create($member, MemberPoint::TYPE_SUGGESTION_APPROVED)){
+                if (!service("point/manager")->create($member, MemberPoint::TYPE_SUGGESTION_APPROVED)) {
                     $this->db->rollback();
                     return false;
                 }
