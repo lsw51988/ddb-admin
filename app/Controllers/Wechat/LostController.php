@@ -50,10 +50,11 @@ class LostController extends WechatAuthController
                 $bikeImages[$i] = di("config")->app->URL . "/wechat/member/bikeImg/" . $bikeImages[$i];
             }
             if ($lostBike = LostBikes::findFirst("member_id=" . $memberBikeId . " AND created_at>='" . date("Y-m-d H:i:s", strtotime("-3 day")) . "'")) {
+                $area = Areas::findFirstByDistrictCode($lostBike->getDistrict());
                 $location = [];
-                $location[] = $lostBike->getProvince();
-                $location[] = $lostBike->getCity();
-                $location[] = $lostBike->getDistrict();
+                $location[] = $area->getProvinceName();
+                $location[] = $area->getCityName();
+                $location[] = $area->getDistrictName();
                 return $this->success([
                     "lostBike" => $lostBike,
                     "location" => $location,
@@ -82,7 +83,7 @@ class LostController extends WechatAuthController
                 $lostBike->setUpdatedAt(Date("Y-m-d H:i:s", time()));
             } else {
                 $lostBike = new LostBikes();
-                if ($currentMember->getPoints() < 10) {
+                if ($currentMember->getPoints() < MemberPoint::$typeScore[MemberPoint::TYPE_LOST_BIKE]) {
                     return $this->error("积分不足");
                 }
             }
