@@ -88,7 +88,7 @@ class Manager extends Service
             'member_id' => $lostBike->getMemberId(),
             'created_at' => date('Y-m-d H:i:s')
         ];
-        if ($bikeRefreshModel->save($bikeRefreshData)) {
+        if (!$bikeRefreshModel->save($bikeRefreshData)) {
             $this->db->rollback();
             return false;
         }
