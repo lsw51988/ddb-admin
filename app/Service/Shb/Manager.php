@@ -123,10 +123,9 @@ class Manager extends Service
         if (!$shb->save()) {
             $this->db->rollback();
             return false;
-        } else {
-            $this->db->commit();
-            return $shb->getId();
         }
+        $this->db->commit();
+        return $shb->getId();
     }
 
     public function repub($member, $data)

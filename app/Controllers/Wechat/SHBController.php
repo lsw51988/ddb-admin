@@ -55,7 +55,7 @@ class SHBController extends WechatAuthController
         if ($shbId = service("shb/manager")->update($member, $data)) {
             return $this->success();
         }
-        return $this->error();
+        return $this->error('更新失败');
     }
 
     /**
