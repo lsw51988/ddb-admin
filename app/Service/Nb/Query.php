@@ -34,7 +34,12 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,brand_name,price,city,district,detail_addr,status,voltage";
-        $conditions = "status=" . NewBike::STATUS_AUTH;
+
+        if (!empty($search['self_flag'])) {
+            $conditions = "member_id = " . $search['member_id'];
+        } else {
+            $conditions = "status=" . NewBike::STATUS_AUTH;
+        }
 
         if (!empty($search['district']) && !empty($search['city'])) {
             $conditions = $conditions . " AND city_code='" . $search['city'] . "' AND district_code='" . $search['district'] . "'";
@@ -62,9 +67,6 @@ class Query extends Service
             }
         }
 
-        if (!empty($search['self_flag'])) {
-            $conditions = $conditions . " AND member_id = " . $search['member_id'];
-        }
         $order = "updated_at DESC";
         $data = NewBikes::page($columns, $conditions, [], $order);
         return $data;

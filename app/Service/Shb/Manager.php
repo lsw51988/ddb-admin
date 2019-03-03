@@ -63,7 +63,7 @@ class Manager extends Service
         //2.积分扣除 发布二手车的积分
         //如果小于3辆车，则不扣除积分
         $secondBikeCount = SecondBike::count('member_id = ' . $member->getId());
-        if ($secondBikeCount > 3) {
+        if ($secondBikeCount >= 3) {
             if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_SHB, $shb->getId())) {
                 $this->db->rollback();
                 return false;

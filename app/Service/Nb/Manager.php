@@ -71,7 +71,7 @@ class Manager extends Service
         }
         //2.积分扣除 发布新车的积分 免费发布3个信息
         $newBikeCount = NewBikes::count('member_id = ' . $member->getId());
-        if ($newBikeCount > 3) {
+        if ($newBikeCount >= 3) {
             if (!service('point/manager')->create($member, MemberPoint::TYPE_PUBLISH_NB, null, null, null, $nb->getId())) {
                 $this->db->rollback();
                 return false;

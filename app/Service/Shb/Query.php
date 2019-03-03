@@ -31,7 +31,11 @@ class Query extends Service
     public function getList($search = [])
     {
         $columns = "id,brand_name,out_price,city,district,created_at,status";
-        $conditions = "status=" . SecondBike::STATUS_AUTH;
+        if (!empty($search['self_flag'])) {
+            $conditions = "member_id = " . $search['member_id'];
+        } else {
+            $conditions = "status=" . SecondBike::STATUS_AUTH;
+        }
         if (!empty($search['time'])) {
             switch ($search['time']) {
                 case 1:
@@ -61,9 +65,6 @@ class Query extends Service
                     $order = " AND out_price DESC";
                     break;
             }
-        }
-        if (!empty($search['self_flag'])) {
-            $conditions = $conditions . " AND member_id = " . $search['member_id'];
         }
 
         $data = SecondBike::page($columns, $conditions, [], $order);

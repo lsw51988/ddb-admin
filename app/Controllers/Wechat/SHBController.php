@@ -85,8 +85,12 @@ class SHBController extends WechatAuthController
             if ($shb->getMemberId() != $member->getId()) {
                 return $this->error("非本人操作");
             }
-            $shb->setStatus(SecondBike::STATUS_CANCEL)->setCancelTime(date("Y-m-d H:i:s", time()))->setCancelReason($data['reason'])->save();
-            return $this->success();
+            $shb->setStatus(SecondBike::STATUS_CANCEL)->setCancelTime(date("Y-m-d H:i:s", time()))->setCancelReason($data['reason']);
+            if ($shb->save()) {
+                return $this->success();
+            } else {
+                return $this->error('操作失败');
+            }
         } else {
             return $this->error("未找到该条记录");
         }
@@ -125,7 +129,7 @@ class SHBController extends WechatAuthController
             $district = $member->getDistrict();
             $area = Areas::findFirstByDistrictCode($district);
             $data['city_code'] = $area->getCityCode();
-        }else{
+        } else {
             $area = Areas::findFirstByDistrictName($data['district']);
             $data['city_code'] = $area->getCityCode();
             $data['district_code'] = $area->getDistrictCode();
