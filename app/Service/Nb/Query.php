@@ -166,18 +166,6 @@ class Query extends Service
         $data['remark'] = $nb->getRemark();
         $data['status'] = $nb->getStatus();
 
-        $data['left_days'] = $this->getLeftDays($nb->getAvailTime());
-
         return $data;
-    }
-
-    private function getLeftDays($date)
-    {
-        $seconds = strtotime($date) - time();
-        if ($seconds <= 0) {
-            return 0;
-        } else {
-            return intval($seconds / 86400);
-        }
     }
 }

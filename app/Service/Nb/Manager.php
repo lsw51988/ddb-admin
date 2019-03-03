@@ -19,6 +19,7 @@ use Ddb\Modules\MemberBike;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\NewBike;
 use Ddb\Modules\Repair;
+use Phalcon\Di\Exception;
 
 class Manager extends Service
 {
@@ -82,7 +83,13 @@ class Manager extends Service
         return $nb->getId();
     }
 
-    public function update($member, $data)
+    /**
+     * @param NewBike $nb
+     * @param $member
+     * @param $data
+     * @return bool|int
+     */
+    public function update(NewBike $nb, $member, $data)
     {
         $addr = explode(",", $data['addr']);
         $data['province'] = $addr[0];
@@ -90,9 +97,6 @@ class Manager extends Service
         $data['district'] = $addr[2];
         $data['voltage'] = MemberBike::$voltageDesc[$data['voltage']];
         $this->db->begin();
-        if (!$nb = NewBikes::findFirst($data['id'])) {
-            return false;
-        }
         $nb->setMemberId($member->getId())
             ->setVoltage($data['voltage'])
             ->setBrandName($data['brand_name'])

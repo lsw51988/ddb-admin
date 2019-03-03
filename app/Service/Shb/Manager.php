@@ -105,7 +105,8 @@ class Manager extends Service
             ->setCity($data['city'])
             ->setDistrict($data['district'])
             ->setDetailAddr($data['detail_addr'])
-            ->setNumber($data['number']);
+            ->setNumber($data['number'])
+            ->setInStatus($data['in_status']);
         if ($area = Areas::findFirst("province_name='" . $data['province'] . "' AND city_name='" . $data['city'] . "' AND district_name='" . $data['district'] . "'")) {
             $shb->setProvinceCode($area->getProvinceCode())
                 ->setCityCode($area->getCityCode())
@@ -117,7 +118,7 @@ class Manager extends Service
             $shb->setRemark($data['remark']);
         }
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
-            $shb->setLastChangeTime($data['last_change_time']);
+            $shb->setLastChangeTime($data['last_change_time'].'-01 00:00:00');
         }
 
         if (!$shb->save()) {
@@ -156,7 +157,7 @@ class Manager extends Service
             $shb->setRemark($data['remark']);
         }
         if (isset($data['last_change_time']) && $data['last_change_time'] != "未更换") {
-            $shb->setLastChangeTime($data['last_change_time']);
+            $shb->setLastChangeTime($data['last_change_time'].'-01 00:00:00');
         }
 
         if (!$shb->save()) {

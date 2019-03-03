@@ -60,10 +60,13 @@ class NBController extends WechatAuthController
     {
         $member = $this->currentMember;
         $data = $this->data;
-        if ($nbId = service("nb/manager")->update($member, $data)) {
+        if (!$nb = NewBike::findFirst($data['id'])) {
+            return $this->error('未找到该记录');
+        }
+        if ($nbId = service("nb/manager")->update($nb,$member, $data)) {
             return $this->success();
         }
-        return $this->error();
+        return $this->error('更新失败');
     }
 
     /**
