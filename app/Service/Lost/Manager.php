@@ -69,28 +69,32 @@ class Manager extends Service
     }
 
     /**
-     * @param LostBikes $lostBike
+     * @param LostBike $lostBike
      * @return bool
      */
-    public function refresh(LostBikes $lostBike)
+    public function refresh(LostBike $lostBike)
     {
-        $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00').'\'');
+        $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00') . '\'');
         $this->db->begin();
-        if ($todayRefreshCount < 3) {
-            $lostBike->setUpdatedAt(date('Y-m-d H:i:s'));
-            if (!$lostBike->save()) {
-                $this->db->rollback();
-                return false;
-            }
-        } else {
-            $bikeRefreshModel = new BikeRefresh();
-            $bikeRefreshData = [
-                'bike_id' => $lostBike->getId(),
-                'type' => BikeRefresh::TYPE_LOST,
-                'member_id' => $lostBike->getMemberId(),
-                'created_at' => date('Y-m-d H:i:s')
-            ];
-            if ($bikeRefreshModel->save($bikeRefreshData)) {
+        $lostBike->setUpdatedAt(date('Y-m-d H:i:s'));
+        if (!$lostBike->save()) {
+            $this->db->rollback();
+            return false;
+        }
+        $bikeRefreshModel = new BikeRefresh();
+        $bikeRefreshData = [
+            'bike_id' => $lostBike->getId(),
+            'type' => BikeRefresh::TYPE_LOST,
+            'member_id' => $lostBike->getMemberId(),
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+        if ($bikeRefreshModel->save($bikeRefreshData)) {
+            $this->db->rollback();
+            return false;
+        }
+        if ($todayRefreshCount >= 3) {
+            $member = Member::findFirst($lostBike->getMemberId());
+            if (!service('point/manager')->create($member, MemberPoint::TYPE_LOST_BIKE, null, null, $lostBike->getId())) {
                 $this->db->rollback();
                 return false;
             }

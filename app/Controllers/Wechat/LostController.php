@@ -76,19 +76,6 @@ class LostController extends WechatAuthController
             }
         } else {
             $data = $this->data;
-            /*if ($data["lostBikeId"]) {
-                $lostBike = LostBikes::findFirst($data["lostBikeId"]);
-                if ($lostBike->getUpdatedAt() != null && strtotime($lostBike->getUpdatedAt()) >= strtotime(Date("Y-m-d 00:00:00"))) {
-                    return $this->error("今日已经刷新过了,明天再来吧");
-                }
-
-                $lostBike->setUpdatedAt(Date("Y-m-d H:i:s", time()));
-            } else {
-                $lostBike = new LostBikes();
-                if ($currentMember->getPoints() < MemberPoint::$typeScore[MemberPoint::TYPE_LOST_BIKE]) {
-                    return $this->error("积分不足");
-                }
-            }*/
             $lostBike = new LostBikes();
             if ($currentMember->getPoints() < MemberPoint::$typeScore[MemberPoint::TYPE_LOST_BIKE]) {
                 return $this->error("积分不足");
@@ -128,11 +115,14 @@ class LostController extends WechatAuthController
     public function refreshAction()
     {
         $data = $this->data;
-        if ($lostBike = LostBikes::findFirst($data['lostBikeId'])) {
+        if ($lostBike = LostBike::findFirst($data['lostBikeId'])) {
+            if ($lostBike->getStatus() == LostBike::STATUS_CREATE) {
+                return $this->error('还未通过审核，刷新无用');
+            }
             if (service('lost/manager')->refresh($lostBike)) {
                 $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00') . '\'');
                 return $this->success([
-                    'left_refresh_count' => 3 - $todayRefreshCount
+                    'left_refresh_count' => 2 - $todayRefreshCount
                 ]);
             } else {
                 return $this->error('刷新失败');
