@@ -48,6 +48,7 @@ class MemberPoint extends MemberPoints
     const TYPE_REFRESH_NB = -8;
     const TYPE_PUBLISH_NB = -9;
     const TYPE_PUBLISH_LB = -10;
+    const TYPE_REFRESH_LB = -11;
 
     const TYPE_PRIVILEGE_ONE_MONTH = -12;
     const TYPE_PRIVILEGE_THREE_MONTH = -13;
@@ -93,6 +94,7 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_NB => "刷新新车排名",
         self::TYPE_PUBLISH_NB => "发布新车信息",
         self::TYPE_PUBLISH_LB => "发布丢失车辆信息",
+        self::TYPE_REFRESH_LB => "刷新丢失车辆信息",
 
         self::TYPE_PUBLISH_SHB_REFUSE => "拒绝发布二手车信息",
         self::TYPE_PUBLISH_NB_REFUSE => "拒绝展示新车信息",
@@ -126,7 +128,7 @@ class MemberPoint extends MemberPoints
 
         self::TYPE_PUBLISH_SHB_REFUSE => 100,
         self::TYPE_PUBLISH_NB_REFUSE => 100,
-        self::TYPE_PUBLISH_LB_REFUSE => 10,
+        self::TYPE_PUBLISH_LB_REFUSE => 20,
 
         self::TYPE_PUBLISH_SHB => -100,
         self::TYPE_CANCEL_APPEAL => -10,
@@ -137,7 +139,8 @@ class MemberPoint extends MemberPoints
         self::TYPE_REFRESH_SHB => -10,
         self::TYPE_REFRESH_NB => -10,
         self::TYPE_PUBLISH_NB => -100,
-        self::TYPE_PUBLISH_LB => -10,
+        self::TYPE_PUBLISH_LB => -20,
+        self::TYPE_REFRESH_LB => -10,
 
         self::TYPE_PRIVILEGE_ONE_MONTH => -100,
         self::TYPE_PRIVILEGE_THREE_MONTH => -280,

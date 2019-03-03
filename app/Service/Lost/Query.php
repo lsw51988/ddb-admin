@@ -43,14 +43,14 @@ class Query extends Service
         } else {
             $conditions = $conditions . " AND city='" . $search['city'] . "'";
         }
-        $order = "";
+        $order = "updated_at DESC";
         if (!empty($search['rewards'])) {
             switch ($search['rewards']) {
                 case 1:
-                    $order = "rewards ASC";
+                    $order = " AND rewards ASC";
                     break;
                 case 2:
-                    $order = "rewards DESC";
+                    $order = " AND rewards DESC";
                     break;
             }
         }

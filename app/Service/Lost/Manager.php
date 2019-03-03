@@ -94,7 +94,7 @@ class Manager extends Service
         }
         if ($todayRefreshCount >= 3) {
             $member = Member::findFirst($lostBike->getMemberId());
-            if (!service('point/manager')->create($member, MemberPoint::TYPE_LOST_BIKE, null, null, $lostBike->getId())) {
+            if (!service('point/manager')->create($member, MemberPoint::TYPE_REFRESH_LB, null, null, $lostBike->getId())) {
                 $this->db->rollback();
                 return false;
             }

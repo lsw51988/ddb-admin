@@ -42,7 +42,6 @@ class Query extends Service
             $conditions = $conditions . " AND city_code='" . $search['city'] . "'";
         }
 
-        $order = "";
         if (!empty($search['price'])) {
             switch ($search['price']) {
                 case 1:
@@ -66,7 +65,7 @@ class Query extends Service
         if (!empty($search['self_flag'])) {
             $conditions = $conditions . " AND member_id = " . $search['member_id'];
         }
-
+        $order = "updated_at DESC";
         $data = NewBikes::page($columns, $conditions, [], $order);
         return $data;
     }

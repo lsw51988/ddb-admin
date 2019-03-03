@@ -51,14 +51,14 @@ class Query extends Service
         } else {
             $conditions = $conditions . " AND city_code='" . $search['city_code'] . "'";
         }
-        $order = "";
+        $order = "updated_at DESC";
         if (!empty($search['price'])) {
             switch ($search['price']) {
                 case 1:
-                    $order = "out_price ASC";
+                    $order = " AND out_price ASC";
                     break;
                 case 2:
-                    $order = "out_price DESC";
+                    $order = " AND out_price DESC";
                     break;
             }
         }
