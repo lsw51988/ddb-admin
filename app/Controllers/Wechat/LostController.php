@@ -12,6 +12,7 @@ namespace Ddb\Controllers\Wechat;
 use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\LostBikes;
 use Ddb\Models\MemberBikeImages;
+use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\LostBike;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberBike;
@@ -121,18 +122,22 @@ class LostController extends WechatAuthController
     }
 
     /**
-     * @Post("/fresh")
+     * @Post("/refresh")
      * 刷新丢失车辆
      */
-    public function refreshAction(){
+    public function refreshAction()
+    {
         $data = $this->data;
-        if($lostBike = LostBike::findFirst($data['lostBikeId'])){
-            if(service('lost/manager')->refresh($lostBike)){
-                return $this->success();
-            }else{
+        if ($lostBike = LostBikes::findFirst($data['lostBikeId'])) {
+            if (service('lost/manager')->refresh($lostBike)) {
+                $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00') . '\'');
+                return $this->success([
+                    'left_refresh_count' => 3 - $todayRefreshCount
+                ]);
+            } else {
                 return $this->error('刷新失败');
             }
-        }else{
+        } else {
             return $this->error('未找到该记录');
         }
     }
@@ -141,15 +146,16 @@ class LostController extends WechatAuthController
      * @Post("/revoke")
      * 撤回丢失车辆
      */
-    public function revokeAction(){
+    public function revokeAction()
+    {
         $data = $this->data;
-        if($lostBike = LostBike::findFirst($data['lostBikeId'])){
-            if(service('lost/manager')->revoke($lostBike,$data)){
+        if ($lostBike = LostBike::findFirst($data['lostBikeId'])) {
+            if (service('lost/manager')->revoke($lostBike, $data)) {
                 return $this->success();
-            }else{
+            } else {
                 return $this->error('刷新失败');
             }
-        }else{
+        } else {
             return $this->error('未找到该记录');
         }
     }

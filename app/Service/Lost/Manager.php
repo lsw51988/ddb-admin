@@ -11,6 +11,7 @@ namespace Ddb\Service\Lost;
 
 use Ddb\Core\Service;
 use Ddb\Models\LostBikeContacts;
+use Ddb\Models\LostBikes;
 use Ddb\Modules\BikeRefresh;
 use Ddb\Modules\LostBike;
 use Ddb\Modules\Member;
@@ -67,9 +68,13 @@ class Manager extends Service
         return true;
     }
 
-    public function refresh(LostBike $lostBike)
+    /**
+     * @param LostBikes $lostBike
+     * @return bool
+     */
+    public function refresh(LostBikes $lostBike)
     {
-        $todayRefreshCount = BikeRefresh::where('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=' . date('Y-m-d H:i:s'));
+        $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00').'\'');
         $this->db->begin();
         if ($todayRefreshCount < 3) {
             if (!$lostBike->setUpdatedAt(date('Y-m-d H:i:s')->save())) {
