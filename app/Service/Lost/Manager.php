@@ -77,7 +77,8 @@ class Manager extends Service
         $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00').'\'');
         $this->db->begin();
         if ($todayRefreshCount < 3) {
-            if (!$lostBike->setUpdatedAt(date('Y-m-d H:i:s')->save())) {
+            $lostBike->setUpdatedAt(date('Y-m-d H:i:s'));
+            if (!$lostBike->save()) {
                 $this->db->rollback();
                 return false;
             }
@@ -103,7 +104,7 @@ class Manager extends Service
         $lostBike->setStatus($data['status'])
             ->setUpdatedAt(date('Y-m-d H:i:s'));
         //已经找到
-        if ($data['status'] == LostBike::STATUS_FIND) {
+        if ($data['status'] == LostBike::STATUS_FOUND) {
             $lostBike->setFinishTime(date('Y-m-d H:i:s'));
         }
         //放弃寻找
