@@ -132,7 +132,7 @@ class LostController extends WechatAuthController
             if (service('lost/manager')->refresh($lostBike)) {
                 $todayRefreshCount = BikeRefresh::count('bike_id = ' . $lostBike->getId() . ' AND type = ' . BikeRefresh::TYPE_LOST . ' AND created_at>=\'' . date('Y-m-d 00:00:00') . '\'');
                 return $this->success([
-                    'left_refresh_count' => 3 - $todayRefreshCount
+                    'left_refresh_count' => 4 - $todayRefreshCount
                 ]);
             } else {
                 return $this->error('刷新失败');
