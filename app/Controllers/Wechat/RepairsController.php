@@ -89,9 +89,13 @@ class RepairsController extends WechatAuthController
             return $this->error("短信验证码不正确,请重新获取");
         }
         if ($repair = Repair::findFirst($data['repair_id'])) {
-            if ($mobile != $repair->getMobile()) {
-                return $this->error("您的手机号与系统所留的手机号码不一致,请检查");
+
+            if($repair->getMobile()){
+                if ($mobile != $repair->getMobile()) {
+                    return $this->error("您的手机号与系统所留的手机号码不一致,请检查");
+                }
             }
+
             $repair->setBelongerId($member->getId())
                 ->setStatus(Repair::STATUS_CLAIM)
                 ->setLongitude($data['longitude'])
