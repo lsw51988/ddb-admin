@@ -34,13 +34,13 @@ class Query extends Service
 
         $mts = Repair::find([
             "columns" => "longitude,latitude,name,address,belonger_name,id",
-            "conditions" => "longitude >= :minLong: AND longitude<= :maxLong: AND latitude>=:minLati: AND latitude <= :maxLati:",
+            "conditions" => "longitude >= :minLong: AND longitude<= :maxLong: AND latitude>=:minLati: AND latitude <= :maxLati: AND status=:status:",
             "bind" => [
                 "minLong" => $minLong,
                 "maxLong" => $maxLong,
                 "minLati" => $minLati,
                 "maxLati" => $maxLati,
-                "status"=>Repair::STATUS_PASS,
+                "status" => Repair::STATUS_PASS,
             ]
         ]);
         $mts = $mts->toArray();
@@ -59,25 +59,25 @@ class Query extends Service
             ->from(["R" => Repair::class])
             ->leftJoin(Areas::class, "A.district_code = R.district", "A")
             ->columns($columns);
-        if (ok($request,'status') && $request['status'] != 99) {
+        if (ok($request, 'status') && $request['status'] != 99) {
             $builder->andWhere("R.status=" . $request['status']);
         }
-        if (ok($request,'belonger_name')) {
+        if (ok($request, 'belonger_name')) {
             $builder->andWhere("R.belonger_name like '%" . $request['belonger_name'] . "%'");
         }
-        if (ok($request,'mobile')) {
+        if (ok($request, 'mobile')) {
             $builder->andWhere("R.mobile = " . $request['mobile']);
         }
-        if (ok($request,'type') && $request['type'] != 99) {
+        if (ok($request, 'type') && $request['type'] != 99) {
             $builder->andWhere("R.type =" . $request['type']);
         }
-        if (ok($request,'province')) {
+        if (ok($request, 'province')) {
             $builder->andWhere("R.province =" . $request['province']);
         }
-        if (ok($request,'city')) {
+        if (ok($request, 'city')) {
             $builder->andWhere("R.city =" . $request['city']);
         }
-        if (ok($request,'district')) {
+        if (ok($request, 'district')) {
             $builder->andWhere("R.district =" . $request['district']);
         }
         $paginator = new QueryBuilder([
