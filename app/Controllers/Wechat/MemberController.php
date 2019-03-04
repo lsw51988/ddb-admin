@@ -75,13 +75,13 @@ class MemberController extends WechatAuthController
         }
         $memberBike->setMemberId($member->getId())
             ->setBrandName($data['brand_name'])
-            ->setBuyDate($data['buy_date'] . "-01 00:00:00")
+            ->setBuyDate($data['buy_date'] . " 00:00:00")
             ->setNumber($data['number'])
-            ->setVoltage(MemberBike::$voltageDesc[$data['voltage']])
+            ->setVoltage($data['voltage'])
             ->setPrice($data['price'])
             ->setStatus($data['status']);
         if (ok($data, 'last_change_time')) {
-            $memberBike->setLastChangeTime($data['last_change_time'].'-01 00:00:00');
+            $memberBike->setLastChangeTime($data['last_change_time'].' 00:00:00');
         }
         if (!$memberBike->save()) {
             $this->db->rollback();
@@ -140,7 +140,7 @@ class MemberController extends WechatAuthController
             }
 
             //di("queue")->useTube("SmsCode")->put(serialize(['smsCodeId' => $smsCode->getId(), 'token' => $token, 'data' => []]));
-            return $this->success("发送成功");
+            //return $this->success("发送成功");
         } else {
             return $this->error("发送失败");
         }

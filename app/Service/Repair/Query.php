@@ -40,7 +40,7 @@ class Query extends Service
                 "maxLong" => $maxLong,
                 "minLati" => $minLati,
                 "maxLati" => $maxLati,
-                //"status"=>Repair::STATUS_NOT_OWNER_CREATE,
+                "status"=>Repair::STATUS_PASS,
             ]
         ]);
         $mts = $mts->toArray();
