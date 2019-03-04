@@ -117,8 +117,8 @@ class RepairClaimController extends AdminAuthController
                     return $this->error('更改用户手机失败');
                 }
                 $repair = Repair::findFirst($repairClaim->getRepairId());
-                $repair->setBelongerName($repairClaim['name'])
-                    ->setMobile($repairClaim['mobile'])
+                $repair->setBelongerName($repairClaim->getName())
+                    ->setMobile($repairClaim->getMobile())
                     ->setBelongerId($repairClaim->getMemberId())
                     ->setAuditorId($this->currentUser->getId())
                     ->setUpdatedAt(date('Y-m-d H:i;s'));
