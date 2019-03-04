@@ -156,12 +156,12 @@ class IndexController extends BaseController
         $token = $this->request->getHeader("token");
         $key = $token . 'captcha';
         if ($captcha == di("cache")->get($key)) {
-            di("cache")->delete($key);
             //tcgmc = tokenCanGetMobileCode
             $tcgmcKey = $token . "_tcgmc";
             di("cache")->save($tcgmcKey, 1, 300);
             return $this->success();
         }
+        di("cache")->delete($key);
         return $this->error();
     }
 
