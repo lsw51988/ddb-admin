@@ -84,14 +84,15 @@ class RepairsController extends WechatAuthController
     public function claimAction()
     {
         $data = $this->data;
-        $mobile = $data['mobile'];
-        if (!service("sms/manager")->verify($mobile, $data['sms_code'])) {
-            return $this->error("短信验证码不正确,请重新获取");
-        }
+//        $mobile = $data['mobile'];
+//        if (!service("sms/manager")->verify($mobile, $data['sms_code'])) {
+//            return $this->error("短信验证码不正确,请重新获取");
+//        }
         if ($repair = Repair::findFirst($data['repair_id'])) {
             $repairClaimModel = new RepairClaim();
             $repairClaimData = [
                 'member_id' => $this->currentMember->getId(),
+                'name' => $data['name'],
                 'repair_id' => $data['repair_id']
             ];
             if ($repairClaimModel->save($repairClaimData)) {
