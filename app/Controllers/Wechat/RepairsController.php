@@ -13,8 +13,6 @@ use Ddb\Controllers\WechatAuthController;
 use Ddb\Models\Areas;
 use Ddb\Models\RepairAuthImages;
 use Ddb\Models\RepairImages;
-use Ddb\Modules\Member;
-use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Repair;
 use Ddb\Modules\RepairClaim;
 use Phalcon\Exception;
@@ -84,21 +82,25 @@ class RepairsController extends WechatAuthController
     public function claimAction()
     {
         $data = $this->data;
-//        $mobile = $data['mobile'];
-//        if (!service("sms/manager")->verify($mobile, $data['sms_code'])) {
-//            return $this->error("短信验证码不正确,请重新获取");
-//        }
+        $mobile = $data['mobile'];
+        if (!service("sms/manager")->verify($mobile, $data['sms_code'])) {
+            return $this->error("短信验证码不正确,请重新获取");
+        }
         if ($repair = Repair::findFirst($data['repair_id'])) {
             $repairClaimModel = new RepairClaim();
+            if ($repairClaimModel->findFirstByMemberId($this->currentMember->getId())) {
+                return $this->error('请勿重复申请');
+            }
             $repairClaimData = [
                 'member_id' => $this->currentMember->getId(),
+                'mobile' => $data['mobile'],
                 'name' => $data['name'],
                 'repair_id' => $data['repair_id']
             ];
             if ($repairClaimModel->save($repairClaimData)) {
-                return $this->success('');
+                return $this->success();
             } else {
-                return $this->error();
+                return $this->error('操作失败，请将该页面截图发电动帮公众号，我们将及时处理');
             }
         }
     }
@@ -222,6 +224,20 @@ class RepairsController extends WechatAuthController
     public function repairImgAction($id)
     {
         if (!$repairImage = RepairImages::findFirst($id)) {
+            return $this->error("找不到图片");
+        }
+        $path = $repairImage->getPath();
+        $data = service("file/manager")->read($path);
+        return $this->response->setContent($data)->setContentType('image/jpeg');
+    }
+
+    /**
+     * @Get("/repairClaimImg/{id:[0-9]+}")
+     * 查看维修点照片
+     */
+    public function repairClaimImgAction($id)
+    {
+        if (!$repairImage = RepairAuthImages::findFirst($id)) {
             return $this->error("找不到图片");
         }
         $path = $repairImage->getPath();

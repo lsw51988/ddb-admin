@@ -29,6 +29,8 @@ namespace PHPSTORM_META {
             'queue/manager' instanceof \Ddb\Service\Queue\Manager,
             'refresh/manager' instanceof \Ddb\Service\Refresh\Manager,
             'repair/query' instanceof \Ddb\Service\Repair\Query,
+            'repairClaim/query' instanceof \Ddb\Service\RepairClaim\Query,
+            'repairClaim/manager' instanceof \Ddb\Service\RepairClaim\Manager,
             'recommend/manager' instanceof \Ddb\Service\Recommend\Manager,
             'shb/query' instanceof \Ddb\Service\Shb\Query,
             'shb/manager' instanceof \Ddb\Service\Shb\Manager,

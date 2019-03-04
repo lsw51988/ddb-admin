@@ -32,6 +32,7 @@ class CreateRepairClaimsTable extends AbstractMigration
     {
         $this->table('repair_claims')
             ->addColumn("name", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "用户姓名"])
+            ->addColumn("mobile", "string", ["limit" => MysqlAdapter::INT_TINY, "null" => false, "comment" => "用户手机"])
             ->addColumn("member_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "用户id"])
             ->addColumn("repair_id", "integer", ["limit" => MysqlAdapter::INT_REGULAR, "null" => false, "comment" => "维修点id"])
             ->addColumn("status", "integer", ["limit" => MysqlAdapter::INT_TINY, "default" => 1, "comment" => "状态 1创建 2同意 3拒绝"])
