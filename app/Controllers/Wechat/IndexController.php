@@ -142,6 +142,9 @@ class IndexController extends BaseController
         $_vc->doimg();
         app_log('ddb')->info($key);
         app_log('ddb')->info($_vc->getCode());
+        if (di("cache")->get($key)) {
+            di("cache")->delete($key);
+        }
         di("cache")->save($key, $_vc->getCode(), 300);
     }
 
