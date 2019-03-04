@@ -16,6 +16,7 @@ use Ddb\Models\RepairImages;
 use Ddb\Modules\Member;
 use Ddb\Modules\MemberPoint;
 use Ddb\Modules\Repair;
+use Ddb\Modules\RepairClaim;
 use Phalcon\Exception;
 
 /**
@@ -84,24 +85,17 @@ class RepairsController extends WechatAuthController
     {
         $data = $this->data;
         $mobile = $data['mobile'];
-        $member = $this->currentMember;
         if (!service("sms/manager")->verify($mobile, $data['sms_code'])) {
             return $this->error("短信验证码不正确,请重新获取");
         }
         if ($repair = Repair::findFirst($data['repair_id'])) {
-
-            if($repair->getMobile()){
-                if ($mobile != $repair->getMobile()) {
-                    return $this->error("您的手机号与系统所留的手机号码不一致,请检查");
-                }
-            }
-
-            $repair->setBelongerId($member->getId())
-                ->setStatus(Repair::STATUS_CLAIM)
-                ->setLongitude($data['longitude'])
-                ->setLatitude($data['latitude']);
-            if ($repair->save()) {
-                return $this->success();
+            $repairClaimModel = new RepairClaim();
+            $repairClaimData = [
+                'member_id' => $this->currentMember->getId(),
+                'repair_id' => $data['repair_id']
+            ];
+            if ($repairClaimModel->save($repairClaimData)) {
+                return $this->success('');
             } else {
                 return $this->error();
             }
