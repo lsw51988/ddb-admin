@@ -196,7 +196,7 @@ class RepairsController extends WechatAuthController
         $data = $this->data;
         $longitude = $data['longitude'];
         $latitude = $data['latitude'];
-        $nearMts = service("repair/query")->getNearMtsByRadius($longitude, $latitude);
+        $nearMts = service("repair/query")->getNearMtsByRadius($longitude, $latitude, 100);
         return $this->success($nearMts);
     }
 

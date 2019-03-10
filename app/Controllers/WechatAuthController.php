@@ -15,7 +15,7 @@ use Ddb\Modules\Member;
 class WechatAuthController extends BaseController
 {
     protected $token = "";
-    protected $currentMember = "";
+    protected $currentMember;
 
     public function onConstruct()
     {
