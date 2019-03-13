@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/viewer/viewer.css"/>
     <link rel="stylesheet" href="/viewer/viewer.min.css"/>
     <link rel="stylesheet" href="/css/base.css"/>
-    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
     <script src="/layui/layui.js"></script>
     <script src="/viewer/viewer.js"></script>
     <script src="/viewer/viewer.min.js"></script>
