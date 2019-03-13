@@ -81,7 +81,7 @@ class MemberController extends WechatAuthController
             ->setPrice($data['price'])
             ->setStatus($data['status']);
         if (ok($data, 'last_change_time')) {
-            $memberBike->setLastChangeTime($data['last_change_time'].' 00:00:00');
+            $memberBike->setLastChangeTime($data['last_change_time'] . ' 00:00:00');
         }
         if (!$memberBike->save()) {
             $this->db->rollback();
@@ -409,5 +409,19 @@ class MemberController extends WechatAuthController
     {
         $data = service("member/query")->getMessages($this->currentMember, $this->data);
         return $this->success($data);
+    }
+
+    /**
+     * 用户在添加维修点之前检查附近是否有维修点，如果有则打开认领页面，否则直接进入添加页面
+     * @Post("/checkNearMts")
+     */
+    public function checkNearMtsAction()
+    {
+        $request = $this->data;
+        if (service('repair/query')->getNearMtsByRadius($request['longitude'], $request['latitude'], 100)) {
+            return $this->success();
+        } else {
+            return $this->error();
+        }
     }
 }
