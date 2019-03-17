@@ -22,6 +22,9 @@ class AdminAuthController extends ViewBaseController
             return $this->response->redirect('/admin/login');
         } else {
             $this->currentUser = service("user/query")->getCurrentUser();
+            //添加左侧边栏的统计信息
+            $overviewData = service("user/query")->getAdminStatistic();
+            $this->view->setVar('overviewData', $overviewData);
         }
     }
 }
