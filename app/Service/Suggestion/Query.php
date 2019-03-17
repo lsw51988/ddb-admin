@@ -32,7 +32,7 @@ class Query extends BaseService
             'limit' => $search['limit'],
             'page' => $search['page']
         ]);
-        $data = $paginator->paginate();
+        $data = $paginator->getPaginate();
         return $data;
     }
 }

@@ -32,7 +32,7 @@
             <div class="layui-row layui-form-item">
                 <div class="layui-col-md12">
                     <label class="layui-form-label">区域</label>
-                    <div class="layui-col-md2" style="margin-right: 10px;">
+                    <div class="layui-col-md2" style="margin-left: 30px;">
                         <select lay-filter="province" name="province" class="province" value="{{ search['province'] }}">
                         </select>
                     </div>
