@@ -83,6 +83,7 @@ class IndexController extends BaseController
             "nickName" => $member->getNickName(),
             "auth_time" => $member->getAuthTime(),
             "mobile" => $member->getMobile(),
+            "status" => $member->getStatus(),
             "id" => $member->getId(),
             "union_flag" => $unionFlag,
             "repair_flag" => $repairFlag,
@@ -205,6 +206,7 @@ class IndexController extends BaseController
             $rData['id'] = $data['id'];
             $rData['mobile'] = $member->getMobile();
             $rData['nickName'] = $member->getNickName();
+            $rData['status'] = $member->getStatus();
             $rData['token'] = $member->getToken();
             $rData['union_flag'] = $unionFlag;
             $rData['location'] = [$memberLocation->getProvince(), $memberLocation->getCity(), $memberLocation->getDistrict()];

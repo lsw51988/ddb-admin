@@ -287,6 +287,7 @@ class MemberController extends WechatAuthController
                     $member->setUnionId($sData->unionId)
                         ->setAvatarUrl($data['avatarUrl'])
                         ->setNickName($data['nickName'])
+                        ->setStatus(Member::STATUS_TO_AUTH)
                         ->setGender($data['gender']);
                     if (!$member->save()) {
                         return $this->error("保存用户信息错误");
