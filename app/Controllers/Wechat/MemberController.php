@@ -419,7 +419,9 @@ class MemberController extends WechatAuthController
     public function checkNearMtsAction()
     {
         $request = $this->data;
-        if (service('repair/query')->getNearMtsByRadius($request['longitude'], $request['latitude'], 100)) {
+        $scale = isset($data['scale']) ? 18 : $data['scale'];
+        $radius = service('repair/query')->getRadiusByScale($scale);
+        if (service('repair/query')->getNearMtsByRadius($request['longitude'], $request['latitude'], $radius)) {
             return $this->success();
         } else {
             return $this->error();
