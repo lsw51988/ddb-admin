@@ -20,4 +20,17 @@ class IndexController extends ViewBaseController
     {
 
     }
+
+    /**
+     * @Get("/business_license_img")
+     * 营业执照
+     */
+    public function businessLicenseImgAction()
+    {
+        ob_clean();
+        header("Content-type:image/jpeg");
+        $this->response->setContentType('image/jpeg');
+        $this->response->setContent(file_get_contents(APP_PATH."/../public/img/qr_code.jpg"));
+        return $this->response;
+    }
 }

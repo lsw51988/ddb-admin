@@ -1,5 +1,5 @@
 {% extends '/layouts/base.volt' %}
-{% block title %}电动帮首页{% endblock %}
+{% block title %}电动帮{% endblock %}
 {% block content %}
 
 {% endblock %}

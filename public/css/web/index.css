@@ -4,8 +4,13 @@
     background: #393D49;
     color: white;
 }
-.index-footer .about{
+.index-footer .web-about{
     height:40px;
     line-height:40px;
     left:-15px ;
+}
+.ddc-gw{
+    cursor: pointer;
+    color:white;
+    margin-right:10px;
 }
