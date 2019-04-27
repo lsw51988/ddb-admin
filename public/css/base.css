@@ -1,3 +1,15 @@
-.pd-20{
-    padding:20px;
+.pd-20 {
+    padding: 20px;
+}
+
+.pdb-20 {
+    padding-bottom: 20px;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.inline-block {
+    display: inline-block;;
 }

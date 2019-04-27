@@ -37,7 +37,7 @@
         <li class="layui-nav-item operation"><a href="#">登录</a></li>
     </ul>
 </div>
-<div class="layui-container layui-bg-green">
+<div class="layui-container">
     {% block content %}{% endblock %}
 </div>
 
