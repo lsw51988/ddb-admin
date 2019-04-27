@@ -58,6 +58,7 @@ class Query extends Service
         $builder = $this->modelsManager->createBuilder()
             ->from(["R" => Repair::class])
             ->leftJoin(Areas::class, "A.district_code = R.district", "A")
+            ->orderBy("R.id DESC")
             ->columns($columns);
         if (ok($request, 'status') && $request['status'] != 99) {
             $builder->andWhere("R.status=" . $request['status']);

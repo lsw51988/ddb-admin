@@ -118,6 +118,7 @@ class Query extends BaseService
         $builder = $this->modelsManager->createBuilder()
             ->from(["M" => Member::class])
             ->leftJoin(Areas::class, "A.district_code = M.district", "A")
+            ->orderBy("M.id DESC")
             ->columns($columns);
         if (!empty($request['status']) && $request['status'] != 99) {
             $builder->andWhere("M.status=" . $request['status']);
