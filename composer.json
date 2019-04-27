@@ -12,41 +12,27 @@
   ],
   "require": {
     "php": "^7.0.0",
-    "ext-phalcon": "~3.0",
-    "robmorgan/phinx": "~0.5.3",
-    "league/fractal": "0.12.0",
-    "league/flysystem": "1.0.9",
-    "league/flysystem-cached-adapter": "1.0.2",
-    "league/flysystem-replicate-adapter": "1.0.0",
-    "ellipsesynergie/api-response": "0.10.0",
-    "swiftmailer/swiftmailer": "5.4.1",
-    "gregwar/captcha": "1.1",
-    "guzzlehttp/guzzle": "6.0.2",
-    "phalcon/devtools": "dev-master"
+    "league/flysystem": "^1.0.44",
+    "guzzlehttp/guzzle": "^6.3.2",
+    "robmorgan/phinx": "^0.9.2",
+    "pda/pheanstalk": "3.1.0",
+    "aliyuncs/oss-sdk-php": "~2.0",
+    "intervention/image":"2.4.1"
   },
   "require-dev": {
-    "robmorgan/phinx": "~0.5.3",
-    "mockery/mockery": "0.9.*",
-    "phpunit/phpunit": "~4.0",
-    "phpspec/phpspec": "~2.1"
+    "phalcon/ide-stubs": "*",
+    "phpspec/phpspec": "~3.4",
+    "phpunit/phpunit": "^5.7",
+    "league/fractal": "0.16.0",
+    "ellipsesynergie/api-response": "0.14.0"
   },
   "autoload": {
-    "psr-4": {
-      "Ddb\\": "app/"
-    },
     "files": [
-      "app/Core/helpers.php",
-      "app/Modules/Helpers/helpers.php"
-    ]
-  },
-  "repositories": {
-    "packagist": {
-      "type": "composer",
-      "url": "https://packagist.phpcomposer.com"
+      "app/Core/Core.php"
+    ],
+    "psr-4": {
+      "Ddb\\": "app/",
+      "Aliyun\\": "app/Core/AliSms/lib/"
     }
-  },
-  "config": {
-    "preferred-install": "dist"
   }
-
 }

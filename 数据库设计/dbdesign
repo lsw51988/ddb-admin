@@ -1,0 +1,417 @@
+表的一切设计是为了提高用户体验
+    1.减少求助者求助等待时间
+    2.增加修理店老板的收入
+    3.需要平衡1,2两点
+
+
+1.用户信息表 如果用户微信未曾填写相关地址信息需要根据经纬度逆向解析出用户地址，用户为授权地址信息则无法注册 http://lbs.qq.com/webservice_v1/guide-gcoder.html
+members
+    id
+    avatarUrl 微信头像 not null
+    province 所在省  not null
+    city 所在城市 not null
+    district 所在区 not null
+    country 国家 not null
+    language 语言 not null
+    gender 性别 not null 1男 0女
+    nickName 微信昵称 not null
+    realName 真实姓名 Null
+    mobile 手机号码 null
+    points 可用积分 default 0
+    type 类型 骑行者0 修理者1 default 0
+    auth_time 认证时间 null
+    token_time token有效时间 null
+    scene_code 场景值 null 微信小程序进入的场景值
+    open_id 用户openid 识别用户 not null
+    timestamp
+
+2.后台用户表
+users
+    id
+    name 姓名 not null
+    password 密码 not null
+    role_id 角色id not null 对应roles
+    mobile 手机 not null
+    status 状态 0不可用 1可用
+    email 邮箱 not null
+    creator_id 创建者 对应user not null
+    updater_id 更新者 对应user null
+    department_id 部门id not null
+    timestamp
+
+3.角色表
+roles
+    id
+    parent_id 父亲节点 default 0
+    name 角色名称 not null
+    desc 角色描述 not null
+    status 状态 0禁用 1启用
+    creator_id 创建者 对应user not null
+    updater_id 更新者 对应user null
+    timestamp
+
+4.权限表
+accesses
+    id
+    parent_id 父亲节点 not null default 0
+    access_id 权限id not null
+    model_id 模块id not null 代码注释标注
+
+5.角色权限表
+role_accesses
+    id
+    role_id 角色id 对应roles表
+    access_id 权限id 对应access表
+
+6.用户角色表
+user_roles
+    id
+    user_id
+    role_id
+    creator_id 创建者 对应user not null
+    updater_id 更新者 对应user null
+    timestamp
+
+
+=================================分割线=================================
+=================================分割线=================================
+
+
+7.用户积分表
+member_points
+    id
+    member_id
+    type 类型，描述用户如何获得积分
+            增加方式：   1注册 2每日打开第一次 3用户完善信息 4增加维修点 5第一次探索新的页面 6提出建议（最多10次） 7提出建议被采纳 8推荐奖励（最多20次） 9推荐成功 10评分 11完成应答 12提交回访单 13充值
+            减少方式：   -1 商城 -2保险 -3发布二手车信息  -4取消帮助 -5拖车帮助求助人=》应助人
+    value 数值 not null
+            类别分数：   1注册5分 2每日打开1分 3用户完善5分 4添加维修点10分 5第一次探索1分 6提出建议1分 7被采纳5分 8推荐1分 9推荐成功5分 10评分2分 11完成应答2分 12提交回访单2分
+                       -1商城待定 -2保险待定 -3发布二手车信息1分一毛钱 4取消帮助将会扣除积分 -5拖车帮助积分用户自定义
+    second_bike_id 当用于二手车发布的时候抵消现金会用到 对应second_bikes
+    appeal_id 当用于请求拖车帮助的时候会用到 对应appeals
+    timestamp
+
+8.用户电动车求助表 求助者可以取消 持续时间为30分钟
+appeals
+    id
+    ask_id 求助人id 对应member not null
+    awr_id 当前帮助人id 对应member null
+    type 故障类型 not null
+    des 故障描述 not null
+    mobile 手机号 not null
+    longitude 经度 not null
+    latitude 纬度 not null
+    points 积分 default 0
+    updates 更新次数 default 0
+    update_des 更新描述 null
+    status 状态  1请求帮助 2求助人自助取消 3时间到期系统取消
+                4帮助人应答 5帮助完成
+    awr_time 首次应答时间 null
+    awr_cancel_time 应答取消时间 null
+    awr_fin_time 应答完成时间 null
+    timestamp
+
+9.求助应答表 取消应答在下一次的抢单过程中优先级会被降低
+appeal_answers
+    id
+    appeal_id not null 对应appeals表
+    awr_id 应答人id 对应member not null
+    type 类型 1来自用户查看附近维修点 2.用户主动请求拖车帮助 not null
+    status 1开始帮助 2帮助完成 3取消帮助 default 1
+    cancel_reason 取消原因 null
+    cancel_time 取消时间 null
+    create_time 创建时间 default now
+    finish_time 完成时间 null
+
+10.维修回访单
+appeal_callbacks
+    id
+    appeal_id not null 对应appeals表
+    wait_time 等待时长 not null
+    fix_time 维修时长 not null
+    price 维修价格 not null
+    score 满意程度 1不满意 2基本满意 3满意 4非常满意 not null
+    content 其他想说的 null
+    timestamp
+
+11.修理店资料
+repairs
+    id
+    name 名称 not null
+    longitude 经度 not null
+    latitude 纬度 not null
+    mobile 电话 not null
+    phone 手机 null
+    creator_id 创建人 not null 对应member
+    creator_type 创建人类型 not null 1=>member 2=>user
+    belonger_id 归属者 null 对应member null
+    auditor_id 后台审核者 null 对应user null
+    status 状态 1被创建 2后台审核通过 3后台审核拒绝 default 1
+    path 修理店图片存储路径 not null
+    refuse_reason 拒绝原因 null
+    timestamp
+
+12修理店评价表
+repair_appraises
+    id
+    repair_id 对应repairs
+    score not null 1不满意 2基本满意 3满意 4非常满意
+    content 描述 null
+    member_id 评价人id not null
+    timestamp
+
+
+13.用户电动车
+member_bikes
+    id
+    member_id
+    buy_date 购买时间 not null
+    voltage 电压 not null
+    brand_id 品牌 对应brand表 not null
+    price 价格 not null
+    status 购买时的状态 not null 1新的 2二手的 default 1
+    last_change_time 最近一次更换电池时间 null
+    number 牌照 null
+    timestamp
+
+14.电动车照片
+member_bike_images
+    id
+    member_bike_id not null
+    path 存储路径 not null
+    creator_id 上传人 not null 对应member
+    timestamp
+
+15.建议
+suggestions
+    id
+    member_id
+    content 具体描述 not null
+    type 类别 not null
+    user_id 审核人 null
+    refuse_reason 拒绝原因 null
+    reply 采纳情况下做出的回复 null
+    status 状态 1提交 2否决 3采纳
+    audit_time 审核时间 null
+    timestamp
+
+16.评分
+scores
+    id
+    member_id
+    score 评分 1不满意 2基本满意 3满意 4非常满意 not null
+    content 附加内容 null
+    timestamp
+
+17.消息表
+messages
+    id
+    title 标题 not null
+    title_image 标题图片 not null
+    content 具体内容
+    timestamp
+18.已读消息表
+message_reads
+    id
+    message_id
+    member_id
+    timestamp
+
+=================================分割线=================================
+=================================分割线=================================
+
+
+19.二手车 默认发布的有效期是4天，可以延期一次时间为3天
+second_bikes
+    id
+    member_id
+    buy_time 购买时间 not null
+    voltage 电压 not null
+    brand_id 品牌对应brand表 not null
+    in_price 新车价格 not null
+    in_status 新车价格 not null 1新的 2二手的 default 1
+    out_price 卖出价格 not null
+    deal_price 成交价格 null
+    province 所在省  not null
+    city 所在城市 not null
+    district 所在区 not null
+    card_num 车牌号 not null 无车牌的电动车不允许交易
+    extended 是否延期过一次 0否 1是 default 0
+    status 状态 1提交 2审核通过 3审核拒绝 4成功交易 5过期4天 6过期7天 7状态异常
+    deal_time 成交时间 null
+    timestamp
+
+20.二手车照片
+second_bike_images
+    id
+    second_bike_id not null
+    path 存储路径 not null
+    creator_id 上传人 not null 对应member
+    timestamp
+
+21.二手车浏览记录
+second_bike_browses
+    id
+    second_bike_id not null
+    member_id 浏览人id
+    call_time 打电话时间 null
+    timestamp
+
+
+=================================分割线=================================
+=================================分割线=================================
+数据分析用到
+
+22.用户第一次进入新的页面的时间记录
+page_records
+    id
+    member_id
+    page_code 页面代码
+            请求帮助 help - 1
+                查看附近维修点 - 11
+                拖车帮助 - 12
+            增加维修点 add_mt - 2
+            用户完善资料 member_update - 3
+            用户详情页 member_detail - 4
+            建议 suggestion - 5
+            推荐 recommend - 6
+            二手车首页 second_bike_index - 7
+            二手车详情 second_bike_detail - 8
+            二手车出售发布 second_bike_create - 9
+            二手车列表 second_bike_list - 10
+            二手车出售首页 second_bike_sell_index - 11
+            我的商城 my_shop - 12
+            关于电动帮 about - 13
+            帮公益 commonweal -14
+            评分 score - 15
+            商业合作 business - 16
+            用户须知 inform - 17
+    create_time
+
+23.用户每次进入时间(也可以分析每天的首次进入时间)
+member_ins
+    id
+    member_id
+    create_time
+
+24.品牌表
+brands
+    id
+    parent_id 父亲节点 not null default 0
+    name 名称 not null
+    desc 角色描述 not null
+    status 状态 0禁用 1启用
+    creator_id 创建者 对应user not null
+    updater_id 更新者 对应user null
+    timestamp
+
+
+
+=================================分割线=================================
+=================================分割线=================================
+电动车商城
+销售策略：
+以门店为基础进行销售，目前最主要的购买方式直接去门店进行购买，这样做的好处是有利于后期的维修。增加门店的利润。减少用户购买的成本。
+在电动帮买的电动车必须是比门店的价格要低的。
+门店利润分成：
+    售价的5%
+默认只显示所在区域的门店的电动车销售
+
+app端只卖电动车
+
+网页端会有更多的销售配件之类的.
+
+23.商品表
+goods
+    id
+    no 编号 not null
+    name 名称 not null
+    brand_id 品牌id not null
+    repair_id 店铺id not null
+    price 价格 not null
+    sell_count 卖出数量 default 0
+    des 商品描述 not null
+    good_status 状态 1在售 2缺货 3下架
+    timestamp
+
+24.商品图片表
+good_images
+    id
+    good_id not null
+    path 存储路径 not null
+    creator_id 上传人 not null 对应member
+    timestamp
+
+25.商品评价表
+good_appraises
+    id
+    good_id
+    order_id 订单表号 not null
+    repair_id 店铺id not null
+    member_id 用户id not null
+    goodsScore 商品评分 not null 1不满意 2基本满意 3满意 4非常满意
+    serviceScore 服务评分 not null 1不满意 2基本满意 3满意 4非常满意
+    timeScore 时效评分 not null 1不满意 2基本满意 3满意 4非常满意
+    content 内容 null
+    isShow 是否显示 0隐藏 1显示
+
+26.商品评价图片表
+good_appraise_images
+    id
+    good_appraise_id
+    path 存储路径 not null
+    member_id 上传人 not null 对应member
+    timestamp
+
+27.订单表
+orders
+    id
+    no 编号 not null
+    province 省 not null
+    city 市 not null
+    district 区 not null
+    repair_id 店铺id not null
+    pay_type 付款方式 1.到店支付 2.微信支付 3.支付宝支付 4.网银支付 not null
+    score 获得积分 default 0
+    member_id 用户id
+    member_phone 用户电话
+    memo 备注 null
+    order_src 订单来源 1.微信小程序 2.ios 3.android 4.电脑端
+    order_type 订单类型 1.普通订单 2.团购 3.抢购订单
+    commission 平台佣金 not null
+    use_score 使用积分 null
+    score_money 积分兑换的钱 null
+    deliverMoney 运费 default 0
+    deliveryTime 发货时间 null
+    getTime 收货时间 null
+    member_address_id 收货地址
+    need_invoice 需要发票 0不需要 1需要 default 0
+    invoice_title 发票抬头 null
+    return_reason 退回原因 null
+    status 状态             1创建订单        2商家读取订单消息   3商家已处理等待发货 4揽件配送中  5送达用户  6用户签收
+                用户取消订单701              702                 703                 704          705        706
+
+28.地址表
+member_addresses
+    id
+    name 收货人名称 not null
+    mobile 电话 not null
+    province 省 not null
+    city 市 not null
+    district 区 not null
+    detail 具体地址 not null
+    post_code 邮编 not null
+    is_default 是否是默认 0不是 1默认 default 0
+    member_id
+    timestamp
+
+
+
+
+
+
+
+
+
+
+

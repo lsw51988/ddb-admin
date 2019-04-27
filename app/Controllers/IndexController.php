@@ -1,26 +1,27 @@
 <?php
+
 namespace Ddb\Controllers;
 
-use Phalcon\Mvc\Controller;
+use Ddb\Core\BaseController;
+use Ddb\Models\MemberBikeImages;
+use Ddb\Modules\Member;
+use Ddb\Modules\MemberMessage;
 
-class IndexController extends Controller
+class IndexController extends BaseController
 {
     /**
      * @Route("/")
      */
     public function indexAction()
     {
-
-        echo "ddb";
+        echo "欢迎来到电动帮";
     }
 
     /**
-     * @Route("/ddb")
+     * @Route("/test")
      */
-    public function ddbAction()
-    {
+    public function testAction(){
 
-        echo "ddb-test";
     }
 
     public function route404Action()

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Xueron
- * Date: 2015/7/30
- * Time: 11:56
- */
 
 namespace Ddb\Core\Mvc\View\Engine\Volt\Extension;
 

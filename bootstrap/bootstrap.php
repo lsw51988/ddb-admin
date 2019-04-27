@@ -1,33 +1,69 @@
 <?php
+define("APP_PATH", __DIR__ . "/../app");
+define("APP_ENV", getenv("APP_ENV") == false ? "local" : getenv("APP_ENV"));
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// global configurations
-di()->setShared(
+$di = new Phalcon\Di\FactoryDefault();
+
+$di->setShared(
+    "cache",
+    function () {
+        $frontCache = new Phalcon\Cache\Frontend\Data(
+        //缓存时间一般为2周
+            [
+                'lifetime' => '1209600'
+            ]
+        );
+        if (PHP_SAPI == "cli" || APP_ENV == "local" || APP_ENV == "qa") {
+            //本地或cli环境下用本地文件存储 文件缓存时间会存在问题
+            $cache = new Phalcon\Cache\Backend\File(
+                $frontCache,
+                [
+                    "cacheDir" => __DIR__ . "/../storage/cache/",
+                ]
+            );
+        } else {
+            //redis缓存
+            $cache = new \Phalcon\Cache\Backend\Redis(
+                $frontCache,
+                [
+                    'host' => "localhost",
+                    'port' => 6379,
+                    "persistent" => false,
+                    'lifetime' => '2000'
+                ]
+            );
+        }
+        return $cache;
+    }
+);
+
+
+$di->setShared(
     "config",
     function () {
-        $cachedConfigFile = __DIR__ . '/app/cache/config.php';
-        if (!$config = readCache($cachedConfigFile)) {
-            $configDir = __DIR__ . '/../app/config';
+        if (di("cache")->get("config")) {
+            $config = unserialize(di("cache")->get("config"));
+        } else {
+            $configDir = APP_PATH . "/Config";
             $configFiles = glob($configDir . '/*.php');
             $config = [];
-            foreach ($configFiles as $configFile) {
-                $name = substr(basename($configFile), 0, -4);
-                $config[strtolower($name)] = require $configFile;
+            if (di("cache")->get("config") == null) {
+                foreach ($configFiles as $configFile) {
+                    $name = substr(basename($configFile), 0, -4);
+                    $configData = require $configFile;
+                    $config[strtolower($name)] = $configData[APP_ENV];
+                }
+                di("cache")->save("config", serialize($config));
             }
-
-            // 生产环境重建缓存
-//            if (app_env() == 'production') {
-//                writeCache($cachedConfigFile, $config);
-//            }
         }
-
         return new \Phalcon\Config($config);
     }
 );
 
 // modelsManager
-di()->setShared(
+$di->setShared(
     'modelsManager',
     function () {
         $modelsManager = new \Phalcon\Mvc\Model\Manager();
@@ -37,7 +73,7 @@ di()->setShared(
 );
 
 // transactionManager
-di()->setShared(
+$di->setShared(
     'transactionManager',
     function () {
         $transactionManager = new \Ddb\Core\Mvc\Model\Transaction\Manager();
@@ -46,91 +82,41 @@ di()->setShared(
 );
 
 // router
-di()->setShared(
+$di->setShared(
     "router",
     function () {
-        if (app_name() == 'cmd') {
-            $router = new \Phalcon\Cli\Router();
-            return $router;
-        } else {
-            $router = new \Phalcon\Mvc\Router\Annotations(false);
-            $router->setEventsManager(di('eventsManager'));
-            $router->setDefaultNamespace('\\Ddb\\Controllers');
-            $router->setDefaultController('index');
-            $router->setDefaultAction('index');
-            $router->notFound(array(
-                "controller" => "index",
-                "action" => "route404"
-            ));
-            return $router;
-        }
-    }
-);
-
-// output
-di()->setShared(
-    'output',
-    function () {
-        return new \Ddb\Core\Console\Output\ConsoleOutput();
+        $router = new \Phalcon\Mvc\Router\Annotations(false);
+        $router->setEventsManager(di('eventsManager'));
+        $router->setDefaultNamespace('\\Ddb\\Controllers');
+        $router->setDefaultController('index');
+        $router->setDefaultAction('index');
+        $router->notFound(array(
+            "controller" => "index",
+            "action" => "route404"
+        ));
+        return $router;
     }
 );
 
 // dispatcher
-di()->setShared(
+$di->setShared(
     "dispatcher",
     function () {
-        if (app_name() == 'cmd') {
-            $dispatcher = new \Phalcon\Cli\Dispatcher();
-            $dispatcher->setEventsManager(di('eventsManager'));
-            $dispatcher->setDefaultNamespace("\\Ddb\\Tasks");
-            $dispatcher->setDefaultTask("main");
-            $dispatcher->setDefaultAction("main");
-            return $dispatcher;
-        } else {
-            $dispatcher = new \Phalcon\Mvc\Dispatcher();
-            $dispatcher->setEventsManager(di('eventsManager'));
-            $dispatcher->setDefaultNamespace('\\Ddb\\Controllers');
-            $dispatcher->setDefaultController('index');
-            $dispatcher->setDefaultAction('index');
-            return $dispatcher;
-        }
-    }
-);
-
-// modelsMetaData
-di()->setShared(
-    'modelsMetadata',
-    function () {
-        if (di('config')->app->debug) {
-            return new \Phalcon\Mvc\Model\MetaData\Memory();
-        }
-        // 当前默认使用文件缓存，另外还可以支持redis、session、apc等，后期根据性能需要调整即可
-        return new \Phalcon\Mvc\Model\MetaData\Files(di('config')->database->modelsMetaData->toArray());
-    }
-);
-
-// modelsCache
-di()->setShared(
-    'modelsCache',
-    function () {
-        if (di('config')->app->debug) {
-            $frontCache = new \Phalcon\Cache\Frontend\None();
-            return new \Phalcon\Cache\Backend\Memory($frontCache);
-        } else {
-            //Cache data for one day by default
-            $frontCache = new \Phalcon\Cache\Frontend\Data(["lifetime" => 86400 * 30]);
-            return new \Phalcon\Cache\Backend\File($frontCache, di('config')->database->models->toArray());
-        }
+        $dispatcher = new \Phalcon\Mvc\Dispatcher();
+        $dispatcher->setEventsManager(di('eventsManager'));
+        $dispatcher->setDefaultNamespace('\\Ddb\\Controllers');
+        $dispatcher->setDefaultController('index');
+        $dispatcher->setDefaultAction('index');
+        return $dispatcher;
     }
 );
 
 // view
-di()->setShared(
+$di->setShared(
     "view",
     function () {
         $config = di('config');
         $view = new \Phalcon\Mvc\View();
-        $view->setEventsManager(di('eventsManager'));
         $viewDir = $config->view->path . DIRECTORY_SEPARATOR;
         if (!file_exists($viewDir) || !is_dir($viewDir)) {
             $viewDir = $config->view->path;
@@ -148,7 +134,7 @@ di()->setShared(
 );
 
 // viewCache should not be shared service
-di()->set(
+$di->set(
     'viewCache',
     function () {
         // Cache data for one day by default
@@ -166,11 +152,10 @@ di()->set(
 );
 
 // volt engine
-di()->setShared(
+$di->setShared(
     'volt',
     function () {
         $volt = new \Phalcon\Mvc\View\Engine\Volt(di('view'), di());
-        $volt->setEventsManager(di('eventsManager'));
         $options = di('config')->view->volt->toArray();
         if (di('config')->app->debug) {
             $options["compileAlways"] = true;
@@ -186,19 +171,18 @@ di()->setShared(
 );
 
 // crypt
-di()->setShared(
+$di->setShared(
     'crypt',
     function () {
         $crypt = new \Phalcon\Crypt();
-
-        //设置加密密钥
-        $crypt->setKey(di('config')->app->cryptKey)->setCipher('rijndael-128')->setMode('ofb');
+        //设置加密密钥默认使用AES-256-CFB算法
+        $crypt->setKey(di('config')->app->cryptKey);
         return $crypt;
     }
 );
 
 // 加密工具的设置
-di()->setShared(
+$di->setShared(
     "security",
     function () {
         $security = new \Phalcon\Security();
@@ -208,7 +192,7 @@ di()->setShared(
 );
 
 // session, 默认使用redis来共享存储
-di()->setShared(
+$di->setShared(
     'session',
     function () {
         if (!empty(di('config')->session->cookie_params)) {
@@ -222,13 +206,11 @@ di()->setShared(
             );
         }
 
-        // Only use redis in production & testing
-        $appEnv = app_env();
-//        if ($appEnv == 'production' || $appEnv == 'testing') {
-            // $session = new \Phalcon\Session\Adapter\Redis(di('config')->session->options->toArray());
-//        } else {
-            $session = new \Phalcon\Session\Adapter\Files(di('config')->session->options->toArray());
-//        }
+        //if (APP_ENV == 'production') {
+        $session = new \Phalcon\Session\Adapter\Redis(di('config')->session->options->toArray());
+        /*        } else {
+                $session = new \Phalcon\Session\Adapter\Files();
+                }*/
 
         if (!empty(di('config')->session->session_name)) {
             $session->setName(di('config')->session->session_name);
@@ -243,18 +225,21 @@ di()->setShared(
 );
 
 // filesystem
-di()->setShared(
+$di->setShared(
     'filesystem',
     function () {
-        $appEnv = app_env();
-        if ($appEnv == 'development') {
-            return new \League\Flysystem\Adapter\Local(di('config')->filesystem->development->root);
-        }
+        /*if (getenv("APP_ENV") == 'local') {
+            return new \League\Flysystem\Adapter\Local(di('config')->filesystem->root);
+        }else{*/
+            $ossClient = new \OSS\OssClient(di('config')->filesystem->AccessKeyId, di('config')->filesystem->AccessKeySecret, di('config')->filesystem->Endpoint, false);
+            $aliOss = new \Ddb\Core\FS\Adapters\AliOSS(di('config')->filesystem->Bucket,$ossClient);
+            return $aliOss;
+        //}
     }
 );
 
 // httpClient
-di()->setShared(
+$di->setShared(
     'httpClient',
     function () {
         $client = new \GuzzleHttp\Client();
@@ -263,7 +248,7 @@ di()->setShared(
 );
 
 // apiResponse
-di()->setShared(
+$di->setShared(
     "apiResponse",
     function () {
         $manager = new \League\Fractal\Manager();
@@ -275,145 +260,66 @@ di()->setShared(
 );
 
 // random
-di()->setShared(
+$di->setShared(
     'random',
     function () {
         // require phalcon > 2.0.7
         return new \Phalcon\Security\Random();
     }
 );
-
-// transformerManager
-di()->setShared(
-    'transformerManager',
+$di->setShared(
+    'queue',
     function () {
-        $manager = new \League\Fractal\Manager();
-        $manager->setSerializer(new \League\Fractal\Serializer\JsonApiSerializer());
-        return $manager;
+        $config = di("config")->get("queue");
+        return new \Pheanstalk\Pheanstalk($config->host, $config->port);
     }
 );
 
-di()->setShared('profile', function (){
-    return new \Phalcon\Db\Profiler();
+$di->set('db', function () {
+    $em = new \Phalcon\Events\Manager();
+    $em->attach('db',
+        function($event, $connection)
+        {
+            if ($event->getType() == 'beforeQuery') {
+                app_log("db")->info($connection->getSQLStatement());
+            }
+        }
+    );
+
+    $db =  new Phalcon\Db\Adapter\Pdo\Mysql(array(
+        "host" => di("config")->database->host,
+        "username" => di("config")->database->username,
+        "password" => di("config")->database->password,
+        "dbname" => di("config")->database->dbname,
+        "charset" => di("config")->database->charset
+    ));
+    $db->setEventsManager($em);
+    return $db;
 });
 
-function InitDatabase()
+/*function InitDatabase()
 {
-    $appEnv = app_env();
 
-    // We only use mysql database here.
-    $connections = di('config')->database->$appEnv;
-    foreach ($connections as $connectionName => $connectionConfig) {
-        // 对于主链接，writeConnection，使用非shared的方式
-        $shared = false;
-        if ($connectionName != 'db') {
-            $shared = true;
+    $connection = new Phalcon\Db\Adapter\Pdo\Mysql(array(
+        "host" => di("config")->database->host,
+        "username" => di("config")->database->username,
+        "password" => di("config")->database->password,
+        "dbname" => di("config")->database->dbname,
+        "charset" => di("config")->database->charset
+    ));
+
+    $eventsManager = new \Phalcon\Events\Manager();
+
+    $eventsManager->attach(
+        "db:beforeQuery",
+        function (\Phalcon\Events\Event $event, $connection) {
+            $sql = $connection->getSQLStatement();
+            app_log("mysql")->info($sql);
         }
+    );
+    $connection->setEventsManager($eventsManager);
+}*/
 
-        // 创建日志服务
-        di()->setShared(
-            $connectionName . "Logger",
-            app_log($connectionName)
-        );
-
-        // 创建数据库服务
-        di()->set(
-            $connectionName,
-            function () use ($connectionName, $connectionConfig) {
-                $db = new \Phalcon\Db\Adapter\Pdo\Mysql($connectionConfig->toArray());
-
-                // 新创建单独的事件管理器, 注册监听器，用来调试sql
-                // TODO: 这里是用单独的事件管理器还是全局的呢?
-                //$eventsManager = new \Phalcon\Events\Manager();
-                $db->setEventsManager(di('eventsManager'));
-
-                if (di('config')->app->debug && app_env() != 'production') {
-                    di('eventsManager')->attach(
-                        'db',
-                        function ($event, $source) use ($db, $connectionName) {
-                            // 数据库的监控和日志单独处理，不与应用本身的放一起
-                            $logger = di($connectionName . "Logger");
-                            if ($source == $db) { // 只记录当前链接的事件
-                                $profile = di('profile');
-                                if ($event->getType() == 'beforeQuery') {
-                                    $profile->startProfile(
-                                        $source->getSQLStatement()
-                                    );
-
-                                    $sqlVariables = $source->getSQLVariables();
-                                    if (count($sqlVariables)) {
-                                        $keyArr = [];
-                                        $valArr = [];
-                                        foreach ($sqlVariables as $k => $v) {
-                                            if (':' == $k[0]) {
-                                                $keyArr[] = $k;
-                                            } else {
-                                                $keyArr[] = ':' . $k;
-                                            }
-                                            if ('string' == gettype($v)) {
-                                                $valArr[] = '\'' . $v . '\'';
-                                            } else {
-                                                $valArr[] = $v;
-                                            }
-                                        }
-
-                                        $query = $source->getSQLStatement();
-                                        for ($i = count($keyArr)-1; $i>=0; $i--){
-                                            $query = str_replace($keyArr[$i], $valArr[$i], $query);
-                                        }
-                                        $logger->log($query, \Phalcon\Logger::DEBUG);
-                                    } else {
-                                        $logger->log($source->getSQLStatement(), \Phalcon\Logger::DEBUG);
-                                    }
-                                }else if($event->getType() == 'afterQuery'){
-                                    $profile->stopProfile();
-                                    $profile = $profile->getLastProfile();
-                                    $totalSeconds = $profile->getTotalElapsedSeconds();
-                                    $slow_query_time = 1;
-                                    if($totalSeconds > $slow_query_time){
-                                        $logger->log('Run time is ' . $totalSeconds, \Phalcon\Logger::ERROR);
-                                    }
-                                }
-                            }
-                        }
-                    );
-                }
-
-                return $db;
-            },
-            $shared
-        );
-    }
-}
-
-function InitListener()
-{
-    $appName = app_name();
-    /** @var Phalcon\Config $listeners */
-    if ($listeners = di('config')->get('listener')) {
-        if (isset($listeners->global)) {
-            foreach ($listeners->global as $event => $listener) {
-                if (class_exists($listener)) {
-                    //di("appLogger")->info("attach $listener for $event");
-                    di('eventsManager')->attach($event, new $listener);
-                } else {
-                    di("logger")->warning("class $listener for $event not found");
-                }
-            }
-        }
-
-        if ($listeners->get(strtolower($appName))) {
-            foreach ($listeners->get(strtolower($appName)) as $event => $listener) {
-                if (class_exists($listener)) {
-                    //di("appLogger")->info("attach $listener for $event");
-                    di('eventsManager')->attach($event, new $listener);
-                } else {
-                    di("logger")->warning("class $listener for $event not found");
-                }
-            }
-        }
-    }
-}
 
 function InitRouters($appPath, $prefix)
 {
@@ -434,32 +340,6 @@ function InitRouters($appPath, $prefix)
     }
 }
 
-/**
- * 初始化应用的个性化配置
- */
-function InitApp()
-{
-    $loader = new \Phalcon\Loader();
-}
-
-/**
- * 关闭数据库连接, 给进程管理器使用
- */
-function ShutDatabase()
-{
-    $appEnv = app_env();
-
-    // For database, we only use mysql here.
-    $connections = di('config')->database->database->$appEnv;
-    foreach ($connections as $connectionName => $connectionConfig) {
-        if (di($connectionName)) {
-            di($connectionName)->close();
-        }
-    }
-}
-
 // Initialize and bootstrap application
-InitRouters(__DIR__ . "/../app/Controllers/", "Ddb\\Controllers\\");
-InitListener();
-InitDatabase();
-InitApp();
+InitRouters("../app/Controllers/", "Ddb\\Controllers\\");
+//InitDatabase();
